@@ -41,8 +41,8 @@ interface StoreState {
   isFavorite: (productId: string) => boolean
   cartTotal: number
   cartCount: number
-  currentView: "home" | "product" | "about" | "blog" | "category"
-  setCurrentView: (view: "home" | "product" | "about" | "blog" | "category") => void
+  currentView: "home" | "product" | "about" | "blog" | "category" | "checkout"
+  setCurrentView: (view: "home" | "product" | "about" | "blog" | "category" | "checkout") => void
   selectedProduct: Product | null
   setSelectedProduct: (product: Product | null) => void
   selectedCategory: string | null
