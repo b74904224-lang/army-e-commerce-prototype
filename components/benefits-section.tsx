@@ -2,31 +2,31 @@
 
 import { motion } from "framer-motion"
 import { useStore } from "@/lib/store-context"
-import { Shield, Truck, Award, Leaf } from "lucide-react"
+import { Shield, Droplets, Feather, Mountain } from "lucide-react"
 
 const translations = {
   ua: {
     benefits: [
-      { icon: Shield, title: "Військова якість", description: "Протестовано в реальних польових умовах" },
-      { icon: Truck, title: "Швидка доставка", description: "По всій Україні за 1-3 дні" },
-      { icon: Award, title: "Гарантія 2 роки", description: "На всю продукцію бренду" },
-      { icon: Leaf, title: "Екологічно", description: "Безпечні матеріали для людини та природи" }
+      { icon: Shield, title: "Надійні матеріали", description: "Термоізоляція, що захищає від холоду ґрунту" },
+      { icon: Droplets, title: "Вологостійкість", description: "Повністю не пропускає вологу" },
+      { icon: Feather, title: "Легкість і компактність", description: "Стійкість до проколів і зношування" },
+      { icon: Mountain, title: "Для будь-якої пригоди", description: "Універсальність використання" }
     ]
   },
   ru: {
     benefits: [
-      { icon: Shield, title: "Военное качество", description: "Протестировано в реальных полевых условиях" },
-      { icon: Truck, title: "Быстрая доставка", description: "По всей Украине за 1-3 дня" },
-      { icon: Award, title: "Гарантия 2 года", description: "На всю продукцию бренда" },
-      { icon: Leaf, title: "Экологично", description: "Безопасные материалы для человека и природы" }
+      { icon: Shield, title: "Надежные материалы", description: "Теплоизоляция, защищающая от холода почвы" },
+      { icon: Droplets, title: "Влагостойкость", description: "Полностью не пропускает влагу" },
+      { icon: Feather, title: "Легкость и компактность", description: "Стойкость к проколам и износу" },
+      { icon: Mountain, title: "Для любого приключения", description: "Универсальность использования" }
     ]
   },
   en: {
     benefits: [
-      { icon: Shield, title: "Military Quality", description: "Tested in real field conditions" },
-      { icon: Truck, title: "Fast Delivery", description: "Across Ukraine in 1-3 days" },
-      { icon: Award, title: "2 Year Warranty", description: "On all brand products" },
-      { icon: Leaf, title: "Eco-Friendly", description: "Safe materials for people and nature" }
+      { icon: Shield, title: "Reliable Materials", description: "Thermal insulation protecting from ground cold" },
+      { icon: Droplets, title: "Water Resistance", description: "Completely does not absorb moisture" },
+      { icon: Feather, title: "Light & Compact", description: "Resistant to punctures and wear" },
+      { icon: Mountain, title: "For Any Adventure", description: "Versatility of use" }
     ]
   }
 }

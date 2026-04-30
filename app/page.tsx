@@ -3,8 +3,11 @@
 import { StoreProvider, useStore } from "@/lib/store-context"
 import { Header } from "@/components/header"
 import { HeroSection } from "@/components/hero-section"
+import { ProductsGrid } from "@/components/products-grid"
+import { AboutPreview } from "@/components/about-preview"
 import { CategoryGrid } from "@/components/category-grid"
 import { BenefitsSection } from "@/components/benefits-section"
+import { AtmosphereSection } from "@/components/atmosphere-section"
 import { ProductPage } from "@/components/product-page"
 import { CategoryView } from "@/components/category-view"
 import { AboutPage } from "@/components/about-page"
@@ -31,8 +34,12 @@ function MainContent() {
           transition={{ duration: 0.3 }}
         >
           <HeroSection />
+          <ProductsGrid type="new" />
+          <AboutPreview />
           <CategoryGrid />
           <BenefitsSection />
+          <ProductsGrid type="popular" />
+          <AtmosphereSection />
         </motion.div>
       )}
 

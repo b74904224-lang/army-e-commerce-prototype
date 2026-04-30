@@ -13,14 +13,11 @@ const translations = {
     inFavorites: "В обраному",
     description: "Опис",
     specifications: "Характеристики",
-    density: "Щільність",
-    dimensions: "Розміри",
-    material: "Матеріал",
-    weight: "Вага",
     inStock: "В наявності",
     outOfStock: "Немає в наявності",
     back: "Назад",
-    new: "Новинка"
+    new: "Новинка",
+    quantity: "Кількість:"
   },
   ru: {
     addToCart: "Добавить в корзину",
@@ -29,14 +26,11 @@ const translations = {
     inFavorites: "В избранном",
     description: "Описание",
     specifications: "Характеристики",
-    density: "Плотность",
-    dimensions: "Размеры",
-    material: "Материал",
-    weight: "Вес",
     inStock: "В наличии",
     outOfStock: "Нет в наличии",
     back: "Назад",
-    new: "Новинка"
+    new: "Новинка",
+    quantity: "Количество:"
   },
   en: {
     addToCart: "Add to Cart",
@@ -45,14 +39,11 @@ const translations = {
     inFavorites: "In Favorites",
     description: "Description",
     specifications: "Specifications",
-    density: "Density",
-    dimensions: "Dimensions",
-    material: "Material",
-    weight: "Weight",
     inStock: "In Stock",
     outOfStock: "Out of Stock",
     back: "Back",
-    new: "New"
+    new: "New",
+    quantity: "Quantity:"
   }
 }
 
@@ -92,6 +83,14 @@ export function ProductPage({ product }: ProductPageProps) {
     }
   }
 
+  const getSpecifications = () => {
+    switch (language) {
+      case "ua": return product.specificationsUa
+      case "ru": return product.specificationsRu
+      default: return product.specifications
+    }
+  }
+
   const handleAddToCart = () => {
     for (let i = 0; i < quantity; i++) {
       addToCart(product)
@@ -106,6 +105,9 @@ export function ProductPage({ product }: ProductPageProps) {
   const handleBack = () => {
     setCurrentView("category")
   }
+
+  const specs = getSpecifications()
+  const specEntries = Object.entries(specs)
 
   return (
     <motion.div
@@ -192,7 +194,7 @@ export function ProductPage({ product }: ProductPageProps) {
             {/* Quantity Selector */}
             <div className="flex items-center gap-4">
               <span className="text-sm font-medium text-foreground">
-                {language === "ua" ? "Кількість:" : language === "ru" ? "Количество:" : "Quantity:"}
+                {t.quantity}
               </span>
               <div className="flex items-center border border-border">
                 <button
@@ -296,22 +298,15 @@ export function ProductPage({ product }: ProductPageProps) {
                     </p>
                   ) : (
                     <dl className="space-y-3">
-                      <div className="flex justify-between py-2 border-b border-border">
-                        <dt className="text-muted-foreground">{t.density}</dt>
-                        <dd className="font-medium text-foreground">{product.specifications.density}</dd>
-                      </div>
-                      <div className="flex justify-between py-2 border-b border-border">
-                        <dt className="text-muted-foreground">{t.dimensions}</dt>
-                        <dd className="font-medium text-foreground">{product.specifications.dimensions}</dd>
-                      </div>
-                      <div className="flex justify-between py-2 border-b border-border">
-                        <dt className="text-muted-foreground">{t.material}</dt>
-                        <dd className="font-medium text-foreground">{product.specifications.material}</dd>
-                      </div>
-                      <div className="flex justify-between py-2">
-                        <dt className="text-muted-foreground">{t.weight}</dt>
-                        <dd className="font-medium text-foreground">{product.specifications.weight}</dd>
-                      </div>
+                      {specEntries.map(([key, value], index) => (
+                        <div 
+                          key={key} 
+                          className={`flex justify-between py-2 ${index < specEntries.length - 1 ? "border-b border-border" : ""}`}
+                        >
+                          <dt className="text-muted-foreground">{key}</dt>
+                          <dd className="font-medium text-foreground text-right">{value}</dd>
+                        </div>
+                      ))}
                     </dl>
                   )}
                 </motion.div>

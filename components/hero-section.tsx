@@ -6,19 +6,19 @@ import { ArrowRight } from "lucide-react"
 
 const translations = {
   ua: {
-    title: "Спорядження для справжніх умов",
-    subtitle: "Професійне тактичне та туристичне спорядження українського виробництва",
-    cta: "Перейти до покупок"
+    title: "Спорядження для ваших пригод",
+    subtitle: "Професійне тактичне та туристичне спорядження українського виробництва у стилі Minimalism Outdoor",
+    cta: "Переглянути каталог"
   },
   ru: {
-    title: "Снаряжение для настоящих условий",
-    subtitle: "Профессиональное тактическое и туристическое снаряжение украинского производства",
-    cta: "Перейти к покупкам"
+    title: "Снаряжение для ваших приключений",
+    subtitle: "Профессиональное тактическое и туристическое снаряжение украинского производства в стиле Minimalism Outdoor",
+    cta: "Посмотреть каталог"
   },
   en: {
-    title: "Equipment for Real Conditions",
-    subtitle: "Professional tactical and outdoor equipment made in Ukraine",
-    cta: "Shop Now"
+    title: "Equipment for Your Adventures",
+    subtitle: "Professional tactical and outdoor equipment made in Ukraine in Minimalism Outdoor style",
+    cta: "View Catalog"
   }
 }
 
@@ -36,8 +36,8 @@ export function HeroSection() {
       {/* Background Image */}
       <div className="absolute inset-0">
         <img
-          src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1920&q=80"
-          alt="Outdoor camping scene"
+          src="/images/hero-outdoor.jpg"
+          alt="Outdoor camping scene with ARMY equipment"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-foreground/70 via-foreground/40 to-transparent" />

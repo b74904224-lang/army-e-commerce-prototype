@@ -5,36 +5,42 @@ import { Instagram, Facebook, Youtube, Mail, Phone, MapPin } from "lucide-react"
 
 const translations = {
   ua: {
-    description: "Професійне тактичне та туристичне спорядження українського виробництва.",
+    description: "Професійне тактичне та туристичне спорядження українського виробництва у стилі Minimalism Outdoor.",
     navigation: "Навігація",
     home: "Головна",
     products: "Товари",
     about: "Про бренд",
     blog: "Блог",
+    info: "Інформація",
+    delivery: "Доставка і оплата",
     contact: "Контакти",
     address: "Київ, Україна",
     workingHours: "Пн-Пт: 9:00 - 18:00",
     rights: "Всі права захищено."
   },
   ru: {
-    description: "Профессиональное тактическое и туристическое снаряжение украинского производства.",
+    description: "Профессиональное тактическое и туристическое снаряжение украинского производства в стиле Minimalism Outdoor.",
     navigation: "Навигация",
     home: "Главная",
     products: "Товары",
     about: "О бренде",
     blog: "Блог",
+    info: "Информация",
+    delivery: "Доставка и оплата",
     contact: "Контакты",
     address: "Киев, Украина",
     workingHours: "Пн-Пт: 9:00 - 18:00",
     rights: "Все права защищены."
   },
   en: {
-    description: "Professional tactical and outdoor equipment made in Ukraine.",
+    description: "Professional tactical and outdoor equipment made in Ukraine in Minimalism Outdoor style.",
     navigation: "Navigation",
     home: "Home",
     products: "Products",
     about: "About",
     blog: "Blog",
+    info: "Information",
+    delivery: "Delivery & Payment",
     contact: "Contact",
     address: "Kyiv, Ukraine",
     workingHours: "Mon-Fri: 9:00 AM - 6:00 PM",
@@ -128,8 +134,31 @@ export function Footer() {
             </ul>
           </div>
 
+          {/* Information */}
+          <div>
+            <h3 className="font-semibold mb-4">{t.info}</h3>
+            <ul className="space-y-2">
+              <li>
+                <a
+                  href="#"
+                  className="text-background/70 hover:text-background transition-colors"
+                >
+                  {t.delivery}
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className="text-background/70 hover:text-background transition-colors"
+                >
+                  {t.contact}
+                </a>
+              </li>
+            </ul>
+          </div>
+
           {/* Contact */}
-          <div className="sm:col-span-2 lg:col-span-2">
+          <div>
             <h3 className="font-semibold mb-4">{t.contact}</h3>
             <ul className="space-y-3">
               <li className="flex items-center gap-3 text-background/70">

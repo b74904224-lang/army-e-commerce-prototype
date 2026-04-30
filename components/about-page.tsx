@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion"
 import { useStore } from "@/lib/store-context"
-import { Target, Users, Mountain, Heart } from "lucide-react"
+import { Shield, Droplets, Feather, Mountain } from "lucide-react"
 
 const translations = {
   ua: {
@@ -10,15 +10,17 @@ const translations = {
     subtitle: "Створено для тих, хто обирає якість",
     story: {
       title: "Наша історія",
-      p1: "ARMY — український бренд тактичного та туристичного спорядження, заснований у 2022 році. Ми народилися в час, коли якісне вітчизняне спорядження стало необхідністю, а не просто альтернативою імпортним аналогам.",
-      p2: "Наша команда — це інженери, дизайнери та практики, які знають, що означає працювати в складних умовах. Кожен продукт проходить ретельне тестування в реальних польових умовах перед тим, як потрапити до вас.",
-      p3: "Ми використовуємо лише перевірені матеріали та сучасні технології виробництва. Наша мета — створювати спорядження, яке працює тоді, коли це найбільш потрібно."
+      p1: "Торгівельна марка ARMY була заснована у 2022 році — у часи серйозних випробувань та переосмислення базових потреб. Саме тоді особливо гостро постала необхідність у надійному, практичному та доступному спорядженні для використання в польових умовах. Починаючи з відповіді на запити військових, бренд поступово сформував філософію якості, витривалості та універсальності.",
+      p2: "Від самого початку ми зробили свідомий вибір: не зупинятися на досягнутому, а постійно вдосконалювати продукцію, підвищуючи її функціональність і комфорт. Сьогодні ARMY — це не лише про витримку в складних умовах, а й про зручність у повсякденному використанні.",
+      p3: "Асортимент бренду охоплює каремати, спальні мішки, а також різні модифікації туристичних і польових сидінь. Усі вироби поєднують у собі ключові властивості, що цінуються як у польових умовах, так і під час активного відпочинку.",
+      p4: "Сьогодні продукція ARMY впевнено виходить за межі суто польового застосування. Її обирають туристи, мандрівники, поціновувачі кемпінгу та відпочинку на природі. Окремий напрям — спортивна сфера: каремати активно використовуються на уроках фізичної культури в школах, під час занять фітнесом, тренувань у спортивних клубах та студіях.",
+      p5: "ARMY — це приклад того, як практичність, витривалість і продуманий дизайн можуть служити різним людям і різним цілям. Незалежно від того, чи це подорож, тренування, активний відпочинок або заняття спортом, наша продукція створена для комфорту, на який можна покластися."
     },
-    values: [
-      { icon: Target, title: "Якість", description: "Кожен продукт проходить суворий контроль якості" },
-      { icon: Users, title: "Команда", description: "Досвідчені фахівці з пристрастю до своєї справи" },
-      { icon: Mountain, title: "Надійність", description: "Спорядження, перевірене в екстремальних умовах" },
-      { icon: Heart, title: "Турбота", description: "Підтримка клієнтів на кожному етапі" }
+    features: [
+      { icon: Shield, title: "Термоізоляція", description: "Захищає від холоду ґрунту" },
+      { icon: Droplets, title: "Водостійкість", description: "Не пропускає вологу" },
+      { icon: Feather, title: "Легкість і міцність", description: "Стійкість до проколів і зношування" },
+      { icon: Mountain, title: "Універсальність", description: "Від підстилки до нестандартних сценаріїв" }
     ],
     stats: [
       { value: "2022", label: "Рік заснування" },
@@ -32,15 +34,17 @@ const translations = {
     subtitle: "Создано для тех, кто выбирает качество",
     story: {
       title: "Наша история",
-      p1: "ARMY — украинский бренд тактического и туристического снаряжения, основанный в 2022 году. Мы родились во время, когда качественное отечественное снаряжение стало необходимостью, а не просто альтернативой импортным аналогам.",
-      p2: "Наша команда — это инженеры, дизайнеры и практики, которые знают, что значит работать в сложных условиях. Каждый продукт проходит тщательное тестирование в реальных полевых условиях перед тем, как попасть к вам.",
-      p3: "Мы используем только проверенные материалы и современные технологии производства. Наша цель — создавать снаряжение, которое работает тогда, когда это больше всего нужно."
+      p1: "Торговая марка ARMY была основана в 2022 году — во времена серьезных испытаний и переосмысления базовых потребностей. Именно тогда особенно остро встала необходимость в надежном, практичном и доступном снаряжении для использования в полевых условиях. Начиная с ответа на запросы военных, бренд постепенно сформировал философию качества, выносливости и универсальности.",
+      p2: "С самого начала мы сделали осознанный выбор: не останавливаться на достигнутом, а постоянно совершенствовать продукцию, повышая её функциональность и комфорт. Сегодня ARMY — это не только о выдержке в сложных условиях, но и об удобстве в повседневном использовании.",
+      p3: "Ассортимент бренда охватывает карематы, спальные мешки, а также различные модификации туристических и полевых сидений. Все изделия сочетают в себе ключевые свойства, ценимые как в полевых условиях, так и во время активного отдыха.",
+      p4: "Сегодня продукция ARMY уверенно выходит за рамки исключительно полевого применения. Её выбирают туристы, путешественники, ценители кемпинга и отдыха на природе. Отдельное направление — спортивная сфера: карематы активно используются на уроках физической культуры в школах, во время занятий фитнесом, тренировок в спортивных клубах и студиях.",
+      p5: "ARMY — это пример того, как практичность, выносливость и продуманный дизайн могут служить разным людям и разным целям. Независимо от того, путешествие это, тренировка, активный отдых или занятия спортом, наша продукция создана для комфорта, на который можно положиться."
     },
-    values: [
-      { icon: Target, title: "Качество", description: "Каждый продукт проходит строгий контроль качества" },
-      { icon: Users, title: "Команда", description: "Опытные специалисты со страстью к своему делу" },
-      { icon: Mountain, title: "Надежность", description: "Снаряжение, проверенное в экстремальных условиях" },
-      { icon: Heart, title: "Забота", description: "Поддержка клиентов на каждом этапе" }
+    features: [
+      { icon: Shield, title: "Теплоизоляция", description: "Защищает от холода почвы" },
+      { icon: Droplets, title: "Водостойкость", description: "Не пропускает влагу" },
+      { icon: Feather, title: "Легкость и прочность", description: "Стойкость к проколам и износу" },
+      { icon: Mountain, title: "Универсальность", description: "От подстилки до нестандартных сценариев" }
     ],
     stats: [
       { value: "2022", label: "Год основания" },
@@ -54,15 +58,17 @@ const translations = {
     subtitle: "Created for those who choose quality",
     story: {
       title: "Our Story",
-      p1: "ARMY is a Ukrainian brand of tactical and outdoor equipment, founded in 2022. We were born at a time when quality domestic equipment became a necessity, not just an alternative to imported counterparts.",
-      p2: "Our team consists of engineers, designers, and practitioners who know what it means to work in difficult conditions. Every product undergoes thorough testing in real field conditions before reaching you.",
-      p3: "We use only proven materials and modern production technologies. Our goal is to create equipment that works when it&apos;s needed most."
+      p1: "The ARMY trademark was founded in 2022 — during times of serious trials and rethinking of basic needs. It was then that the need for reliable, practical and affordable equipment for field use became especially acute. Starting with responding to military requests, the brand gradually formed a philosophy of quality, endurance and versatility.",
+      p2: "From the very beginning, we made a conscious choice: not to stop at what we have achieved, but to constantly improve our products, increasing their functionality and comfort. Today ARMY is not only about endurance in difficult conditions, but also about convenience in everyday use.",
+      p3: "The brand's range covers sleeping mats, sleeping bags, as well as various modifications of tourist and field seats. All products combine key properties that are valued both in field conditions and during active recreation.",
+      p4: "Today, ARMY products confidently go beyond purely field use. They are chosen by tourists, travelers, camping enthusiasts and outdoor recreation lovers. A separate direction is the sports sphere: sleeping mats are actively used in physical education classes at schools, during fitness classes, training in sports clubs and studios.",
+      p5: "ARMY is an example of how practicality, endurance and thoughtful design can serve different people and different purposes. Whether it's a trip, training, active recreation or sports, our products are designed for comfort you can rely on."
     },
-    values: [
-      { icon: Target, title: "Quality", description: "Every product passes strict quality control" },
-      { icon: Users, title: "Team", description: "Experienced specialists with passion for their work" },
-      { icon: Mountain, title: "Reliability", description: "Equipment tested in extreme conditions" },
-      { icon: Heart, title: "Care", description: "Customer support at every stage" }
+    features: [
+      { icon: Shield, title: "Thermal Insulation", description: "Protects from ground cold" },
+      { icon: Droplets, title: "Water Resistance", description: "Does not let moisture through" },
+      { icon: Feather, title: "Lightweight & Durable", description: "Resistant to punctures and wear" },
+      { icon: Mountain, title: "Versatility", description: "From mat to non-standard scenarios" }
     ],
     stats: [
       { value: "2022", label: "Year Founded" },
@@ -82,8 +88,8 @@ export function AboutPage() {
       {/* Hero Section */}
       <section className="relative h-[50vh] min-h-[400px] overflow-hidden">
         <img
-          src="https://images.unsplash.com/photo-1510312305653-8ed496efae75?w=1920&q=80"
-          alt="ARMY brand"
+          src="/images/nature-atmosphere.jpg"
+          alt="ARMY brand outdoor equipment"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-foreground/60" />
@@ -117,17 +123,19 @@ export function AboutPage() {
               <p>{t.story.p1}</p>
               <p>{t.story.p2}</p>
               <p>{t.story.p3}</p>
+              <p>{t.story.p4}</p>
+              <p>{t.story.p5}</p>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Values Section */}
+      {/* Features Section - Key product properties */}
       <section className="py-16 sm:py-20 bg-muted">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {t.values.map((value, index) => {
-              const Icon = value.icon
+            {t.features.map((feature, index) => {
+              const Icon = feature.icon
               return (
                 <motion.div
                   key={index}
@@ -140,8 +148,8 @@ export function AboutPage() {
                   <div className="w-14 h-14 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
                     <Icon className="w-7 h-7 text-primary" />
                   </div>
-                  <h3 className="font-semibold text-foreground mb-2">{value.title}</h3>
-                  <p className="text-sm text-muted-foreground">{value.description}</p>
+                  <h3 className="font-semibold text-foreground mb-2">{feature.title}</h3>
+                  <p className="text-sm text-muted-foreground">{feature.description}</p>
                 </motion.div>
               )
             })}
@@ -169,6 +177,36 @@ export function AboutPage() {
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Atmospheric block */}
+      <section className="relative h-[60vh] min-h-[400px] overflow-hidden">
+        <img
+          src="/images/hero-outdoor.jpg"
+          alt="Created for nature"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-foreground/50" />
+        <div className="absolute inset-0 flex items-center justify-center text-center px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="max-w-2xl"
+          >
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+              {language === "ua" ? "Створено для природи" : language === "ru" ? "Создано для природы" : "Created for Nature"}
+            </h2>
+            <p className="text-lg text-white/80">
+              {language === "ua" 
+                ? "Наша продукція створена для комфорту, на який можна покластися" 
+                : language === "ru" 
+                ? "Наша продукция создана для комфорта, на который можно положиться"
+                : "Our products are designed for comfort you can rely on"}
+            </p>
+          </motion.div>
         </div>
       </section>
     </div>
