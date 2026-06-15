@@ -89,3 +89,30 @@ Order notifications are emailed to `ORDER_NOTIFICATION_TO` and also appended to
 `server/data/orders.jsonl` (git-ignored) as a durable backup. Totals are always
 recalculated server-side from the catalog, so client-submitted prices are never
 trusted.
+
+## Final launch checklist
+
+Run through these steps in order when going live on the OVH VPS:
+
+1. **Fill in the root `.env`** — set `NEXT_PUBLIC_API_URL=https://api.armytak.com`
+   and `NEXT_PUBLIC_SITE_URL=https://armytak.com`.
+2. **Fill in `server/.env`** — set `NODE_ENV=production`, a strong `JWT_SECRET`
+   (`openssl rand -base64 32`), the `SMTP_*` credentials,
+   `ORDER_NOTIFICATION_TO`, and `CORS_ORIGINS=https://armytak.com`.
+3. **Configure DNS A-records** — point `armytak.com` (and `www`) and
+   `api.armytak.com` at the VPS public IP; wait for propagation.
+4. **Build and start the stack** — from the project root run
+   `docker compose up -d --build` and confirm both containers are healthy.
+5. **Configure Nginx** — copy `nginx/armytak-web.conf` and
+   `server/nginx/army-api.conf` into `/etc/nginx/sites-available/`, enable them
+   with symlinks, then `sudo nginx -t && sudo systemctl reload nginx`.
+6. **Issue SSL with certbot** — `sudo certbot --nginx -d armytak.com -d www.armytak.com`
+   and `sudo certbot --nginx -d api.armytak.com`.
+7. **Verify the API health endpoint** — open `https://api.armytak.com/health`
+   and confirm it returns an OK response.
+8. **Place a test order** — complete a real checkout (and a buy-now order) on
+   `https://armytak.com`.
+9. **Confirm the notification email** — verify the order email arrived at
+   `ORDER_NOTIFICATION_TO`.
+10. **Confirm the durable backup** — check that the order was written to
+    `server/data/orders.jsonl` (e.g. `docker compose exec api tail -n 5 data/orders.jsonl`).
