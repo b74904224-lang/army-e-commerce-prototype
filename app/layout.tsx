@@ -1,11 +1,38 @@
 import type { Metadata } from 'next'
 import { Analytics } from '@vercel/analytics/next'
+import { getSiteUrl } from '@/lib/site-routes'
 import './globals.css'
 
+const siteUrl = getSiteUrl()
+
 export const metadata: Metadata = {
-  title: 'ARMY | Outdoor Equipment',
-  description: 'Premium outdoor and military-grade equipment. Founded in 2022.',
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: 'ARMYTAK | Спорядження для туризму та армії',
+    template: '%s | ARMYTAK',
+  },
+  description:
+    'ARMYTAK — каремати, спальні мішки, польові сидіння та розкладні матраци армійського класу. Доставка по Україні.',
+  applicationName: 'ARMYTAK',
   generator: 'v0.app',
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    siteName: 'ARMYTAK',
+    url: siteUrl,
+    title: 'ARMYTAK | Спорядження для туризму та армії',
+    description:
+      'Каремати, спальні мішки, польові сидіння та розкладні матраци армійського класу. Доставка по Україні.',
+    locale: 'uk_UA',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'ARMYTAK | Спорядження для туризму та армії',
+    description:
+      'Каремати, спальні мішки, польові сидіння та розкладні матраци армійського класу.',
+  },
   icons: {
     icon: [
       {
@@ -31,7 +58,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="bg-background">
+    <html lang="uk" className="bg-background">
       <body className="font-sans antialiased">
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}

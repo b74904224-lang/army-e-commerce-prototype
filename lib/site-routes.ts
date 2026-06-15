@@ -1,35 +1,19 @@
-// Server-safe route constants for SEO (sitemap/robots/canonical).
-// Kept free of any "use client" imports so it can run in server components.
+/**
+ * Centralized site URL helper used by SEO surfaces (sitemap, robots, canonical
+ * metadata). Kept free of client-only imports so it is safe to use in Server
+ * Components and route handlers.
+ *
+ * The storefront is a single-route client app (navigation is driven by in-app
+ * state, not URLs), so the only crawlable page is the site root.
+ */
 
-export const SITE_URL = "https://armytak.com"
+/** Absolute site origin, e.g. https://armytak.com (no trailing slash). */
+export function getSiteUrl(): string {
+  const fromEnv =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : undefined)
 
-/** Product detail slugs (mirrors the catalog ids in lib/store-context.tsx). */
-export const PRODUCT_IDS = [
-  "army-l0",
-  "army-l1",
-  "field-seat-01",
-  "folding-mat-01",
-  "sleeping-bag-01",
-  "sleeping-bag-02",
-] as const
-
-/** Category slugs used by the storefront. */
-export const CATEGORY_IDS = [
-  "roll-mats",
-  "field-seats",
-  "folding-mats",
-  "sleeping-bags",
-] as const
-
-/** Logical top-level pages of the storefront. */
-export const STATIC_PATHS = [
-  "/",
-  "/catalog",
-  "/about",
-  "/blog",
-  "/checkout",
-  "/contacts",
-  "/delivery-payment",
-  "/privacy-policy",
-  "/returns",
-] as const
+  return (fromEnv ?? "https://armytak.com").replace(/\/$/, "")
+}
