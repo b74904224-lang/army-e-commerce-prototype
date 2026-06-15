@@ -131,15 +131,15 @@ export const products: Product[] = [
       "Макс. разрывная нагрузка (ширина)": "77 Н/5см",
       "Водопоглощение": "0%",
       "Коэффициент теплоизоляции": "0,035 Вт/(м·К)",
-      "Огнестойкость": "Умеренно стойкая",
+      "Огнестойко��ть": "Умеренно стойкая",
       "Макс. температура эксплуатации": "+70°С",
       "Мин. температура эксплуатации": "-40°С",
       "Остаточная деформация": "12%",
       "Вес изделия с креплением": "350 грамм"
     },
     images: [
-      "/images/products/army-l0-main.jpg",
-      "/images/products/army-l0-unrolled.jpg",
+      "/images/products/army-l0-roll.webp",
+      "/images/products/army-l0-stand.webp",
       "/images/products/army-l0-detail.jpg",
       "/images/products/army-l0-outdoor.jpg"
     ],
@@ -177,10 +177,8 @@ export const products: Product[] = [
       "Вес": "420 грамм"
     },
     images: [
-      "/images/products/army-l0-main.jpg",
-      "/images/products/army-l0-unrolled.jpg",
-      "/images/products/army-l0-detail.jpg",
-      "/images/products/army-l0-outdoor.jpg"
+      "/images/products/army-l1-roll.webp",
+      "/images/products/army-l1-stand.webp"
     ],
     isNew: true,
     inStock: true
@@ -294,9 +292,7 @@ export const products: Product[] = [
     },
     images: [
       "/images/categories/spalni-mishky.jpg",
-      "/images/hero-outdoor.jpg",
-      "/images/nature-atmosphere.jpg",
-      "/images/products/army-l0-outdoor.jpg"
+      "/images/nature-atmosphere.jpg"
     ],
     isNew: true,
     inStock: true
