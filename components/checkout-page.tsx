@@ -3,6 +3,8 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useStore } from "@/lib/store-context"
+import { isApiConfigured } from "@/lib/api-client"
+import { createOrder, type OrderPayload } from "@/lib/api"
 import {
   ChevronLeft,
   CreditCard,
@@ -194,6 +196,8 @@ export function CheckoutPage() {
   const [orderPlaced, setOrderPlaced] = useState(false)
   const [orderNumber, setOrderNumber] = useState("")
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   const getProductName = (item: (typeof cart)[0]) => {
     switch (language) {
@@ -254,21 +258,87 @@ export function CheckoutPage() {
     return Object.keys(e).length === 0
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const shippingCost = deliveryType === "home" ? 80 : 0
+  const total = cartTotal + shippingCost
+  const prepaymentAmount = Math.round(total * 0.3)
+
+  const buildOrderPayload = (): OrderPayload => ({
+    customer: {
+      name: formData.name.trim(),
+      phone: formData.phone.trim(),
+      email: formData.email.trim(),
+    },
+    delivery: {
+      service: deliveryService,
+      type: deliveryType,
+      city: formData.city,
+      ...(deliveryType === "branch"
+        ? { branchNumber: formData.branchNumber.trim() }
+        : {
+            street: formData.street.trim(),
+            building: formData.building.trim(),
+            apartment: formData.apartment.trim(),
+          }),
+    },
+    payment: {
+      method: paymentMethod,
+      ...(paymentMethod !== "cod"
+        ? {
+            card: {
+              number: formData.cardNumber.replace(/\s/g, ""),
+              expiry: formData.expiry,
+              holder: formData.cardHolder.trim(),
+            },
+          }
+        : {}),
+      ...(paymentMethod === "partial" ? { prepaymentAmount } : {}),
+    },
+    items: cart.map((item) => ({
+      productId: item.product.id,
+      name: item.product.name,
+      price: item.product.price,
+      quantity: item.quantity,
+    })),
+    totals: {
+      subtotal: cartTotal,
+      shipping: shippingCost,
+      total,
+    },
+  })
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setSubmitError(null)
     if (!validateForm()) {
       const firstError = document.querySelector("[data-error='true']")
       firstError?.scrollIntoView({ behavior: "smooth", block: "center" })
       return
     }
-    setOrderNumber(`ARMY-${Date.now().toString(36).toUpperCase()}`)
-    setOrderPlaced(true)
-    clearCart()
-  }
 
-  const shippingCost = deliveryType === "home" ? 80 : 0
-  const total = cartTotal + shippingCost
-  const prepaymentAmount = Math.round(total * 0.3)
+    setSubmitting(true)
+    try {
+      if (isApiConfigured) {
+        // POST the full order to the OVHcloud backend.
+        const res = await createOrder(buildOrderPayload())
+        setOrderNumber(res.orderNumber || `ARMY-${Date.now().toString(36).toUpperCase()}`)
+      } else {
+        // Fallback: simulate an order number locally when no backend is set.
+        setOrderNumber(`ARMY-${Date.now().toString(36).toUpperCase()}`)
+      }
+      setOrderPlaced(true)
+      clearCart()
+    } catch {
+      setSubmitError(
+        language === "ua"
+          ? "Не вдалося оформити замовлення. Спробуйте ще раз."
+          : language === "ru"
+          ? "Не удалось оформить заказ. Попробуйте ещё раз."
+          : "Could not place the order. Please try again."
+      )
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   const inputClass = (field: string) =>
     `w-full px-4 py-3 bg-background border rounded-md text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all ${
@@ -710,10 +780,17 @@ export function CheckoutPage() {
 
                 <button
                   type="submit"
-                  className="w-full mt-6 py-4 bg-primary text-primary-foreground font-semibold rounded-md uppercase tracking-wide hover:bg-primary/90 transition-colors"
+                  disabled={submitting}
+                  className="w-full mt-6 py-4 bg-primary text-primary-foreground font-semibold rounded-md uppercase tracking-wide hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {t.placeOrder}
+                  {submitting ? "..." : t.placeOrder}
                 </button>
+
+                {submitError && (
+                  <p className="mt-3 text-sm text-destructive text-center" role="alert">
+                    {submitError}
+                  </p>
+                )}
               </div>
             </div>
           </div>

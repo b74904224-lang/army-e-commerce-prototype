@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { useStore, products, Product } from "@/lib/store-context"
+import { useStore, type Product } from "@/lib/store-context"
+import { useProducts } from "@/lib/use-products"
 import { Search, X } from "lucide-react"
 
 const translations = {
@@ -31,6 +32,7 @@ export function SearchModal() {
     setCurrentView,
     setSelectedProduct
   } = useStore()
+  const { products } = useProducts()
   const t = translations[language]
   const [query, setQuery] = useState("")
   const inputRef = useRef<HTMLInputElement>(null)

@@ -1,7 +1,8 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { useStore, products, categories, Product } from "@/lib/store-context"
+import { useStore, categories, type Product } from "@/lib/store-context"
+import { useProducts } from "@/lib/use-products"
 import { Heart, ShoppingBag } from "lucide-react"
 
 const translations = {
@@ -36,6 +37,7 @@ export function CategoryView() {
     toggleFavorite,
     isFavorite
   } = useStore()
+  const { products } = useProducts()
   const t = translations[language]
 
   const filteredProducts = selectedCategory

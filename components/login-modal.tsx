@@ -69,6 +69,7 @@ export function LoginModal() {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
 
   const resetForm = () => {
     setName("")
@@ -88,7 +89,7 @@ export function LoginModal() {
     resetForm()
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
 
@@ -111,14 +112,19 @@ export function LoginModal() {
       return
     }
 
-    const result = isRegister
-      ? register(name, email, password)
-      : login(email, password)
+    setSubmitting(true)
+    try {
+      const result = isRegister
+        ? await register(name, email, password)
+        : await login(email, password)
 
-    if (result.success) {
-      close()
-    } else {
-      setError(result.error ?? null)
+      if (result.success) {
+        close()
+      } else {
+        setError(result.error ?? null)
+      }
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -233,9 +239,10 @@ export function LoginModal() {
 
                 <button
                   type="submit"
-                  className="w-full py-3 bg-primary text-primary-foreground font-semibold uppercase tracking-wide hover:bg-primary/90 transition-colors"
+                  disabled={submitting}
+                  className="w-full py-3 bg-primary text-primary-foreground font-semibold uppercase tracking-wide hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {isRegister ? t.registerButton : t.loginButton}
+                  {submitting ? "..." : isRegister ? t.registerButton : t.loginButton}
                 </button>
 
                 <div className="text-center text-sm text-muted-foreground">

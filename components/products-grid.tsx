@@ -1,7 +1,8 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { useStore, products, Product } from "@/lib/store-context"
+import { useStore, type Product } from "@/lib/store-context"
+import { useProducts } from "@/lib/use-products"
 import { ShoppingBag } from "lucide-react"
 
 const translations = {
@@ -31,6 +32,7 @@ interface ProductsGridProps {
 
 export function ProductsGrid({ type }: ProductsGridProps) {
   const { language, addToCart, setSelectedProduct, setCurrentView } = useStore()
+  const { products } = useProducts()
   const t = translations[language]
 
   const filteredProducts = type === "new" 

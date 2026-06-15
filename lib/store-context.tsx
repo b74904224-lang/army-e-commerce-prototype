@@ -1,6 +1,9 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react"
+import { isApiConfigured } from "./api-client"
+import { registerRequest, loginRequest, logoutRequest } from "./api"
+import { ApiError } from "./api-client"
 
 export interface AuthUser {
   name: string
@@ -67,8 +70,8 @@ interface StoreState {
   notification: string | null
   showNotification: (message: string) => void
   currentUser: AuthUser | null
-  register: (name: string, email: string, password: string) => { success: boolean; error?: string }
-  login: (email: string, password: string) => { success: boolean; error?: string }
+  register: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
   logout: () => void
 }
 
@@ -131,7 +134,7 @@ export const products: Product[] = [
       "Макс. разрывная нагрузка (ширина)": "77 Н/5см",
       "Водопоглощение": "0%",
       "Коэффициент теплоизоляции": "0,035 Вт/(м·К)",
-      "Огнестойко��ть": "Умеренно стойкая",
+      "Огнестойко����ть": "Умеренно стойкая",
       "Макс. температура эксплуатации": "+70°С",
       "Мин. температура эксплуатации": "-40°С",
       "Остаточная деформация": "12%",
@@ -280,7 +283,7 @@ export const products: Product[] = [
     },
     specificationsUa: {
       "Температурний діапазон": "-20°C до +10°C",
-      "Геометричний розмір": "2200×800мм (стиснутий: 400×200мм)",
+      "Геомет��ичний розмір": "2200×800мм (стиснутий: 400×200мм)",
       "Матеріал": "Ріпстоп нейлон, синтетичний утеплювач",
       "Вага": "1,8 кг"
     },
@@ -403,8 +406,34 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const register = (name: string, email: string, password: string) => {
+  const persistSession = (session: AuthUser) => {
+    localStorage.setItem("army_current_user", JSON.stringify(session))
+    setCurrentUser(session)
+  }
+
+  const register = async (name: string, email: string, password: string) => {
     const normalizedEmail = email.trim().toLowerCase()
+
+    // Real network registration against the OVHcloud backend (issues a JWT).
+    if (isApiConfigured) {
+      try {
+        const { user } = await registerRequest(name.trim(), normalizedEmail, password)
+        const session: AuthUser = { name: user.name, email: user.email }
+        persistSession(session)
+        showNotification(
+          language === "ua"
+            ? `Вітаємо, ${session.name}! Акаунт створено.`
+            : language === "ru"
+            ? `Добро пожаловать, ${session.name}! Аккаунт создан.`
+            : `Welcome, ${session.name}! Account created.`
+        )
+        return { success: true }
+      } catch (err) {
+        return { success: false, error: resolveAuthError(err) }
+      }
+    }
+
+    // Fallback: local mock "database" via localStorage.
     const users = getStoredUsers()
     if (users.some(u => u.email === normalizedEmail)) {
       return {
@@ -418,12 +447,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       }
     }
     const newUser: StoredUser = { name: name.trim(), email: normalizedEmail, password }
-    const updatedUsers = [...users, newUser]
-    localStorage.setItem("army_users", JSON.stringify(updatedUsers))
+    localStorage.setItem("army_users", JSON.stringify([...users, newUser]))
 
     const session: AuthUser = { name: newUser.name, email: newUser.email }
-    localStorage.setItem("army_current_user", JSON.stringify(session))
-    setCurrentUser(session)
+    persistSession(session)
     showNotification(
       language === "ua"
         ? `Вітаємо, ${session.name}! Акаунт створено.`
@@ -434,8 +461,29 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     return { success: true }
   }
 
-  const login = (email: string, password: string) => {
+  const login = async (email: string, password: string) => {
     const normalizedEmail = email.trim().toLowerCase()
+
+    // Real network authentication against the OVHcloud backend (issues a JWT).
+    if (isApiConfigured) {
+      try {
+        const { user } = await loginRequest(normalizedEmail, password)
+        const session: AuthUser = { name: user.name, email: user.email }
+        persistSession(session)
+        showNotification(
+          language === "ua"
+            ? `Привіт, ${session.name}!`
+            : language === "ru"
+            ? `Привет, ${session.name}!`
+            : `Hi, ${session.name}!`
+        )
+        return { success: true }
+      } catch (err) {
+        return { success: false, error: resolveAuthError(err) }
+      }
+    }
+
+    // Fallback: validate against the local mock "database".
     const users = getStoredUsers()
     const match = users.find(u => u.email === normalizedEmail && u.password === password)
     if (!match) {
@@ -450,8 +498,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       }
     }
     const session: AuthUser = { name: match.name, email: match.email }
-    localStorage.setItem("army_current_user", JSON.stringify(session))
-    setCurrentUser(session)
+    persistSession(session)
     showNotification(
       language === "ua"
         ? `Привіт, ${session.name}!`
@@ -462,7 +509,20 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     return { success: true }
   }
 
+  // Map backend / network errors to localized, user-friendly messages.
+  const resolveAuthError = (err: unknown): string => {
+    if (err instanceof ApiError && err.message && err.status !== 0) {
+      return err.message
+    }
+    return language === "ua"
+      ? "Помилка з'єднання з сервером. Спробуйте пізніше."
+      : language === "ru"
+      ? "Ошибка соединения с сервером. Попробуйте позже."
+      : "Server connection error. Please try again later."
+  }
+
   const logout = () => {
+    logoutRequest()
     localStorage.removeItem("army_current_user")
     setCurrentUser(null)
     showNotification(
