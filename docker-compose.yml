@@ -3,7 +3,7 @@
 # ./nginx (frontend) and ./server/nginx (API).
 
 services:
-  web:
+  frontend:
     build:
       context: .
       dockerfile: Dockerfile
@@ -17,9 +17,9 @@ services:
       # Bind to localhost; Nginx terminates TLS and proxies to this port.
       - "127.0.0.1:3000:3000"
     depends_on:
-      - api
+      - backend
 
-  api:
+  backend:
     build:
       context: ./server
       dockerfile: Dockerfile
