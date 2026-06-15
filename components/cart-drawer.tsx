@@ -59,6 +59,11 @@ export function CartDrawer() {
     setCurrentView("category")
   }
 
+  const handleCheckout = () => {
+    setIsCartOpen(false)
+    setCurrentView("checkout")
+  }
+
   return (
     <AnimatePresence>
       {isCartOpen && (
@@ -129,7 +134,7 @@ export function CartDrawer() {
                           {getProductName(item)}
                         </h3>
                         <p className="text-sm text-muted-foreground">
-                          ₴{item.product.price}
+                          {item.product.price} грн
                         </p>
                         <div className="flex items-center gap-2 mt-2">
                           <button
@@ -169,9 +174,12 @@ export function CartDrawer() {
               <div className="p-4 sm:p-6 border-t border-border space-y-4">
                 <div className="flex items-center justify-between text-lg font-semibold">
                   <span>{t.total}</span>
-                  <span>₴{cartTotal}</span>
+                  <span>{cartTotal} грн</span>
                 </div>
-                <button className="w-full py-4 bg-primary text-primary-foreground font-semibold uppercase tracking-wide hover:bg-primary/90 transition-colors">
+                <button
+                  onClick={handleCheckout}
+                  className="w-full py-4 bg-primary text-primary-foreground font-semibold uppercase tracking-wide hover:bg-primary/90 transition-colors"
+                >
                   {t.checkout}
                 </button>
               </div>

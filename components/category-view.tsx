@@ -174,10 +174,10 @@ export function CategoryView() {
                       {getProductName(product)}
                     </h3>
                     <div className="mt-2 flex items-baseline gap-2">
-                      <span className="font-bold text-foreground">₴{product.price}</span>
+                      <span className="font-bold text-foreground">{product.price} грн</span>
                       {product.originalPrice && (
                         <span className="text-sm text-muted-foreground line-through">
-                          ₴{product.originalPrice}
+                          {product.originalPrice} грн
                         </span>
                       )}
                     </div>

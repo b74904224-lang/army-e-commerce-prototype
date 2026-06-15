@@ -178,11 +178,11 @@ export function ProductPage({ product }: ProductPageProps) {
               </h1>
               <div className="mt-4 flex items-baseline gap-3">
                 <span className="text-2xl sm:text-3xl font-bold text-foreground">
-                  ₴{product.price}
+                  {product.price} грн
                 </span>
                 {product.originalPrice && (
                   <span className="text-lg text-muted-foreground line-through">
-                    ₴{product.originalPrice}
+                    {product.originalPrice} грн
                   </span>
                 )}
               </div>

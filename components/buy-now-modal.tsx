@@ -120,7 +120,7 @@ export function BuyNowModal() {
                       <div>
                         <p className="font-medium text-foreground">{getProductName()}</p>
                         <p className="text-lg font-bold text-primary">
-                          ₴{selectedProduct.price}
+                          {selectedProduct.price} грн
                         </p>
                       </div>
                     </div>

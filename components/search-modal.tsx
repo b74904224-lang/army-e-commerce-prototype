@@ -149,7 +149,7 @@ export function SearchModal() {
                             </p>
                           </div>
                           <span className="font-semibold text-foreground">
-                            ₴{product.price}
+                            {product.price} грн
                           </span>
                         </button>
                       ))}

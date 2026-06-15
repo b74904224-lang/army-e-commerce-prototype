@@ -12,6 +12,7 @@ import { ProductPage } from "@/components/product-page"
 import { CategoryView } from "@/components/category-view"
 import { AboutPage } from "@/components/about-page"
 import { BlogPage } from "@/components/blog-page"
+import { CheckoutPage } from "@/components/checkout-page"
 import { CartDrawer } from "@/components/cart-drawer"
 import { SearchModal } from "@/components/search-modal"
 import { LoginModal } from "@/components/login-modal"
@@ -88,6 +89,18 @@ function MainContent() {
           transition={{ duration: 0.3 }}
         >
           <BlogPage />
+        </motion.div>
+      )}
+
+      {currentView === "checkout" && (
+        <motion.div
+          key="checkout"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <CheckoutPage />
         </motion.div>
       )}
     </AnimatePresence>

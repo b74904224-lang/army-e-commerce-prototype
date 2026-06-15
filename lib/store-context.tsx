@@ -274,7 +274,7 @@ export const products: Product[] = [
       "Вага": "1,8 кг"
     },
     specificationsRu: {
-      "Температурный диапазон": "-20°C до +10°C",
+      "Температурны�� диапазон": "-20°C до +10°C",
       "Геометрический размер": "2200×800мм (сжатый: 400×200мм)",
       "Материал": "Рипстоп нейлон, синтетический утеплитель",
       "Вес": "1,8 кг"
@@ -363,7 +363,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<"ua" | "ru" | "en">("ua")
   const [cart, setCart] = useState<CartItem[]>([])
   const [favorites, setFavorites] = useState<string[]>([])
-  const [currentView, setCurrentView] = useState<"home" | "product" | "about" | "blog" | "category">("home")
+  const [currentView, setCurrentView] = useState<"home" | "product" | "about" | "blog" | "category" | "checkout">("home")
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [isCartOpen, setIsCartOpen] = useState(false)

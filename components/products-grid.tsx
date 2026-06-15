@@ -99,9 +99,9 @@ export function ProductsGrid({ type }: ProductsGridProps) {
                 </button>
                 <div className="flex items-center justify-between">
                   <div className="flex items-baseline gap-2">
-                    <span className="font-semibold text-foreground">₴{product.price}</span>
+                    <span className="font-semibold text-foreground">{product.price} грн</span>
                     {product.originalPrice && (
-                      <span className="text-sm text-muted-foreground line-through">₴{product.originalPrice}</span>
+                      <span className="text-sm text-muted-foreground line-through">{product.originalPrice} грн</span>
                     )}
                   </div>
                   <button
