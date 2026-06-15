@@ -77,25 +77,31 @@ function renderOrderText(order: StoredOrder): string {
   ].join("\n")
 }
 
-/** Sends (or logs) the order notification. Never throws — failures are logged. */
+/**
+ * Sends the order notification email to the administrator.
+ *
+ * - SMTP configured: awaits delivery and THROWS on failure so the caller can
+ *   refuse to confirm the order (the admin email is the primary deliverable).
+ * - SMTP not configured: allowed only outside production — logs to console and
+ *   resolves. In production a missing SMTP config is rejected upstream.
+ */
 export async function sendOrderNotification(order: StoredOrder): Promise<void> {
   const text = renderOrderText(order)
   const tx = getTransporter()
 
   if (!tx) {
-    console.log("[mailer] SMTP disabled — order notification:\n" + text)
+    if (env.isProduction) {
+      throw new Error("SMTP is not configured — cannot deliver order notification in production.")
+    }
+    console.log("[mailer] SMTP disabled (dev) — order notification:\n" + text)
     return
   }
 
-  try {
-    await tx.sendMail({
-      from: env.ORDER_NOTIFICATION_FROM,
-      to: env.ORDER_NOTIFICATION_TO,
-      subject: `Нове замовлення ${order.orderNumber} — ${order.totals.total} грн`,
-      text,
-    })
-  } catch (err) {
-    // An email failure must not break order acceptance.
-    console.error("[mailer] Failed to send order notification:", err)
-  }
+  // Let delivery errors propagate to the route handler.
+  await tx.sendMail({
+    from: env.ORDER_NOTIFICATION_FROM,
+    to: env.ORDER_NOTIFICATION_TO,
+    subject: `Нове замовлення ${order.orderNumber} — ${order.totals.total} грн`,
+    text,
+  })
 }

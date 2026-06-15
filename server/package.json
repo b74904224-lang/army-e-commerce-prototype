@@ -1,7 +1,7 @@
 {
-  "name": "army-store-api",
+  "name": "armytak-api",
   "version": "1.0.0",
-  "description": "External OVHcloud backend API for the ARMY storefront (products, orders, auth).",
+  "description": "External OVHcloud backend API for the ARMYTAK storefront (products, orders, auth).",
   "type": "module",
   "main": "dist/index.js",
   "engines": {

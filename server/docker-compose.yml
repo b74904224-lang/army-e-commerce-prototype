@@ -1,13 +1,16 @@
 services:
   api:
     build: .
-    container_name: army-store-api
+    container_name: armytak-api
     restart: unless-stopped
     env_file:
       - .env
     ports:
       # Bind only to localhost; Nginx terminates TLS and proxies to this port.
       - "127.0.0.1:4000:4000"
+    volumes:
+      # Persist order backups (data/orders.jsonl) across container restarts.
+      - ./data:/app/data
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://localhost:4000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 30s

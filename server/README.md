@@ -1,6 +1,6 @@
-# ARMY Store API (OVHcloud backend)
+# ARMYTAK API (OVHcloud backend)
 
-External REST API that powers the ARMY storefront: product catalog, order
+External REST API that powers the ARMYTAK storefront: product catalog, order
 intake (full checkout + quick "buy now"), and JWT authentication. Built with
 Express + TypeScript, validated with Zod, secured with Helmet / CORS allow-list
 / rate limiting, and sends order notifications via Nodemailer.
@@ -54,7 +54,7 @@ The container binds to `127.0.0.1:4000`; put Nginx in front for TLS.
 
 1. Copy `nginx/army-api.conf` to `/etc/nginx/sites-available/` and symlink it
    into `sites-enabled/` (adjust `server_name`).
-2. `sudo certbot --nginx -d api.army-store.com` to provision Let's Encrypt TLS.
+2. `sudo certbot --nginx -d api.armytak.com` to provision Let's Encrypt TLS.
 3. `sudo nginx -t && sudo systemctl reload nginx`.
 
 ## Environment variables
@@ -72,7 +72,7 @@ See `.env.example`. Key ones:
 On the Vercel project, set:
 
 ```
-NEXT_PUBLIC_API_URL=https://api.army-store.com
+NEXT_PUBLIC_API_URL=https://api.armytak.com
 ```
 
 The storefront then sends auth, orders, and product requests to this server.

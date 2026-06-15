@@ -2,7 +2,7 @@
 //
 // Configure the production endpoint by setting NEXT_PUBLIC_API_URL to the
 // OVHcloud server IP or custom API subdomain, e.g.:
-//   NEXT_PUBLIC_API_URL=https://api.army-store.com
+//   NEXT_PUBLIC_API_URL=https://api.armytak.com
 //   NEXT_PUBLIC_API_URL=https://51.x.x.x
 //
 // When the variable is not set, product browsing still works from bundled

@@ -20,8 +20,8 @@ const envSchema = z.object({
   SMTP_SECURE: booleanish,
   SMTP_USER: z.string().optional().default(""),
   SMTP_PASS: z.string().optional().default(""),
-  ORDER_NOTIFICATION_FROM: z.string().default("ARMY Store <no-reply@army-store.com>"),
-  ORDER_NOTIFICATION_TO: z.string().default("orders@army-store.com"),
+  ORDER_NOTIFICATION_FROM: z.string().default("ARMYTAK <orders@armytak.com>"),
+  ORDER_NOTIFICATION_TO: z.string().default("orders@armytak.com"),
 })
 
 const parsed = envSchema.safeParse(process.env)
