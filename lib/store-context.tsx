@@ -1,6 +1,15 @@
 "use client"
 
-import { createContext, useContext, useState, ReactNode } from "react"
+import { createContext, useContext, useState, useEffect, ReactNode } from "react"
+
+export interface AuthUser {
+  name: string
+  email: string
+}
+
+interface StoredUser extends AuthUser {
+  password: string
+}
 
 export interface Product {
   id: string
@@ -57,6 +66,10 @@ interface StoreState {
   setIsBuyNowOpen: (open: boolean) => void
   notification: string | null
   showNotification: (message: string) => void
+  currentUser: AuthUser | null
+  register: (name: string, email: string, password: string) => { success: boolean; error?: string }
+  login: (email: string, password: string) => { success: boolean; error?: string }
+  logout: () => void
 }
 
 const StoreContext = createContext<StoreState | undefined>(undefined)
@@ -274,7 +287,7 @@ export const products: Product[] = [
       "Вага": "1,8 кг"
     },
     specificationsRu: {
-      "Температурны�� диапазон": "-20°C до +10°C",
+      "Температурны���� диапазон": "-20°C до +10°C",
       "Геометрический размер": "2200×800мм (сжатый: 400×200мм)",
       "Материал": "Рипстоп нейлон, синтетический утеплитель",
       "Вес": "1,8 кг"
@@ -371,6 +384,99 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [isLoginOpen, setIsLoginOpen] = useState(false)
   const [isBuyNowOpen, setIsBuyNowOpen] = useState(false)
   const [notification, setNotification] = useState<string | null>(null)
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null)
+
+  // Hydrate the logged-in session from localStorage on mount (mock "database")
+  useEffect(() => {
+    try {
+      const session = localStorage.getItem("army_current_user")
+      if (session) {
+        setCurrentUser(JSON.parse(session))
+      }
+    } catch {
+      // ignore corrupted storage
+    }
+  }, [])
+
+  const getStoredUsers = (): StoredUser[] => {
+    try {
+      const raw = localStorage.getItem("army_users")
+      return raw ? (JSON.parse(raw) as StoredUser[]) : []
+    } catch {
+      return []
+    }
+  }
+
+  const register = (name: string, email: string, password: string) => {
+    const normalizedEmail = email.trim().toLowerCase()
+    const users = getStoredUsers()
+    if (users.some(u => u.email === normalizedEmail)) {
+      return {
+        success: false,
+        error:
+          language === "ua"
+            ? "Користувач з таким email вже існує"
+            : language === "ru"
+            ? "Пользователь с таким email уже существует"
+            : "A user with this email already exists"
+      }
+    }
+    const newUser: StoredUser = { name: name.trim(), email: normalizedEmail, password }
+    const updatedUsers = [...users, newUser]
+    localStorage.setItem("army_users", JSON.stringify(updatedUsers))
+
+    const session: AuthUser = { name: newUser.name, email: newUser.email }
+    localStorage.setItem("army_current_user", JSON.stringify(session))
+    setCurrentUser(session)
+    showNotification(
+      language === "ua"
+        ? `Вітаємо, ${session.name}! Акаунт створено.`
+        : language === "ru"
+        ? `Добро пожаловать, ${session.name}! Аккаунт создан.`
+        : `Welcome, ${session.name}! Account created.`
+    )
+    return { success: true }
+  }
+
+  const login = (email: string, password: string) => {
+    const normalizedEmail = email.trim().toLowerCase()
+    const users = getStoredUsers()
+    const match = users.find(u => u.email === normalizedEmail && u.password === password)
+    if (!match) {
+      return {
+        success: false,
+        error:
+          language === "ua"
+            ? "Невірний email або пароль"
+            : language === "ru"
+            ? "Неверный email или пароль"
+            : "Invalid email or password"
+      }
+    }
+    const session: AuthUser = { name: match.name, email: match.email }
+    localStorage.setItem("army_current_user", JSON.stringify(session))
+    setCurrentUser(session)
+    showNotification(
+      language === "ua"
+        ? `Привіт, ${session.name}!`
+        : language === "ru"
+        ? `Привет, ${session.name}!`
+        : `Hi, ${session.name}!`
+    )
+    return { success: true }
+  }
+
+  const logout = () => {
+    localStorage.removeItem("army_current_user")
+    setCurrentUser(null)
+    showNotification(
+      language === "ua"
+        ? "Ви вийшли з акаунту"
+        : language === "ru"
+        ? "Вы вышли из аккаунта"
+        : "You have logged out"
+    )
+  }
 
   const addToCart = (product: Product) => {
     setCart(prev => {
@@ -455,7 +561,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         isBuyNowOpen,
         setIsBuyNowOpen,
         notification,
-        showNotification
+        showNotification,
+        currentUser,
+        register,
+        login,
+        logout
       }}
     >
       {children}

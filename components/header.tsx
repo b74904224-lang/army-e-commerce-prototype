@@ -1,14 +1,14 @@
 "use client"
 
-import { Search, User, Heart, ShoppingBag, Menu, X } from "lucide-react"
+import { Search, User, Heart, ShoppingBag, Menu, X, LogOut } from "lucide-react"
 import { useStore } from "@/lib/store-context"
 import { motion, AnimatePresence } from "framer-motion"
 import { useState } from "react"
 
 const translations = {
-  ua: { new: "Новинки", about: "Про бренд", products: "Товар", blog: "Блог" },
-  ru: { new: "Новинки", about: "О бренде", products: "Товары", blog: "Блог" },
-  en: { new: "New", about: "About", products: "Products", blog: "Blog" }
+  ua: { new: "Новинки", about: "Про бренд", products: "Товар", blog: "Блог", hi: "Привіт", logout: "Вийти" },
+  ru: { new: "Новинки", about: "О бренде", products: "Товары", blog: "Блог", hi: "Привет", logout: "Выйти" },
+  en: { new: "New", about: "About", products: "Products", blog: "Blog", hi: "Hi", logout: "Log out" }
 }
 
 export function Header() {
@@ -21,9 +21,12 @@ export function Header() {
     setIsSearchOpen,
     setIsLoginOpen,
     setCurrentView,
-    setSelectedCategory
+    setSelectedCategory,
+    currentUser,
+    logout
   } = useStore()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
   const t = translations[language]
 
   const handleNavClick = (view: "home" | "product" | "about" | "blog" | "category") => {
@@ -129,13 +132,65 @@ export function Header() {
             >
               <Search className="w-5 h-5" />
             </button>
-            <button
-              onClick={() => setIsLoginOpen(true)}
-              className="p-2 text-foreground hover:text-primary transition-colors"
-              aria-label="Account"
-            >
-              <User className="w-5 h-5" />
-            </button>
+            {currentUser ? (
+              <div className="relative">
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center gap-2 p-2 text-foreground hover:text-primary transition-colors"
+                  aria-label="Account menu"
+                >
+                  <span className="hidden sm:inline text-sm font-medium max-w-[120px] truncate">
+                    {t.hi}, {currentUser.name}
+                  </span>
+                  <span className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-bold uppercase">
+                    {currentUser.name.charAt(0)}
+                  </span>
+                </button>
+                <AnimatePresence>
+                  {userMenuOpen && (
+                    <>
+                      <div
+                        className="fixed inset-0 z-40"
+                        onClick={() => setUserMenuOpen(false)}
+                      />
+                      <motion.div
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        className="absolute right-0 mt-2 w-56 bg-background border border-border rounded shadow-xl z-50 overflow-hidden"
+                      >
+                        <div className="px-4 py-3 border-b border-border">
+                          <p className="text-sm font-semibold text-foreground truncate">
+                            {currentUser.name}
+                          </p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {currentUser.email}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => {
+                            logout()
+                            setUserMenuOpen(false)
+                          }}
+                          className="flex items-center gap-2 w-full px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          {t.logout}
+                        </button>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <button
+                onClick={() => setIsLoginOpen(true)}
+                className="p-2 text-foreground hover:text-primary transition-colors"
+                aria-label="Account"
+              >
+                <User className="w-5 h-5" />
+              </button>
+            )}
             <button
               onClick={() => {
                 setSelectedCategory(null)
