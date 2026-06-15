@@ -5,8 +5,9 @@
 //   NEXT_PUBLIC_API_URL=https://api.army-store.com
 //   NEXT_PUBLIC_API_URL=https://51.x.x.x
 //
-// When the variable is not set, the app gracefully falls back to local
-// mock data / mock auth so the UI keeps working in preview and CI builds.
+// When the variable is not set, product browsing still works from bundled
+// catalog data, but ordering and authentication are disabled (no mock/fake
+// success) so production builds never silently accept un-delivered orders.
 
 export const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "")
 

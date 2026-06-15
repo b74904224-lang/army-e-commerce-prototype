@@ -130,7 +130,7 @@ export const products: Product[] = [
       "Макс. разрывная нагрузка (ширина)": "77 Н/5см",
       "Водопоглощение": "0%",
       "Коэффициент теплоизоляции": "0,035 Вт/(м·К)",
-      "Огнестойко����ть": "Умеренно стойкая",
+      "Огнестойкость": "Умеренно стойкая",
       "Макс. температура эксплуатации": "+70°С",
       "Мин. температура эксплуатации": "-40°С",
       "Остаточная деформация": "12%",
@@ -279,12 +279,12 @@ export const products: Product[] = [
     },
     specificationsUa: {
       "Температурний діапазон": "-20°C до +10°C",
-      "Геомет��ичний розмір": "2200×800мм (стиснутий: 400×200мм)",
+      "Геометричний розмір": "2200×800мм (стиснутий: 400×200мм)",
       "Матеріал": "Ріпстоп нейлон, синтетичний утеплювач",
       "Вага": "1,8 кг"
     },
     specificationsRu: {
-      "Температурны���� диапазон": "-20°C до +10°C",
+      "Температурный диапазон": "-20°C до +10°C",
       "Геометрический размер": "2200×800мм (сжатый: 400×200мм)",
       "Материал": "Рипстоп нейлон, синтетический утеплитель",
       "Вес": "1,8 кг"
@@ -380,8 +380,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [isBuyNowOpen, setIsBuyNowOpen] = useState(false)
   const [notification, setNotification] = useState<string | null>(null)
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null)
+  const [hydrated, setHydrated] = useState(false)
 
-  // Hydrate the logged-in session from localStorage on mount (mock "database")
+  // Hydrate session + cart from localStorage on mount.
   useEffect(() => {
     try {
       const session = localStorage.getItem("army_current_user")
@@ -389,9 +390,29 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setCurrentUser(JSON.parse(session))
       }
     } catch {
-      // ignore corrupted storage
+      // ignore corrupted session storage
     }
+    try {
+      const storedCart = localStorage.getItem("army_cart")
+      if (storedCart) {
+        const parsed = JSON.parse(storedCart)
+        if (Array.isArray(parsed)) setCart(parsed)
+      }
+    } catch {
+      // ignore corrupted cart storage
+    }
+    setHydrated(true)
   }, [])
+
+  // Persist the cart whenever it changes (after the initial hydration).
+  useEffect(() => {
+    if (!hydrated) return
+    try {
+      localStorage.setItem("army_cart", JSON.stringify(cart))
+    } catch {
+      // storage may be full or unavailable — fail silently
+    }
+  }, [cart, hydrated])
 
   const persistSession = (session: AuthUser) => {
     // Only non-sensitive profile data (name/email) is stored — never passwords.

@@ -1,0 +1,101 @@
+// Order notification email via Nodemailer.
+//
+// When SMTP is not configured (SMTP_HOST empty), orders are logged to the
+// console instead of being emailed — handy for local development.
+
+import nodemailer from "nodemailer"
+import type { Transporter } from "nodemailer"
+import { env } from "../config/env.js"
+import type { StoredOrder } from "../store/orders.js"
+
+let transporter: Transporter | null = null
+
+function getTransporter(): Transporter | null {
+  if (!env.smtpEnabled) return null
+  if (transporter) return transporter
+  transporter = nodemailer.createTransport({
+    host: env.SMTP_HOST,
+    port: env.SMTP_PORT,
+    secure: env.SMTP_SECURE, // true for 465, false for other ports
+    auth: env.SMTP_USER ? { user: env.SMTP_USER, pass: env.SMTP_PASS } : undefined,
+  })
+  return transporter
+}
+
+const serviceLabels: Record<string, string> = {
+  nova_poshta: "Нова Пошта",
+  ukr_poshta: "Укрпошта",
+  meest: "Міст Пошта (Meest)",
+  other: "Інша служба",
+  not_required_for_quick_order: "Уточнюється менеджером",
+}
+
+const paymentLabels: Record<string, string> = {
+  cod: "Післяплата (оплата при отриманні)",
+  bank_transfer: "Оплата на реквізити",
+  manager_confirmation: "Уточнення оплати менеджером",
+}
+
+function renderOrderText(order: StoredOrder): string {
+  const { customer, delivery, payment, items, totals } = order
+  const address =
+    delivery.type === "branch"
+      ? `Відділення №${delivery.branchNumber ?? "-"}`
+      : delivery.type === "home"
+        ? `вул. ${delivery.street ?? "-"}, буд. ${delivery.building ?? "-"}, кв. ${delivery.apartment ?? "-"}`
+        : "Не потребується (швидке замовлення)"
+
+  const itemLines = items
+    .map((i) => `  • ${i.name} ×${i.quantity} — ${i.price} грн`)
+    .join("\n")
+
+  return [
+    `НОВЕ ЗАМОВЛЕННЯ: ${order.orderNumber}`,
+    `Тип: ${order.type === "quick_order" ? "Швидке замовлення" : "Повне оформлення"}`,
+    `Джерело: ${order.source}`,
+    `Дата: ${order.createdAt}`,
+    "",
+    "КЛІЄНТ",
+    `  Ім'я: ${customer.name}`,
+    `  Телефон: ${customer.phone}`,
+    `  Email: ${customer.email ?? "-"}`,
+    "",
+    "ДОСТАВКА",
+    `  Служба: ${serviceLabels[delivery.service] ?? delivery.service}`,
+    `  Місто: ${delivery.city ?? "-"}`,
+    `  Адреса: ${address}`,
+    "",
+    `ОПЛАТА: ${paymentLabels[payment.method] ?? payment.method}`,
+    "",
+    "ТОВАРИ",
+    itemLines,
+    "",
+    `Сума товарів: ${totals.subtotal} грн`,
+    `Доставка: ${totals.shipping === 0 ? "за тарифами" : `${totals.shipping} грн`}`,
+    `ЗАГАЛОМ: ${totals.total} грн`,
+    order.comment ? `\nКоментар: ${order.comment}` : "",
+  ].join("\n")
+}
+
+/** Sends (or logs) the order notification. Never throws — failures are logged. */
+export async function sendOrderNotification(order: StoredOrder): Promise<void> {
+  const text = renderOrderText(order)
+  const tx = getTransporter()
+
+  if (!tx) {
+    console.log("[mailer] SMTP disabled — order notification:\n" + text)
+    return
+  }
+
+  try {
+    await tx.sendMail({
+      from: env.ORDER_NOTIFICATION_FROM,
+      to: env.ORDER_NOTIFICATION_TO,
+      subject: `Нове замовлення ${order.orderNumber} — ${order.totals.total} грн`,
+      text,
+    })
+  } catch (err) {
+    // An email failure must not break order acceptance.
+    console.error("[mailer] Failed to send order notification:", err)
+  }
+}
