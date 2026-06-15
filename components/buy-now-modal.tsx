@@ -3,6 +3,8 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useStore } from "@/lib/store-context"
+import { isApiConfigured } from "@/lib/api-client"
+import { createOrder, type OrderPayload } from "@/lib/api"
 import { X, Zap, CheckCircle } from "lucide-react"
 
 const translations = {
@@ -11,25 +13,42 @@ const translations = {
     name: "Ваше ім'я",
     phone: "Номер телефону",
     submit: "Замовити",
-    success: "Дякуємо! Ми зв'яжемося з вами найближчим часом.",
-    close: "Закрити"
+    sending: "Відправляємо...",
+    success: "Дякуємо! Ваше замовлення прийнято, менеджер зв'яжеться з вами найближчим часом.",
+    orderNumber: "Номер замовлення",
+    close: "Закрити",
+    errName: "Введіть ім'я",
+    errPhone: "Введіть коректний номер телефону",
+    serverError:
+      "Сервер замовлень тимчасово недоступний. Спробуйте пізніше або зв'яжіться з нами телефоном.",
   },
   ru: {
     title: "Быстрый заказ",
     name: "Ваше имя",
     phone: "Номер телефона",
     submit: "Заказать",
-    success: "Спасибо! Мы свяжемся с вами в ближайшее время.",
-    close: "Закрыть"
+    sending: "Отправляем...",
+    success: "Спасибо! Ваш заказ принят, менеджер свяжется с вами в ближайшее время.",
+    orderNumber: "Номер заказа",
+    close: "Закрыть",
+    errName: "Введите имя",
+    errPhone: "Введите корректный номер телефона",
+    serverError:
+      "Сервер заказов временно недоступен. Попробуйте позже или свяжитесь с нами по телефону.",
   },
   en: {
     title: "Quick Order",
     name: "Your Name",
     phone: "Phone Number",
     submit: "Order",
-    success: "Thank you! We will contact you shortly.",
-    close: "Close"
-  }
+    sending: "Sending...",
+    success: "Thank you! Your order has been received, our manager will contact you shortly.",
+    orderNumber: "Order Number",
+    close: "Close",
+    errName: "Enter your name",
+    errPhone: "Enter a valid phone number",
+    serverError: "Order server is temporarily unavailable. Please try again later or contact us by phone.",
+  },
 }
 
 export function BuyNowModal() {
@@ -38,19 +57,84 @@ export function BuyNowModal() {
   const [submitted, setSubmitted] = useState(false)
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [orderNumber, setOrderNumber] = useState("")
 
   const getProductName = () => {
     if (!selectedProduct) return ""
     switch (language) {
-      case "ua": return selectedProduct.nameUa
-      case "ru": return selectedProduct.nameRu
-      default: return selectedProduct.name
+      case "ua":
+        return selectedProduct.nameUa
+      case "ru":
+        return selectedProduct.nameRu
+      default:
+        return selectedProduct.name
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSubmitted(true)
+    setError(null)
+
+    // Client-side validation — keep the modal open on any error.
+    if (!name.trim()) {
+      setError(t.errName)
+      return
+    }
+    if (!/^\+?\d[\d\s-]{8,}$/.test(phone.trim())) {
+      setError(t.errPhone)
+      return
+    }
+    if (!selectedProduct) return
+
+    // No backend configured = do not fake a successful order in production.
+    if (!isApiConfigured) {
+      setError(t.serverError)
+      return
+    }
+
+    const payload: OrderPayload = {
+      type: "quick_order",
+      customer: {
+        name: name.trim(),
+        phone: phone.trim(),
+      },
+      delivery: {
+        service: "not_required_for_quick_order",
+        type: "not_required_for_quick_order",
+      },
+      payment: { method: "manager_confirmation" },
+      items: [
+        {
+          productId: selectedProduct.id,
+          name: selectedProduct.name,
+          price: selectedProduct.price,
+          quantity: 1,
+        },
+      ],
+      totals: {
+        subtotal: selectedProduct.price,
+        shipping: 0,
+        total: selectedProduct.price,
+      },
+      language,
+      source: "buy_now_modal",
+    }
+
+    setSubmitting(true)
+    try {
+      const res = await createOrder(payload)
+      if (!res?.success) {
+        throw new Error(res?.message || "Order rejected by server")
+      }
+      setOrderNumber(res.orderNumber)
+      setSubmitted(true)
+    } catch {
+      setError(t.serverError)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const handleClose = () => {
@@ -58,6 +142,8 @@ export function BuyNowModal() {
     setSubmitted(false)
     setName("")
     setPhone("")
+    setError(null)
+    setOrderNumber("")
   }
 
   return (
@@ -99,7 +185,13 @@ export function BuyNowModal() {
               {submitted ? (
                 <div className="p-8 text-center">
                   <CheckCircle className="w-16 h-16 text-primary mx-auto mb-4" />
-                  <p className="text-lg text-foreground mb-6">{t.success}</p>
+                  <p className="text-lg text-foreground mb-2 text-pretty">{t.success}</p>
+                  {orderNumber && (
+                    <p className="text-sm text-muted-foreground mb-6">
+                      {t.orderNumber}:{" "}
+                      <span className="font-mono font-semibold text-foreground">{orderNumber}</span>
+                    </p>
+                  )}
                   <button
                     onClick={handleClose}
                     className="px-6 py-3 bg-primary text-primary-foreground font-semibold uppercase tracking-wide hover:bg-primary/90 transition-colors"
@@ -113,15 +205,13 @@ export function BuyNowModal() {
                   {selectedProduct && (
                     <div className="flex items-center gap-4 p-3 bg-muted rounded">
                       <img
-                        src={selectedProduct.images[0]}
+                        src={selectedProduct.images[0] || "/placeholder.svg"}
                         alt={getProductName()}
                         className="w-16 h-16 object-cover"
                       />
                       <div>
                         <p className="font-medium text-foreground">{getProductName()}</p>
-                        <p className="text-lg font-bold text-primary">
-                          {selectedProduct.price} грн
-                        </p>
+                        <p className="text-lg font-bold text-primary">{selectedProduct.price} грн</p>
                       </div>
                     </div>
                   )}
@@ -129,27 +219,32 @@ export function BuyNowModal() {
                   <input
                     type="text"
                     value={name}
-                    onChange={e => setName(e.target.value)}
+                    onChange={(e) => setName(e.target.value)}
                     placeholder={t.name}
-                    required
                     className="w-full px-4 py-3 bg-muted border border-border rounded text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   />
 
                   <input
                     type="tel"
                     value={phone}
-                    onChange={e => setPhone(e.target.value)}
+                    onChange={(e) => setPhone(e.target.value)}
                     placeholder={t.phone}
-                    required
                     className="w-full px-4 py-3 bg-muted border border-border rounded text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   />
 
+                  {error && (
+                    <p className="text-sm text-destructive" role="alert">
+                      {error}
+                    </p>
+                  )}
+
                   <button
                     type="submit"
-                    className="w-full py-4 bg-accent text-accent-foreground font-semibold uppercase tracking-wide hover:bg-accent/90 transition-colors flex items-center justify-center gap-2"
+                    disabled={submitting}
+                    className="w-full py-4 bg-accent text-accent-foreground font-semibold uppercase tracking-wide hover:bg-accent/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     <Zap className="w-5 h-5" />
-                    {t.submit}
+                    {submitting ? t.sending : t.submit}
                   </button>
                 </form>
               )}

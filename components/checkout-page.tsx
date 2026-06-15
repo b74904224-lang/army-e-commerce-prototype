@@ -3,16 +3,17 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useStore } from "@/lib/store-context"
+import { isApiConfigured } from "@/lib/api-client"
+import { createOrder, type OrderPayload, type DeliveryService as PayloadService } from "@/lib/api"
 import {
   ChevronLeft,
-  CreditCard,
   Banknote,
-  Wallet,
+  Landmark,
+  PhoneCall,
   CheckCircle2,
   Package,
   Building2,
   Home,
-  ShieldCheck,
 } from "lucide-react"
 
 const translations = {
@@ -36,18 +37,15 @@ const translations = {
     payment: "Спосіб оплати",
     cod: "Оплата при отриманні / Післяплата",
     codDesc: "Сплатіть під час отримання посилки",
-    fullCard: "Повна оплата картою",
-    fullCardDesc: "Visa / Mastercard онлайн",
-    partial: "Часткова передоплата",
-    partialDesc: "Передоплата 30%, решта при отриманні",
-    cardNumber: "Номер картки",
-    expiry: "Термін дії",
-    cvv: "CVV",
-    cardHolder: "Власник картки",
+    bankTransfer: "Оплата на реквізити",
+    bankTransferDesc: "Менеджер надішле реквізити після підтвердження",
+    managerConfirmation: "Уточнення оплати менеджером",
+    managerConfirmationDesc: "Менеджер зв'яжеться та уточнить зручний спосіб оплати",
+    comment: "Коментар до замовлення",
+    commentPlaceholder: "Додаткові побажання (необов'язково)",
     orderSummary: "Ваше замовлення",
     subtotal: "Сума товарів",
     shippingCost: "Доставка",
-    prepayment: "Передоплата (30%)",
     free: "За тарифами",
     total: "До сплати",
     placeOrder: "Підтвердити замовлення",
@@ -58,7 +56,9 @@ const translations = {
     required: "Обов'язкове поле",
     invalidEmail: "Невірний email",
     invalidPhone: "Невірний телефон",
-    securePay: "Безпечна оплата. Дані захищені шифруванням.",
+    emptyCart: "Ваш кошик порожній",
+    serverError:
+      "Сервер замовлень тимчасово недоступний. Спробуйте пізніше або зв'яжіться з нами телефоном.",
     qty: "Кіл-ть",
   },
   ru: {
@@ -81,18 +81,15 @@ const translations = {
     payment: "Способ оплаты",
     cod: "Оплата при получении / Наложенный платеж",
     codDesc: "Оплатите при получении посылки",
-    fullCard: "Полная оплата картой",
-    fullCardDesc: "Visa / Mastercard онлайн",
-    partial: "Частичная предоплата",
-    partialDesc: "Предоплата 30%, остальное при получении",
-    cardNumber: "Номер карты",
-    expiry: "Срок действия",
-    cvv: "CVV",
-    cardHolder: "Владелец карты",
+    bankTransfer: "Оплата на реквизиты",
+    bankTransferDesc: "Менеджер пришлёт реквизиты после подтверждения",
+    managerConfirmation: "Уточнение оплаты менеджером",
+    managerConfirmationDesc: "Менеджер свяжется и уточнит удобный способ оплаты",
+    comment: "Комментарий к заказу",
+    commentPlaceholder: "Дополнительные пожелания (необязательно)",
     orderSummary: "Ваш заказ",
     subtotal: "Сумма товаров",
     shippingCost: "Доставка",
-    prepayment: "Предоплата (30%)",
     free: "По тарифам",
     total: "К оплате",
     placeOrder: "Подтвердить заказ",
@@ -103,7 +100,9 @@ const translations = {
     required: "Обязательное поле",
     invalidEmail: "Неверный email",
     invalidPhone: "Неверный телефон",
-    securePay: "Безопасная оплата. Данные защищены шифрованием.",
+    emptyCart: "Ваша корзина пуста",
+    serverError:
+      "Сервер заказов временно недоступен. Попробуйте позже или свяжитесь с нами по телефону.",
     qty: "Кол-во",
   },
   en: {
@@ -126,18 +125,15 @@ const translations = {
     payment: "Payment Method",
     cod: "Cash on Delivery",
     codDesc: "Pay when you receive the parcel",
-    fullCard: "Full Card Payment",
-    fullCardDesc: "Visa / Mastercard online",
-    partial: "Partial Prepayment",
-    partialDesc: "30% prepayment, rest on delivery",
-    cardNumber: "Card Number",
-    expiry: "Expiry",
-    cvv: "CVV",
-    cardHolder: "Card Holder",
+    bankTransfer: "Bank Transfer",
+    bankTransferDesc: "Manager will send payment details after confirmation",
+    managerConfirmation: "Manager Will Confirm Payment",
+    managerConfirmationDesc: "Manager will contact you to arrange a convenient payment method",
+    comment: "Order Comment",
+    commentPlaceholder: "Additional notes (optional)",
     orderSummary: "Your Order",
     subtotal: "Subtotal",
     shippingCost: "Shipping",
-    prepayment: "Prepayment (30%)",
     free: "By tariff",
     total: "Total",
     placeOrder: "Place Order",
@@ -148,7 +144,8 @@ const translations = {
     required: "Required field",
     invalidEmail: "Invalid email",
     invalidPhone: "Invalid phone",
-    securePay: "Secure payment. Your data is encrypted.",
+    emptyCart: "Your cart is empty",
+    serverError: "Order server is temporarily unavailable. Please try again later or contact us by phone.",
     qty: "Qty",
   },
 }
@@ -167,7 +164,14 @@ const cities = {
 
 type DeliveryService = (typeof deliveryServices)[number]["id"]
 type DeliveryType = "branch" | "home"
-type PaymentMethod = "cod" | "fullCard" | "partial"
+type PaymentMethod = "cod" | "bank_transfer" | "manager_confirmation"
+
+// Map the frontend delivery service ids to the unified backend payload values.
+const serviceToPayload: Record<DeliveryService, PayloadService> = {
+  novaPoshta: "nova_poshta",
+  ukrPoshta: "ukr_poshta",
+  meest: "meest",
+}
 
 export function CheckoutPage() {
   const { language, cart, cartTotal, clearCart, setCurrentView } = useStore()
@@ -182,10 +186,7 @@ export function CheckoutPage() {
     street: "",
     building: "",
     apartment: "",
-    cardNumber: "",
-    expiry: "",
-    cvv: "",
-    cardHolder: "",
+    comment: "",
   })
 
   const [deliveryService, setDeliveryService] = useState<DeliveryService>("novaPoshta")
@@ -208,23 +209,10 @@ export function CheckoutPage() {
     }
   }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    let { name, value } = e.target
-    // Light formatting for card fields
-    if (name === "cardNumber") {
-      value = value
-        .replace(/\D/g, "")
-        .slice(0, 16)
-        .replace(/(.{4})/g, "$1 ")
-        .trim()
-    }
-    if (name === "expiry") {
-      value = value.replace(/\D/g, "").slice(0, 4)
-      if (value.length >= 3) value = `${value.slice(0, 2)}/${value.slice(2)}`
-    }
-    if (name === "cvv") {
-      value = value.replace(/\D/g, "").slice(0, 3)
-    }
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }))
   }
@@ -245,92 +233,82 @@ export function CheckoutPage() {
       if (!formData.building.trim()) e.building = t.required
     }
 
-    if (paymentMethod === "fullCard" || paymentMethod === "partial") {
-      if (formData.cardNumber.replace(/\s/g, "").length < 16) e.cardNumber = t.required
-      if (formData.expiry.length < 5) e.expiry = t.required
-      if (formData.cvv.length < 3) e.cvv = t.required
-      if (!formData.cardHolder.trim()) e.cardHolder = t.required
-    }
-
     setErrors(e)
     return Object.keys(e).length === 0
   }
 
   const shippingCost = deliveryType === "home" ? 80 : 0
   const total = cartTotal + shippingCost
-  const prepaymentAmount = Math.round(total * 0.3)
 
-  // Build a human-readable payload that Formspree will email to the manager.
-  const buildFormspreePayload = (orderNumber: string) => {
-    const serviceName = deliveryServices.find((s) => s.id === deliveryService)?.name ?? deliveryService
-    const deliveryTypeLabel =
-      deliveryType === "branch" ? "Доставка у відділення" : "Адресна доставка кур'єром"
-    const deliveryDetails =
-      deliveryType === "branch"
-        ? `Відділення №${formData.branchNumber.trim()}`
-        : `вул. ${formData.street.trim()}, буд. ${formData.building.trim()}, кв. ${formData.apartment.trim()}`
-    const paymentLabel =
-      paymentMethod === "cod"
-        ? "Післяплата (оплата при отриманні)"
-        : paymentMethod === "fullCard"
-        ? "Повна оплата картою"
-        : `Часткова передоплата (${prepaymentAmount} грн)`
-
-    return {
-      "Номер замовлення": orderNumber,
-      "Ім'я": formData.name.trim(),
-      "Телефон": formData.phone.trim(),
-      "Email": formData.email.trim(),
-      "Поштова служба": serviceName,
-      "Тип доставки": deliveryTypeLabel,
-      "Місто": formData.city,
-      "Адреса / Відділення": deliveryDetails,
-      "Спосіб оплати": paymentLabel,
-      "Товари": cart
-        .map((item) => `${item.product.name} ×${item.quantity} — ${item.product.price} грн`)
-        .join("\n"),
-      "Вартість доставки": shippingCost === 0 ? "Безкоштовно" : `${shippingCost} грн`,
-      "Загальна сума": `${total} грн`,
-    }
-  }
+  // Build the unified order payload sent to the OVHcloud backend (POST /api/orders).
+  const buildOrderPayload = (): OrderPayload => ({
+    type: "checkout",
+    customer: {
+      name: formData.name.trim(),
+      phone: formData.phone.trim(),
+      email: formData.email.trim() || undefined,
+    },
+    delivery: {
+      service: serviceToPayload[deliveryService],
+      type: deliveryType,
+      city: formData.city || undefined,
+      ...(deliveryType === "branch"
+        ? { branchNumber: formData.branchNumber.trim() }
+        : {
+            street: formData.street.trim(),
+            building: formData.building.trim(),
+            apartment: formData.apartment.trim() || undefined,
+          }),
+    },
+    payment: { method: paymentMethod },
+    items: cart.map((item) => ({
+      productId: item.product.id,
+      name: item.product.name,
+      price: item.product.price,
+      quantity: item.quantity,
+    })),
+    totals: {
+      subtotal: cartTotal,
+      shipping: shippingCost,
+      total,
+    },
+    comment: formData.comment.trim() || undefined,
+    language,
+    source: "checkout_page",
+  })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSubmitError(null)
+
+    if (cart.length === 0) {
+      setSubmitError(t.emptyCart)
+      return
+    }
+
     if (!validateForm()) {
       const firstError = document.querySelector("[data-error='true']")
       firstError?.scrollIntoView({ behavior: "smooth", block: "center" })
       return
     }
 
+    // No backend configured = we must NOT fake a successful order in production.
+    if (!isApiConfigured) {
+      setSubmitError(t.serverError)
+      return
+    }
+
     setSubmitting(true)
-    const orderNum = `ARMY-${Date.now().toString(36).toUpperCase()}`
     try {
-      // Send all captured order details to the Formspree endpoint.
-      const response = await fetch("https://formspree.io/f/mlgkzpqr", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(buildFormspreePayload(orderNum)),
-      })
-
-      if (!response.ok) {
-        throw new Error("Formspree submission failed")
+      const res = await createOrder(buildOrderPayload())
+      if (!res?.success) {
+        throw new Error(res?.message || "Order rejected by server")
       }
-
-      setOrderNumber(orderNum)
+      setOrderNumber(res.orderNumber)
       setOrderPlaced(true)
       clearCart()
     } catch {
-      setSubmitError(
-        language === "ua"
-          ? "Не вдалося оформити замовлення. Спробуйте ще раз."
-          : language === "ru"
-          ? "Не удалось оформить заказ. Попробуйте ещё раз."
-          : "Could not place the order. Please try again."
-      )
+      setSubmitError(t.serverError)
     } finally {
       setSubmitting(false)
     }
@@ -610,8 +588,13 @@ export function CheckoutPage() {
                   {(
                     [
                       { id: "cod", icon: Banknote, title: t.cod, desc: t.codDesc },
-                      { id: "fullCard", icon: CreditCard, title: t.fullCard, desc: t.fullCardDesc },
-                      { id: "partial", icon: Wallet, title: t.partial, desc: t.partialDesc },
+                      { id: "bank_transfer", icon: Landmark, title: t.bankTransfer, desc: t.bankTransferDesc },
+                      {
+                        id: "manager_confirmation",
+                        icon: PhoneCall,
+                        title: t.managerConfirmation,
+                        desc: t.managerConfirmationDesc,
+                      },
                     ] as const
                   ).map((method) => (
                     <label
@@ -638,87 +621,18 @@ export function CheckoutPage() {
                   ))}
                 </div>
 
-                {/* Card fields reveal */}
-                <AnimatePresence>
-                  {(paymentMethod === "fullCard" || paymentMethod === "partial") && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="mt-5 p-5 bg-muted/40 rounded-md border border-border space-y-4">
-                        {paymentMethod === "partial" && (
-                          <div className="flex items-center justify-between text-sm bg-primary/10 px-4 py-2.5 rounded-md">
-                            <span className="font-medium text-foreground">{t.prepayment}</span>
-                            <span className="font-bold text-primary">{prepaymentAmount} грн</span>
-                          </div>
-                        )}
-                        <div>
-                          <label className="block text-sm font-medium text-foreground mb-1.5">{t.cardNumber} *</label>
-                          <input
-                            type="text"
-                            inputMode="numeric"
-                            name="cardNumber"
-                            value={formData.cardNumber}
-                            onChange={handleInputChange}
-                            placeholder="0000 0000 0000 0000"
-                            data-error={!!errors.cardNumber}
-                            className={inputClass("cardNumber")}
-                          />
-                          {errors.cardNumber && <p className="text-sm text-destructive mt-1">{errors.cardNumber}</p>}
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-sm font-medium text-foreground mb-1.5">{t.expiry} *</label>
-                            <input
-                              type="text"
-                              inputMode="numeric"
-                              name="expiry"
-                              value={formData.expiry}
-                              onChange={handleInputChange}
-                              placeholder="MM/YY"
-                              data-error={!!errors.expiry}
-                              className={inputClass("expiry")}
-                            />
-                            {errors.expiry && <p className="text-sm text-destructive mt-1">{errors.expiry}</p>}
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-foreground mb-1.5">{t.cvv} *</label>
-                            <input
-                              type="password"
-                              inputMode="numeric"
-                              name="cvv"
-                              value={formData.cvv}
-                              onChange={handleInputChange}
-                              placeholder="•••"
-                              data-error={!!errors.cvv}
-                              className={inputClass("cvv")}
-                            />
-                            {errors.cvv && <p className="text-sm text-destructive mt-1">{errors.cvv}</p>}
-                          </div>
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-foreground mb-1.5">{t.cardHolder} *</label>
-                          <input
-                            type="text"
-                            name="cardHolder"
-                            value={formData.cardHolder}
-                            onChange={handleInputChange}
-                            placeholder="IVAN PETRENKO"
-                            data-error={!!errors.cardHolder}
-                            className={`${inputClass("cardHolder")} uppercase`}
-                          />
-                          {errors.cardHolder && <p className="text-sm text-destructive mt-1">{errors.cardHolder}</p>}
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <ShieldCheck className="w-4 h-4 text-primary" />
-                          {t.securePay}
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                {/* Optional order comment */}
+                <div className="mt-5">
+                  <label className="block text-sm font-medium text-foreground mb-1.5">{t.comment}</label>
+                  <textarea
+                    name="comment"
+                    value={formData.comment}
+                    onChange={handleInputChange}
+                    rows={3}
+                    placeholder={t.commentPlaceholder}
+                    className="w-full px-4 py-3 bg-background border border-border rounded-md text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all resize-none"
+                  />
+                </div>
               </section>
             </div>
 
@@ -761,12 +675,6 @@ export function CheckoutPage() {
                       {deliveryType === "home" ? "80 грн" : t.free}
                     </span>
                   </div>
-                  {paymentMethod === "partial" && (
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>{t.prepayment}</span>
-                      <span className="text-primary font-medium">{prepaymentAmount} грн</span>
-                    </div>
-                  )}
                 </div>
 
                 <div className="border-t border-border mt-4 pt-4 flex justify-between items-center">

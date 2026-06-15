@@ -53,6 +53,18 @@ export const PRODUCTS_ENDPOINT = "/api/products"
 /*  Orders ( /api/orders )                                                    */
 /* -------------------------------------------------------------------------- */
 
+export type OrderType = "checkout" | "quick_order"
+export type OrderSource = "checkout_page" | "buy_now_modal"
+export type DeliveryService =
+  | "nova_poshta"
+  | "ukr_poshta"
+  | "meest"
+  | "other"
+  | "not_required_for_quick_order"
+export type DeliveryType = "branch" | "home" | "not_required_for_quick_order"
+/** Safe payment methods only — no card data is ever collected on the frontend. */
+export type PaymentMethod = "cod" | "bank_transfer" | "manager_confirmation"
+
 export interface OrderItemPayload {
   productId: string
   name: string
@@ -61,30 +73,23 @@ export interface OrderItemPayload {
 }
 
 export interface OrderPayload {
+  type: OrderType
   customer: {
     name: string
     phone: string
-    email: string
+    email?: string
   }
   delivery: {
-    service: string // novaPoshta | ukrPoshta | meest
-    type: "branch" | "home"
-    city: string
+    service: DeliveryService
+    type: DeliveryType
+    city?: string
     branchNumber?: string
     street?: string
     building?: string
     apartment?: string
   }
   payment: {
-    method: "cod" | "fullCard" | "partial"
-    // Card data is sent only when a card method is selected. In production this
-    // must travel over HTTPS to a PCI-compliant endpoint / tokenization service.
-    card?: {
-      number: string
-      expiry: string
-      holder: string
-    }
-    prepaymentAmount?: number
+    method: PaymentMethod
   }
   items: OrderItemPayload[]
   totals: {
@@ -92,17 +97,23 @@ export interface OrderPayload {
     shipping: number
     total: number
   }
+  comment?: string
+  language: "ua" | "ru" | "en"
+  source: OrderSource
 }
 
 export interface OrderResponse {
+  success: boolean
   orderNumber: string
   status: string
+  message?: string
 }
 
 /** POST /api/orders — submit a new order to the OVHcloud backend. */
 export async function createOrder(payload: OrderPayload): Promise<OrderResponse> {
   return apiRequest<OrderResponse>("/api/orders", {
     method: "POST",
+    auth: false,
     body: payload,
   })
 }

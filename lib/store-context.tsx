@@ -10,10 +10,6 @@ export interface AuthUser {
   email: string
 }
 
-interface StoredUser extends AuthUser {
-  password: string
-}
-
 export interface Product {
   id: string
   name: string
@@ -397,16 +393,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  const getStoredUsers = (): StoredUser[] => {
-    try {
-      const raw = localStorage.getItem("army_users")
-      return raw ? (JSON.parse(raw) as StoredUser[]) : []
-    } catch {
-      return []
-    }
-  }
-
   const persistSession = (session: AuthUser) => {
+    // Only non-sensitive profile data (name/email) is stored — never passwords.
     localStorage.setItem("army_current_user", JSON.stringify(session))
     setCurrentUser(session)
   }
@@ -414,100 +402,59 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const register = async (name: string, email: string, password: string) => {
     const normalizedEmail = email.trim().toLowerCase()
 
-    // Real network registration against the OVHcloud backend (issues a JWT).
-    if (isApiConfigured) {
-      try {
-        const { user } = await registerRequest(name.trim(), normalizedEmail, password)
-        const session: AuthUser = { name: user.name, email: user.email }
-        persistSession(session)
-        showNotification(
-          language === "ua"
-            ? `Вітаємо, ${session.name}! Акаунт створено.`
-            : language === "ru"
-            ? `Добро пожаловать, ${session.name}! Аккаунт создан.`
-            : `Welcome, ${session.name}! Account created.`
-        )
-        return { success: true }
-      } catch (err) {
-        return { success: false, error: resolveAuthError(err) }
-      }
+    // Auth works ONLY through the real backend. No password is ever stored locally.
+    if (!isApiConfigured) {
+      return { success: false, error: authUnavailableMessage() }
     }
 
-    // Fallback: local mock "database" via localStorage.
-    const users = getStoredUsers()
-    if (users.some(u => u.email === normalizedEmail)) {
-      return {
-        success: false,
-        error:
-          language === "ua"
-            ? "Користувач з таким email вже існує"
-            : language === "ru"
-            ? "Пользователь с таким email уже существует"
-            : "A user with this email already exists"
-      }
+    try {
+      const { user } = await registerRequest(name.trim(), normalizedEmail, password)
+      const session: AuthUser = { name: user.name, email: user.email }
+      persistSession(session)
+      showNotification(
+        language === "ua"
+          ? `Вітаємо, ${session.name}! Акаунт створено.`
+          : language === "ru"
+          ? `Добро пожаловать, ${session.name}! Аккаунт создан.`
+          : `Welcome, ${session.name}! Account created.`
+      )
+      return { success: true }
+    } catch (err) {
+      return { success: false, error: resolveAuthError(err) }
     }
-    const newUser: StoredUser = { name: name.trim(), email: normalizedEmail, password }
-    localStorage.setItem("army_users", JSON.stringify([...users, newUser]))
-
-    const session: AuthUser = { name: newUser.name, email: newUser.email }
-    persistSession(session)
-    showNotification(
-      language === "ua"
-        ? `Вітаємо, ${session.name}! Акаунт створено.`
-        : language === "ru"
-        ? `Добро пожаловать, ${session.name}! Аккаунт создан.`
-        : `Welcome, ${session.name}! Account created.`
-    )
-    return { success: true }
   }
 
   const login = async (email: string, password: string) => {
     const normalizedEmail = email.trim().toLowerCase()
 
-    // Real network authentication against the OVHcloud backend (issues a JWT).
-    if (isApiConfigured) {
-      try {
-        const { user } = await loginRequest(normalizedEmail, password)
-        const session: AuthUser = { name: user.name, email: user.email }
-        persistSession(session)
-        showNotification(
-          language === "ua"
-            ? `Привіт, ${session.name}!`
-            : language === "ru"
-            ? `Привет, ${session.name}!`
-            : `Hi, ${session.name}!`
-        )
-        return { success: true }
-      } catch (err) {
-        return { success: false, error: resolveAuthError(err) }
-      }
+    // Auth works ONLY through the real backend. No password is ever stored locally.
+    if (!isApiConfigured) {
+      return { success: false, error: authUnavailableMessage() }
     }
 
-    // Fallback: validate against the local mock "database".
-    const users = getStoredUsers()
-    const match = users.find(u => u.email === normalizedEmail && u.password === password)
-    if (!match) {
-      return {
-        success: false,
-        error:
-          language === "ua"
-            ? "Невірний email або пароль"
-            : language === "ru"
-            ? "Неверный email или пароль"
-            : "Invalid email or password"
-      }
+    try {
+      const { user } = await loginRequest(normalizedEmail, password)
+      const session: AuthUser = { name: user.name, email: user.email }
+      persistSession(session)
+      showNotification(
+        language === "ua"
+          ? `Привіт, ${session.name}!`
+          : language === "ru"
+          ? `Привет, ${session.name}!`
+          : `Hi, ${session.name}!`
+      )
+      return { success: true }
+    } catch (err) {
+      return { success: false, error: resolveAuthError(err) }
     }
-    const session: AuthUser = { name: match.name, email: match.email }
-    persistSession(session)
-    showNotification(
-      language === "ua"
-        ? `Привіт, ${session.name}!`
-        : language === "ru"
-        ? `Привет, ${session.name}!`
-        : `Hi, ${session.name}!`
-    )
-    return { success: true }
   }
+
+  const authUnavailableMessage = (): string =>
+    language === "ua"
+      ? "Авторизація тимчасово недоступна. Оформлення замовлення працює без реєстрації."
+      : language === "ru"
+      ? "Авторизация временно недоступна. Оформление заказа работает без регистрации."
+      : "Authentication is temporarily unavailable. Checkout works without registration."
 
   // Map backend / network errors to localized, user-friendly messages.
   const resolveAuthError = (err: unknown): string => {
