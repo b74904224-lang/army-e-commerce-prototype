@@ -3,8 +3,6 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useStore } from "@/lib/store-context"
-import { isApiConfigured } from "@/lib/api-client"
-import { createOrder, type OrderPayload } from "@/lib/api"
 import {
   ChevronLeft,
   CreditCard,
@@ -53,8 +51,8 @@ const translations = {
     free: "За тарифами",
     total: "До сплати",
     placeOrder: "Підтвердити замовлення",
-    orderSuccess: "Замовлення оформлено!",
-    orderSuccessDesc: "Ми зв'яжемося з вами найближчим часом для підтвердження",
+    orderSuccess: "Дякуємо! Ваше замовлення прийнято",
+    orderSuccessDesc: "Наш менеджер зв'яжеться з вами найближчим часом.",
     orderNumber: "Номер замовлення",
     continueShopping: "Продовжити покупки",
     required: "Обов'язкове поле",
@@ -262,49 +260,39 @@ export function CheckoutPage() {
   const total = cartTotal + shippingCost
   const prepaymentAmount = Math.round(total * 0.3)
 
-  const buildOrderPayload = (): OrderPayload => ({
-    customer: {
-      name: formData.name.trim(),
-      phone: formData.phone.trim(),
-      email: formData.email.trim(),
-    },
-    delivery: {
-      service: deliveryService,
-      type: deliveryType,
-      city: formData.city,
-      ...(deliveryType === "branch"
-        ? { branchNumber: formData.branchNumber.trim() }
-        : {
-            street: formData.street.trim(),
-            building: formData.building.trim(),
-            apartment: formData.apartment.trim(),
-          }),
-    },
-    payment: {
-      method: paymentMethod,
-      ...(paymentMethod !== "cod"
-        ? {
-            card: {
-              number: formData.cardNumber.replace(/\s/g, ""),
-              expiry: formData.expiry,
-              holder: formData.cardHolder.trim(),
-            },
-          }
-        : {}),
-      ...(paymentMethod === "partial" ? { prepaymentAmount } : {}),
-    },
-    items: cart.map((item) => ({
-      productId: item.product.id,
-      name: item.product.name,
-      price: item.product.price,
-      quantity: item.quantity,
-    })),
-    totals: {
-      subtotal: cartTotal,
-      shipping: shippingCost,
-      total,
-    },
-  })
+  // Build a human-readable payload that Formspree will email to the manager.
+  const buildFormspreePayload = (orderNumber: string) => {
+    const serviceName = deliveryServices.find((s) => s.id === deliveryService)?.name ?? deliveryService
+    const deliveryTypeLabel =
+      deliveryType === "branch" ? "Доставка у відділення" : "Адресна доставка кур'єром"
+    const deliveryDetails =
+      deliveryType === "branch"
+        ? `Відділення №${formData.branchNumber.trim()}`
+        : `вул. ${formData.street.trim()}, буд. ${formData.building.trim()}, кв. ${formData.apartment.trim()}`
+    const paymentLabel =
+      paymentMethod === "cod"
+        ? "Післяплата (оплата при отриманні)"
+        : paymentMethod === "fullCard"
+        ? "Повна оплата картою"
+        : `Часткова передоплата (${prepaymentAmount} грн)`
+
+    return {
+      "Номер замовлення": orderNumber,
+      "Ім'я": formData.name.trim(),
+      "Телефон": formData.phone.trim(),
+      "Email": formData.email.trim(),
+      "Поштова служба": serviceName,
+      "Тип доставки": deliveryTypeLabel,
+      "Місто": formData.city,
+      "Адреса / Відділення": deliveryDetails,
+      "Спосіб оплати": paymentLabel,
+      "Товари": cart
+        .map((item) => `${item.product.name} ×${item.quantity} — ${item.product.price} грн`)
+        .join("\n"),
+      "Вартість доставки": shippingCost === 0 ? "Безкоштовно" : `${shippingCost} грн`,
+      "Загальна сума": `${total} грн`,
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -316,15 +304,23 @@ export function CheckoutPage() {
     }
 
     setSubmitting(true)
+    const orderNum = `ARMY-${Date.now().toString(36).toUpperCase()}`
     try {
-      if (isApiConfigured) {
-        // POST the full order to the OVHcloud backend.
-        const res = await createOrder(buildOrderPayload())
-        setOrderNumber(res.orderNumber || `ARMY-${Date.now().toString(36).toUpperCase()}`)
-      } else {
-        // Fallback: simulate an order number locally when no backend is set.
-        setOrderNumber(`ARMY-${Date.now().toString(36).toUpperCase()}`)
+      // Send all captured order details to the Formspree endpoint.
+      const response = await fetch("https://formspree.io/f/mlgkzpqr", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(buildFormspreePayload(orderNum)),
+      })
+
+      if (!response.ok) {
+        throw new Error("Formspree submission failed")
       }
+
+      setOrderNumber(orderNum)
       setOrderPlaced(true)
       clearCart()
     } catch {
