@@ -129,11 +129,15 @@ export function CategoryView() {
                       onClick={() => handleProductClick(product)}
                       className="w-full h-full"
                     >
-                      <img
-                        src={product.images[0]}
-                        alt={getProductName(product)}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
+                  <img
+                    src={product.images[0]}
+                    alt={getProductName(product)}
+                    loading="lazy"
+                    decoding="async"
+                    className={`w-full h-full transition-transform duration-500 group-hover:scale-105 ${
+                      product.category === "roll-mats" ? "object-contain p-3 bg-card" : "object-cover"
+                    }`}
+                  />
                     </button>
                     {product.isNew && (
                       <span className="absolute top-3 left-3 px-2 py-1 bg-primary text-primary-foreground text-xs font-semibold uppercase tracking-wide">

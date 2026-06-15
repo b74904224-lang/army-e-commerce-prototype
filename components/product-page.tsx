@@ -108,6 +108,8 @@ export function ProductPage({ product }: ProductPageProps) {
 
   const specs = getSpecifications()
   const specEntries = Object.entries(specs)
+  // Real studio/field photos (roll mats) display best uncropped so they stay sharp
+  const isPhoto = product.category === "roll-mats"
 
   return (
     <motion.div
@@ -139,7 +141,11 @@ export function ProductPage({ product }: ProductPageProps) {
               <img
                 src={product.images[selectedImage]}
                 alt={getName()}
-                className="w-full h-full object-cover"
+                loading="eager"
+                decoding="async"
+                className={`w-full h-full ${
+                  isPhoto ? "object-contain p-4 bg-card" : "object-cover"
+                } [image-rendering:auto]`}
               />
               {product.isNew && (
                 <span className="absolute top-4 left-4 px-3 py-1 bg-primary text-primary-foreground text-xs font-semibold uppercase tracking-wide">
@@ -163,7 +169,11 @@ export function ProductPage({ product }: ProductPageProps) {
                   <img
                     src={image}
                     alt={`${getName()} - ${index + 1}`}
-                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                    className={`w-full h-full ${
+                      isPhoto ? "object-contain p-1 bg-card" : "object-cover"
+                    }`}
                   />
                 </button>
               ))}
