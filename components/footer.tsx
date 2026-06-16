@@ -183,7 +183,7 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-3 text-background/70">
                 <Mail className="w-5 h-5" />
-                <span>orders@armytak.com</span>
+                <span>order@armytak.com</span>
               </li>
               <li className="flex items-center gap-3 text-background/70">
                 <MapPin className="w-5 h-5" />
