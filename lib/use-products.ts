@@ -7,7 +7,7 @@
 import useSWR from "swr"
 import { swrFetcher, isApiConfigured } from "./api-client"
 import { PRODUCTS_ENDPOINT } from "./api"
-import { products as fallbackProducts, type Product } from "./store-context"
+import { products as fallbackProducts, type Product } from "./catalog"
 
 interface UseProductsResult {
   products: Product[]

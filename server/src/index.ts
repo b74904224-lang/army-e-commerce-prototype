@@ -32,7 +32,7 @@ app.use(
       if (!origin || env.corsOrigins.includes(origin)) return callback(null, true)
       callback(new Error(`Origin ${origin} is not allowed by CORS`))
     },
-    methods: ["GET", "POST", "OPTIONS"],
+    methods: ["GET", "POST", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "Accept"],
   }),
 )
