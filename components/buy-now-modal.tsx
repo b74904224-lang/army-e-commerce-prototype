@@ -52,7 +52,7 @@ const translations = {
 }
 
 export function BuyNowModal() {
-  const { language, isBuyNowOpen, setIsBuyNowOpen, selectedProduct } = useStore()
+  const { language, isBuyNowOpen, setIsBuyNowOpen, buyNowProduct: selectedProduct } = useStore()
   const t = translations[language]
   const [submitted, setSubmitted] = useState(false)
   const [name, setName] = useState("")

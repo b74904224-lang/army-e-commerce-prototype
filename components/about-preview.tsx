@@ -2,6 +2,8 @@
 
 import { motion } from "framer-motion"
 import { useStore } from "@/lib/store-context"
+import { routes } from "@/lib/site-routes"
+import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 
 const translations = {
@@ -23,7 +25,7 @@ const translations = {
 }
 
 export function AboutPreview() {
-  const { language, setCurrentView } = useStore()
+  const { language } = useStore()
   const t = translations[language]
 
   return (
@@ -41,13 +43,13 @@ export function AboutPreview() {
           <p className="text-muted-foreground leading-relaxed mb-8 text-balance">
             {t.description}
           </p>
-          <button
-            onClick={() => setCurrentView("about")}
+          <Link
+            href={routes.about}
             className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors"
           >
             {t.cta}
             <ArrowRight className="w-4 h-4" />
-          </button>
+          </Link>
         </motion.div>
       </div>
     </section>

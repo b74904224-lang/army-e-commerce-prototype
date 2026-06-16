@@ -3,6 +3,8 @@
 import { motion } from "framer-motion"
 import { useStore, categories, type Product } from "@/lib/store-context"
 import { useProducts } from "@/lib/use-products"
+import { routes } from "@/lib/site-routes"
+import Link from "next/link"
 import { Heart, ShoppingBag } from "lucide-react"
 
 const translations = {
@@ -26,13 +28,14 @@ const translations = {
   }
 }
 
-export function CategoryView() {
+interface CategoryViewProps {
+  /** Active category id, or null for the full catalog. */
+  categoryId?: string | null
+}
+
+export function CategoryView({ categoryId = null }: CategoryViewProps) {
   const {
     language,
-    selectedCategory,
-    setSelectedCategory,
-    setCurrentView,
-    setSelectedProduct,
     addToCart,
     toggleFavorite,
     isFavorite
@@ -40,11 +43,9 @@ export function CategoryView() {
   const { products } = useProducts()
   const t = translations[language]
 
-  const filteredProducts = selectedCategory
-    ? products.filter(p => p.category === selectedCategory)
+  const displayProducts = categoryId
+    ? products.filter(p => p.category === categoryId)
     : products
-
-  const newProducts = products.filter(p => p.isNew)
 
   const getCategoryName = (category: typeof categories[0]) => {
     switch (language) {
@@ -70,45 +71,34 @@ export function CategoryView() {
     }
   }
 
-  const handleProductClick = (product: Product) => {
-    setSelectedProduct(product)
-    setCurrentView("product")
-  }
-
-  const displayProducts = selectedCategory === null && !newProducts.length
-    ? products
-    : selectedCategory === null
-    ? newProducts.length > 0 ? newProducts : products
-    : filteredProducts
-
   return (
     <div className="min-h-screen bg-background py-8 sm:py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Category Filter */}
         <div className="mb-8 sm:mb-10">
           <div className="flex flex-wrap gap-2 sm:gap-3">
-            <button
-              onClick={() => setSelectedCategory(null)}
+            <Link
+              href={routes.catalog}
               className={`px-4 py-2 text-sm font-medium transition-colors ${
-                selectedCategory === null
+                categoryId === null
                   ? "bg-primary text-primary-foreground"
                   : "bg-muted text-foreground hover:bg-muted/80"
               }`}
             >
               {t.allProducts}
-            </button>
+            </Link>
             {categories.map(category => (
-              <button
+              <Link
                 key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
+                href={routes.category(category.id)}
                 className={`px-4 py-2 text-sm font-medium transition-colors ${
-                  selectedCategory === category.id
+                  categoryId === category.id
                     ? "bg-primary text-primary-foreground"
                     : "bg-muted text-foreground hover:bg-muted/80"
                 }`}
               >
                 {getCategoryName(category)}
-              </button>
+              </Link>
             ))}
           </div>
         </div>
@@ -127,20 +117,20 @@ export function CategoryView() {
                   className="group"
                 >
                   <div className="relative aspect-square bg-muted overflow-hidden mb-4">
-                    <button
-                      onClick={() => handleProductClick(product)}
-                      className="w-full h-full"
+                    <Link
+                      href={routes.product(product.slug)}
+                      className="block w-full h-full"
                     >
-                  <img
-                    src={product.images[0]}
-                    alt={getProductName(product)}
-                    loading="lazy"
-                    decoding="async"
-                    className={`w-full h-full transition-transform duration-500 group-hover:scale-105 ${
-                      product.category === "roll-mats" ? "object-contain p-3 bg-card" : "object-cover"
-                    }`}
-                  />
-                    </button>
+                      <img
+                        src={product.images[0]}
+                        alt={getProductName(product)}
+                        loading="lazy"
+                        decoding="async"
+                        className={`w-full h-full transition-transform duration-500 group-hover:scale-105 ${
+                          product.category === "roll-mats" ? "object-contain p-3 bg-card" : "object-cover"
+                        }`}
+                      />
+                    </Link>
                     {product.isNew && (
                       <span className="absolute top-3 left-3 px-2 py-1 bg-primary text-primary-foreground text-xs font-semibold uppercase tracking-wide">
                         {t.new}
@@ -169,9 +159,9 @@ export function CategoryView() {
                       </button>
                     </div>
                   </div>
-                  <button
-                    onClick={() => handleProductClick(product)}
-                    className="text-left w-full"
+                  <Link
+                    href={routes.product(product.slug)}
+                    className="text-left w-full block"
                   >
                     <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
                       {getProductCategory(product)}
@@ -187,7 +177,7 @@ export function CategoryView() {
                         </span>
                       )}
                     </div>
-                  </button>
+                  </Link>
                 </motion.div>
               )
             })}

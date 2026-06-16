@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useStore, type Product } from "@/lib/store-context"
 import { useProducts } from "@/lib/use-products"
+import { routes } from "@/lib/site-routes"
+import { useRouter } from "next/navigation"
 import { Search, X } from "lucide-react"
 
 const translations = {
@@ -28,11 +30,10 @@ export function SearchModal() {
   const {
     language,
     isSearchOpen,
-    setIsSearchOpen,
-    setCurrentView,
-    setSelectedProduct
+    setIsSearchOpen
   } = useStore()
   const { products } = useProducts()
+  const router = useRouter()
   const t = translations[language]
   const [query, setQuery] = useState("")
   const inputRef = useRef<HTMLInputElement>(null)
@@ -79,8 +80,7 @@ export function SearchModal() {
     : []
 
   const handleProductClick = (product: Product) => {
-    setSelectedProduct(product)
-    setCurrentView("product")
+    router.push(routes.product(product.slug))
     setIsSearchOpen(false)
     setQuery("")
   }

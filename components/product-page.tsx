@@ -3,7 +3,10 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useStore, Product } from "@/lib/store-context"
-import { Heart, ShoppingBag, Zap, ChevronLeft, Minus, Plus } from "lucide-react"
+import { routes } from "@/lib/site-routes"
+import { getCategoryById, categoryName } from "@/lib/catalog"
+import Link from "next/link"
+import { Heart, ShoppingBag, Zap, ChevronRight, Minus, Plus } from "lucide-react"
 
 const translations = {
   ua: {
@@ -17,7 +20,9 @@ const translations = {
     outOfStock: "Немає в наявності",
     back: "Назад",
     new: "Новинка",
-    quantity: "Кількість:"
+    quantity: "Кількість:",
+    home: "Головна",
+    catalog: "Каталог"
   },
   ru: {
     addToCart: "Добавить в корзину",
@@ -30,7 +35,9 @@ const translations = {
     outOfStock: "Нет в наличии",
     back: "Назад",
     new: "Новинка",
-    quantity: "Количество:"
+    quantity: "Количество:",
+    home: "Главная",
+    catalog: "Каталог"
   },
   en: {
     addToCart: "Add to Cart",
@@ -43,7 +50,9 @@ const translations = {
     outOfStock: "Out of Stock",
     back: "Back",
     new: "New",
-    quantity: "Quantity:"
+    quantity: "Quantity:",
+    home: "Home",
+    catalog: "Catalog"
   }
 }
 
@@ -57,15 +66,14 @@ export function ProductPage({ product }: ProductPageProps) {
     addToCart,
     toggleFavorite,
     isFavorite,
-    setCurrentView,
-    setIsBuyNowOpen,
-    setSelectedProduct
+    openBuyNow
   } = useStore()
   const t = translations[language]
   const [selectedImage, setSelectedImage] = useState(0)
   const [activeTab, setActiveTab] = useState<"description" | "specifications">("description")
   const [quantity, setQuantity] = useState(1)
   const favorite = isFavorite(product.id)
+  const category = getCategoryById(product.category)
 
   const getName = () => {
     switch (language) {
@@ -98,12 +106,7 @@ export function ProductPage({ product }: ProductPageProps) {
   }
 
   const handleBuyNow = () => {
-    setSelectedProduct(product)
-    setIsBuyNowOpen(true)
-  }
-
-  const handleBack = () => {
-    setCurrentView("category")
+    openBuyNow(product)
   }
 
   const specs = getSpecifications()
@@ -119,14 +122,39 @@ export function ProductPage({ product }: ProductPageProps) {
       className="min-h-screen bg-background"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        {/* Back Button */}
-        <button
-          onClick={handleBack}
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
-        >
-          <ChevronLeft className="w-4 h-4" />
-          {t.back}
-        </button>
+        {/* Breadcrumbs */}
+        <nav aria-label="Breadcrumb" className="mb-6">
+          <ol className="flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
+            <li>
+              <Link href={routes.home} className="hover:text-foreground transition-colors">
+                {t.home}
+              </Link>
+            </li>
+            <li aria-hidden="true"><ChevronRight className="w-4 h-4" /></li>
+            <li>
+              <Link href={routes.catalog} className="hover:text-foreground transition-colors">
+                {t.catalog}
+              </Link>
+            </li>
+            {category && (
+              <>
+                <li aria-hidden="true"><ChevronRight className="w-4 h-4" /></li>
+                <li>
+                  <Link
+                    href={routes.category(category.id)}
+                    className="hover:text-foreground transition-colors"
+                  >
+                    {categoryName(category, language)}
+                  </Link>
+                </li>
+              </>
+            )}
+            <li aria-hidden="true"><ChevronRight className="w-4 h-4" /></li>
+            <li className="text-foreground font-medium line-clamp-1 max-w-[200px] sm:max-w-none">
+              {getName()}
+            </li>
+          </ol>
+        </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           {/* Image Gallery */}

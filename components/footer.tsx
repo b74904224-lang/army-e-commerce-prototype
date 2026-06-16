@@ -1,6 +1,8 @@
 "use client"
 
 import { useStore } from "@/lib/store-context"
+import { routes } from "@/lib/site-routes"
+import Link from "next/link"
 import { Instagram, Facebook, Youtube, Mail, Phone, MapPin } from "lucide-react"
 
 const translations = {
@@ -13,6 +15,8 @@ const translations = {
     blog: "Блог",
     info: "Інформація",
     delivery: "Доставка і оплата",
+    returns: "Обмін і повернення",
+    privacy: "Політика конфіденційності",
     contact: "Контакти",
     address: "Київ, Україна",
     workingHours: "Пн-Пт: 9:00 - 18:00",
@@ -27,6 +31,8 @@ const translations = {
     blog: "Блог",
     info: "Информация",
     delivery: "Доставка и оплата",
+    returns: "Обмен и возврат",
+    privacy: "Политика конфиденциальности",
     contact: "Контакты",
     address: "Киев, Украина",
     workingHours: "Пн-Пт: 9:00 - 18:00",
@@ -41,6 +47,8 @@ const translations = {
     blog: "Blog",
     info: "Information",
     delivery: "Delivery & Payment",
+    returns: "Returns & Exchange",
+    privacy: "Privacy Policy",
     contact: "Contact",
     address: "Kyiv, Ukraine",
     workingHours: "Mon-Fri: 9:00 AM - 6:00 PM",
@@ -49,13 +57,8 @@ const translations = {
 }
 
 export function Footer() {
-  const { language, setCurrentView, setSelectedCategory } = useStore()
+  const { language } = useStore()
   const t = translations[language]
-
-  const handleNavClick = (view: "home" | "product" | "about" | "blog" | "category") => {
-    setCurrentView(view)
-    window.scrollTo({ top: 0, behavior: "smooth" })
-  }
 
   return (
     <footer className="bg-foreground text-background">
@@ -97,39 +100,36 @@ export function Footer() {
             <h3 className="font-semibold mb-4">{t.navigation}</h3>
             <ul className="space-y-2">
               <li>
-                <button
-                  onClick={() => handleNavClick("home")}
+                <Link
+                  href={routes.home}
                   className="text-background/70 hover:text-background transition-colors"
                 >
                   {t.home}
-                </button>
+                </Link>
               </li>
               <li>
-                <button
-                  onClick={() => {
-                    setSelectedCategory(null)
-                    handleNavClick("category")
-                  }}
+                <Link
+                  href={routes.catalog}
                   className="text-background/70 hover:text-background transition-colors"
                 >
                   {t.products}
-                </button>
+                </Link>
               </li>
               <li>
-                <button
-                  onClick={() => handleNavClick("about")}
+                <Link
+                  href={routes.about}
                   className="text-background/70 hover:text-background transition-colors"
                 >
                   {t.about}
-                </button>
+                </Link>
               </li>
               <li>
-                <button
-                  onClick={() => handleNavClick("blog")}
+                <Link
+                  href={routes.blog}
                   className="text-background/70 hover:text-background transition-colors"
                 >
                   {t.blog}
-                </button>
+                </Link>
               </li>
             </ul>
           </div>
@@ -139,20 +139,36 @@ export function Footer() {
             <h3 className="font-semibold mb-4">{t.info}</h3>
             <ul className="space-y-2">
               <li>
-                <a
-                  href="#"
+                <Link
+                  href={routes.deliveryPayment}
                   className="text-background/70 hover:text-background transition-colors"
                 >
                   {t.delivery}
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  href={routes.returns}
+                  className="text-background/70 hover:text-background transition-colors"
+                >
+                  {t.returns}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href={routes.privacyPolicy}
+                  className="text-background/70 hover:text-background transition-colors"
+                >
+                  {t.privacy}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href={routes.contacts}
                   className="text-background/70 hover:text-background transition-colors"
                 >
                   {t.contact}
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -167,7 +183,7 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-3 text-background/70">
                 <Mail className="w-5 h-5" />
-                <span>info@army.ua</span>
+                <span>order@armytak.com</span>
               </li>
               <li className="flex items-center gap-3 text-background/70">
                 <MapPin className="w-5 h-5" />
