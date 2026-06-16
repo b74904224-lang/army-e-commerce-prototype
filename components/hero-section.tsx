@@ -2,6 +2,8 @@
 
 import { motion } from "framer-motion"
 import { useStore } from "@/lib/store-context"
+import { routes } from "@/lib/site-routes"
+import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 
 const translations = {
@@ -23,13 +25,8 @@ const translations = {
 }
 
 export function HeroSection() {
-  const { language, setCurrentView, setSelectedCategory } = useStore()
+  const { language } = useStore()
   const t = translations[language]
-
-  const handleShopNow = () => {
-    setSelectedCategory(null)
-    setCurrentView("category")
-  }
 
   return (
     <section className="relative h-[70vh] min-h-[500px] max-h-[800px] overflow-hidden">
@@ -67,18 +64,22 @@ export function HeroSection() {
           >
             {t.subtitle}
           </motion.p>
-          <motion.button
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={handleShopNow}
-            className="mt-6 sm:mt-8 inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-white text-foreground font-semibold text-sm sm:text-base uppercase tracking-wide hover:bg-secondary transition-colors"
+            className="inline-block mt-6 sm:mt-8"
           >
-            {t.cta}
-            <ArrowRight className="w-4 h-4" />
-          </motion.button>
+            <Link
+              href={routes.catalog}
+              className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-white text-foreground font-semibold text-sm sm:text-base uppercase tracking-wide hover:bg-secondary transition-colors"
+            >
+              {t.cta}
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </motion.div>
         </motion.div>
       </div>
     </section>

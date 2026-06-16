@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Analytics } from '@vercel/analytics/next'
 import { getSiteUrl } from '@/lib/site-routes'
+import { SiteShell } from '@/components/site-shell'
 import './globals.css'
 
 const siteUrl = getSiteUrl()
@@ -60,7 +61,7 @@ export default function RootLayout({
   return (
     <html lang="uk" className="bg-background">
       <body className="font-sans antialiased">
-        {children}
+        <SiteShell>{children}</SiteShell>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

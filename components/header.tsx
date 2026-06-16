@@ -1,14 +1,17 @@
 "use client"
 
-import { Search, User, Heart, ShoppingBag, Menu, X, LogOut } from "lucide-react"
+import { Search, User, Heart, ShoppingBag, Menu, X, LogOut, LayoutDashboard } from "lucide-react"
 import { useStore } from "@/lib/store-context"
+import { routes } from "@/lib/site-routes"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { useState } from "react"
 
 const translations = {
-  ua: { new: "Новинки", about: "Про бренд", products: "Товар", blog: "Блог", hi: "Привіт", logout: "Вийти" },
-  ru: { new: "Новинки", about: "О бренде", products: "Товары", blog: "Блог", hi: "Привет", logout: "Выйти" },
-  en: { new: "New", about: "About", products: "Products", blog: "Blog", hi: "Hi", logout: "Log out" }
+  ua: { new: "Новинки", about: "Про бренд", products: "Товар", blog: "Блог", hi: "Привіт", logout: "Вийти", login: "Вхід", register: "Реєстрація", account: "Кабінет" },
+  ru: { new: "Новинки", about: "О бренде", products: "Товары", blog: "Блог", hi: "Привет", logout: "Выйти", login: "Вход", register: "Регистрация", account: "Кабинет" },
+  en: { new: "New", about: "About", products: "Products", blog: "Blog", hi: "Hi", logout: "Log out", login: "Sign in", register: "Register", account: "Account" }
 }
 
 export function Header() {
@@ -19,25 +22,20 @@ export function Header() {
     favorites,
     setIsCartOpen,
     setIsSearchOpen,
-    setIsLoginOpen,
-    setCurrentView,
-    setSelectedCategory,
     currentUser,
     logout
   } = useStore()
+  const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const t = translations[language]
 
-  const handleNavClick = (view: "home" | "product" | "about" | "blog" | "category") => {
-    setCurrentView(view)
-    setMobileMenuOpen(false)
-  }
+  const closeMobile = () => setMobileMenuOpen(false)
 
-  const handleNewClick = () => {
-    setSelectedCategory(null)
-    setCurrentView("category")
-    setMobileMenuOpen(false)
+  const handleLogout = () => {
+    logout()
+    setUserMenuOpen(false)
+    router.push(routes.home)
   }
 
   return (
@@ -54,42 +52,39 @@ export function Header() {
           </button>
 
           {/* Logo */}
-          <button
-            onClick={() => handleNavClick("home")}
+          <Link
+            href={routes.home}
             className="text-2xl lg:text-3xl font-bold tracking-tight text-foreground hover:text-primary transition-colors"
           >
             ARMY
-          </button>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-8">
-            <button
-              onClick={handleNewClick}
+            <Link
+              href={routes.catalog}
               className="text-sm font-medium text-foreground hover:text-primary transition-colors uppercase tracking-wide"
             >
               {t.new}
-            </button>
-            <button
-              onClick={() => handleNavClick("about")}
+            </Link>
+            <Link
+              href={routes.about}
               className="text-sm font-medium text-foreground hover:text-primary transition-colors uppercase tracking-wide"
             >
               {t.about}
-            </button>
-            <button
-              onClick={() => {
-                setSelectedCategory(null)
-                handleNavClick("category")
-              }}
+            </Link>
+            <Link
+              href={routes.catalog}
               className="text-sm font-medium text-foreground hover:text-primary transition-colors uppercase tracking-wide"
             >
               {t.products}
-            </button>
-            <button
-              onClick={() => handleNavClick("blog")}
+            </Link>
+            <Link
+              href={routes.blog}
               className="text-sm font-medium text-foreground hover:text-primary transition-colors uppercase tracking-wide"
             >
               {t.blog}
-            </button>
+            </Link>
           </nav>
 
           {/* Right side actions */}
@@ -167,11 +162,16 @@ export function Header() {
                             {currentUser.email}
                           </p>
                         </div>
+                        <Link
+                          href={routes.account}
+                          onClick={() => setUserMenuOpen(false)}
+                          className="flex items-center gap-2 w-full px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors"
+                        >
+                          <LayoutDashboard className="w-4 h-4" />
+                          {t.account}
+                        </Link>
                         <button
-                          onClick={() => {
-                            logout()
-                            setUserMenuOpen(false)
-                          }}
+                          onClick={handleLogout}
                           className="flex items-center gap-2 w-full px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors"
                         >
                           <LogOut className="w-4 h-4" />
@@ -183,19 +183,33 @@ export function Header() {
                 </AnimatePresence>
               </div>
             ) : (
-              <button
-                onClick={() => setIsLoginOpen(true)}
-                className="p-2 text-foreground hover:text-primary transition-colors"
+              <div className="hidden sm:flex items-center gap-2">
+                <Link
+                  href={routes.login}
+                  className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+                >
+                  {t.login}
+                </Link>
+                <span className="text-border">|</span>
+                <Link
+                  href={routes.register}
+                  className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+                >
+                  {t.register}
+                </Link>
+              </div>
+            )}
+            {!currentUser && (
+              <Link
+                href={routes.login}
+                className="sm:hidden p-2 text-foreground hover:text-primary transition-colors"
                 aria-label="Account"
               >
                 <User className="w-5 h-5" />
-              </button>
+              </Link>
             )}
-            <button
-              onClick={() => {
-                setSelectedCategory(null)
-                setCurrentView("category")
-              }}
+            <Link
+              href={routes.account}
               className="relative p-2 text-foreground hover:text-primary transition-colors"
               aria-label="Favorites"
             >
@@ -205,7 +219,7 @@ export function Header() {
                   {favorites.length}
                 </span>
               )}
-            </button>
+            </Link>
             <button
               onClick={() => setIsCartOpen(true)}
               className="relative p-2 text-foreground hover:text-primary transition-colors"
@@ -232,33 +246,76 @@ export function Header() {
             className="lg:hidden border-t border-border bg-background"
           >
             <nav className="px-4 py-4 flex flex-col gap-4">
-              <button
-                onClick={handleNewClick}
+              <Link
+                href={routes.catalog}
+                onClick={closeMobile}
                 className="text-left text-sm font-medium text-foreground hover:text-primary transition-colors uppercase tracking-wide py-2"
               >
                 {t.new}
-              </button>
-              <button
-                onClick={() => handleNavClick("about")}
+              </Link>
+              <Link
+                href={routes.about}
+                onClick={closeMobile}
                 className="text-left text-sm font-medium text-foreground hover:text-primary transition-colors uppercase tracking-wide py-2"
               >
                 {t.about}
-              </button>
-              <button
-                onClick={() => {
-                  setSelectedCategory(null)
-                  handleNavClick("category")
-                }}
+              </Link>
+              <Link
+                href={routes.catalog}
+                onClick={closeMobile}
                 className="text-left text-sm font-medium text-foreground hover:text-primary transition-colors uppercase tracking-wide py-2"
               >
                 {t.products}
-              </button>
-              <button
-                onClick={() => handleNavClick("blog")}
+              </Link>
+              <Link
+                href={routes.blog}
+                onClick={closeMobile}
                 className="text-left text-sm font-medium text-foreground hover:text-primary transition-colors uppercase tracking-wide py-2"
               >
                 {t.blog}
-              </button>
+              </Link>
+
+              {/* Account links */}
+              <div className="pt-2 border-t border-border flex flex-col gap-2">
+                {currentUser ? (
+                  <>
+                    <Link
+                      href={routes.account}
+                      onClick={closeMobile}
+                      className="text-left text-sm font-medium text-foreground hover:text-primary transition-colors py-2"
+                    >
+                      {t.account}
+                    </Link>
+                    <button
+                      onClick={() => {
+                        handleLogout()
+                        closeMobile()
+                      }}
+                      className="text-left text-sm font-medium text-foreground hover:text-primary transition-colors py-2"
+                    >
+                      {t.logout}
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href={routes.login}
+                      onClick={closeMobile}
+                      className="text-left text-sm font-medium text-foreground hover:text-primary transition-colors py-2"
+                    >
+                      {t.login}
+                    </Link>
+                    <Link
+                      href={routes.register}
+                      onClick={closeMobile}
+                      className="text-left text-sm font-medium text-foreground hover:text-primary transition-colors py-2"
+                    >
+                      {t.register}
+                    </Link>
+                  </>
+                )}
+              </div>
+
               {/* Mobile Language Switcher */}
               <div className="flex items-center gap-2 pt-2 border-t border-border">
                 <button

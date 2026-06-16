@@ -2,6 +2,8 @@
 
 import { motion, AnimatePresence } from "framer-motion"
 import { useStore } from "@/lib/store-context"
+import { routes } from "@/lib/site-routes"
+import { useRouter } from "next/navigation"
 import { X, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react"
 
 const translations = {
@@ -39,10 +41,9 @@ export function CartDrawer() {
     isCartOpen,
     setIsCartOpen,
     updateQuantity,
-    removeFromCart,
-    setCurrentView,
-    setSelectedCategory
+    removeFromCart
   } = useStore()
+  const router = useRouter()
   const t = translations[language]
 
   const getProductName = (item: typeof cart[0]) => {
@@ -55,13 +56,12 @@ export function CartDrawer() {
 
   const handleContinueShopping = () => {
     setIsCartOpen(false)
-    setSelectedCategory(null)
-    setCurrentView("category")
+    router.push(routes.catalog)
   }
 
   const handleCheckout = () => {
     setIsCartOpen(false)
-    setCurrentView("checkout")
+    router.push(routes.checkout)
   }
 
   return (

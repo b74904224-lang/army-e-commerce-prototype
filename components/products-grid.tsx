@@ -3,6 +3,8 @@
 import { motion } from "framer-motion"
 import { useStore, type Product } from "@/lib/store-context"
 import { useProducts } from "@/lib/use-products"
+import { routes } from "@/lib/site-routes"
+import Link from "next/link"
 import { ShoppingBag } from "lucide-react"
 
 const translations = {
@@ -31,7 +33,7 @@ interface ProductsGridProps {
 }
 
 export function ProductsGrid({ type }: ProductsGridProps) {
-  const { language, addToCart, setSelectedProduct, setCurrentView } = useStore()
+  const { language, addToCart } = useStore()
   const { products } = useProducts()
   const t = translations[language]
 
@@ -45,11 +47,6 @@ export function ProductsGrid({ type }: ProductsGridProps) {
       case "ru": return product.nameRu
       default: return product.name
     }
-  }
-
-  const handleProductClick = (product: Product) => {
-    setSelectedProduct(product)
-    setCurrentView("product")
   }
 
   return (
@@ -75,9 +72,9 @@ export function ProductsGrid({ type }: ProductsGridProps) {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className="group"
             >
-              <button
-                onClick={() => handleProductClick(product)}
-                className="relative aspect-square overflow-hidden bg-muted w-full text-left"
+              <Link
+                href={routes.product(product.slug)}
+                className="relative aspect-square overflow-hidden bg-muted w-full text-left block"
               >
                 <img
                   src={product.images[0]}
@@ -93,16 +90,16 @@ export function ProductsGrid({ type }: ProductsGridProps) {
                     {t.new}
                   </span>
                 )}
-              </button>
+              </Link>
               <div className="mt-3 space-y-2">
-                <button
-                  onClick={() => handleProductClick(product)}
+                <Link
+                  href={routes.product(product.slug)}
                   className="block text-left"
                 >
                   <h3 className="text-sm font-medium text-foreground line-clamp-2 hover:text-primary transition-colors">
                     {getName(product)}
                   </h3>
-                </button>
+                </Link>
                 <div className="flex items-center justify-between">
                   <div className="flex items-baseline gap-2">
                     <span className="font-semibold text-foreground">{product.price} грн</span>
