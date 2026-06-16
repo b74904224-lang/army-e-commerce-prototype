@@ -5,6 +5,9 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useStore } from "@/lib/store-context"
 import { isApiConfigured } from "@/lib/api-client"
 import { createOrder, type OrderPayload, type DeliveryService as PayloadService } from "@/lib/api"
+import { routes } from "@/lib/site-routes"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
 import {
   ChevronLeft,
   Banknote,
@@ -174,7 +177,8 @@ const serviceToPayload: Record<DeliveryService, PayloadService> = {
 }
 
 export function CheckoutPage() {
-  const { language, cart, cartTotal, clearCart, setCurrentView } = useStore()
+  const { language, cart, cartTotal, clearCart } = useStore()
+  const router = useRouter()
   const t = translations[language]
 
   const [formData, setFormData] = useState({
@@ -341,7 +345,7 @@ export function CheckoutPage() {
             {t.orderNumber}: <span className="font-mono font-semibold text-foreground">{orderNumber}</span>
           </p>
           <button
-            onClick={() => setCurrentView("home")}
+            onClick={() => router.push(routes.home)}
             className="px-8 py-3 bg-primary text-primary-foreground font-semibold rounded-md hover:bg-primary/90 transition-colors uppercase tracking-wide"
           >
             {t.continueShopping}
@@ -354,13 +358,13 @@ export function CheckoutPage() {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen bg-background">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-        <button
-          onClick={() => setCurrentView("home")}
+        <Link
+          href={routes.cart}
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
         >
           <ChevronLeft className="w-4 h-4" />
           {t.back}
-        </button>
+        </Link>
 
         <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-8 tracking-tight">{t.checkout}</h1>
 
