@@ -3,6 +3,7 @@
 import { motion } from "framer-motion"
 import { useStore, type Product } from "@/lib/store-context"
 import { useProducts } from "@/lib/use-products"
+import { formatPrice } from "@/lib/catalog"
 import { routes } from "@/lib/site-routes"
 import Link from "next/link"
 import { ShoppingBag } from "lucide-react"
@@ -102,9 +103,9 @@ export function ProductsGrid({ type }: ProductsGridProps) {
                 </Link>
                 <div className="flex items-center justify-between">
                   <div className="flex items-baseline gap-2">
-                    <span className="font-semibold text-foreground">{product.price} грн</span>
+                    <span className="font-semibold text-foreground">{formatPrice(product.price, language)}</span>
                     {product.originalPrice && (
-                      <span className="text-sm text-muted-foreground line-through">{product.originalPrice} грн</span>
+                      <span className="text-sm text-muted-foreground line-through">{formatPrice(product.originalPrice, language)}</span>
                     )}
                   </div>
                   <button

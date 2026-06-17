@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useStore, type Product } from "@/lib/store-context"
 import { useProducts } from "@/lib/use-products"
+import { formatPrice } from "@/lib/catalog"
 import { routes } from "@/lib/site-routes"
 import { useRouter } from "next/navigation"
 import { Search, X } from "lucide-react"
@@ -151,7 +152,7 @@ export function SearchModal() {
                             </p>
                           </div>
                           <span className="font-semibold text-foreground">
-                            {product.price} грн
+                            {formatPrice(product.price, language)}
                           </span>
                         </button>
                       ))}
