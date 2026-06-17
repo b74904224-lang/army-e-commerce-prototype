@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion"
 import { useStore } from "@/lib/store-context"
-import { formatPrice } from "@/lib/catalog"
+import { formatPrice, formatOrderTotal } from "@/lib/catalog"
 import { routes } from "@/lib/site-routes"
 import { useRouter } from "next/navigation"
 import { X, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react"
@@ -175,7 +175,7 @@ export function CartDrawer() {
               <div className="p-4 sm:p-6 border-t border-border space-y-4">
                 <div className="flex items-center justify-between text-lg font-semibold">
                   <span>{t.total}</span>
-                  <span>{formatPrice(cartTotal, language)}</span>
+                  <span>{formatOrderTotal(cartTotal, language)}</span>
                 </div>
                 <button
                   onClick={handleCheckout}

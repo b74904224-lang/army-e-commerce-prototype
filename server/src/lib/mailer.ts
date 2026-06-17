@@ -36,6 +36,16 @@ const paymentLabels: Record<string, string> = {
   manager_confirmation: "Уточнення оплати менеджером",
 }
 
+/** Item-level price: 0 means the price list is pending → "за запитом". */
+function itemPrice(value: number): string {
+  return !value || value <= 0 ? "Ціна за запитом" : `${value} грн`
+}
+
+/** Order-level amount: 0 means it must be confirmed by a manager. */
+function orderAmount(value: number): string {
+  return !value || value <= 0 ? "уточнюється менеджером" : `${value} грн`
+}
+
 function renderOrderText(order: StoredOrder): string {
   const { customer, delivery, payment, items, totals } = order
   const address =
@@ -46,7 +56,7 @@ function renderOrderText(order: StoredOrder): string {
         : "Не потребується (швидке замовлення)"
 
   const itemLines = items
-    .map((i) => `  • ${i.name} ×${i.quantity} — ${i.price} грн`)
+    .map((i) => `  • ${i.name} ×${i.quantity} — ${itemPrice(i.price)}`)
     .join("\n")
 
   return [
@@ -70,9 +80,9 @@ function renderOrderText(order: StoredOrder): string {
     "ТОВАРИ",
     itemLines,
     "",
-    `Сума товарів: ${totals.subtotal} грн`,
+    `Сума товарів: ${orderAmount(totals.subtotal)}`,
     `Доставка: ${totals.shipping === 0 ? "за тарифами" : `${totals.shipping} грн`}`,
-    `ЗАГАЛОМ: ${totals.total} грн`,
+    `ЗАГАЛОМ: ${orderAmount(totals.total)}`,
     order.comment ? `\nКоментар: ${order.comment}` : "",
   ].join("\n")
 }
@@ -101,7 +111,7 @@ export async function sendOrderNotification(order: StoredOrder): Promise<void> {
   await tx.sendMail({
     from: env.ORDER_NOTIFICATION_FROM,
     to: env.ORDER_NOTIFICATION_TO,
-    subject: `Нове замовлення ${order.orderNumber} — ${order.totals.total} грн`,
+    subject: `Нове замовлення ${order.orderNumber} — ${orderAmount(order.totals.total)}`,
     text,
   })
 }

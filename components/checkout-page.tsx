@@ -6,6 +6,7 @@ import { useStore } from "@/lib/store-context"
 import { isApiConfigured } from "@/lib/api-client"
 import { createOrder, type OrderPayload, type DeliveryService as PayloadService } from "@/lib/api"
 import { routes } from "@/lib/site-routes"
+import { formatPrice, formatOrderTotal } from "@/lib/catalog"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import {
@@ -658,11 +659,11 @@ export function CheckoutPage() {
                           {getProductName(item)}
                         </p>
                         <p className="text-xs text-muted-foreground mt-1">
-                          {t.qty}: {item.quantity} × {item.product.price} грн
+                          {t.qty}: {item.quantity} × {formatPrice(item.product.price, language)}
                         </p>
                       </div>
                       <span className="text-sm font-semibold text-foreground whitespace-nowrap">
-                        {item.product.price * item.quantity} грн
+                        {formatPrice(item.product.price * item.quantity, language)}
                       </span>
                     </div>
                   ))}
@@ -671,7 +672,7 @@ export function CheckoutPage() {
                 <div className="border-t border-border pt-4 space-y-2 text-sm">
                   <div className="flex justify-between text-muted-foreground">
                     <span>{t.subtotal}</span>
-                    <span className="text-foreground">{cartTotal} грн</span>
+                    <span className="text-foreground">{formatOrderTotal(cartTotal, language)}</span>
                   </div>
                   <div className="flex justify-between text-muted-foreground">
                     <span>{t.shippingCost}</span>
@@ -683,7 +684,7 @@ export function CheckoutPage() {
 
                 <div className="border-t border-border mt-4 pt-4 flex justify-between items-center">
                   <span className="text-base font-semibold text-foreground">{t.total}</span>
-                  <span className="text-xl font-bold text-foreground">{total} грн</span>
+                  <span className="text-xl font-bold text-foreground">{formatOrderTotal(total, language)}</span>
                 </div>
 
                 <button
