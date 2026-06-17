@@ -68,6 +68,14 @@ export interface Product {
   inStock: boolean
   /** Optional selectable variants (color, thickness, ...). */
   variants?: ProductVariantGroup[]
+  /**
+   * Optional per-variant image sets, keyed by a variant OPTION id
+   * (e.g. "pixel", "olive-green"). When the customer selects an option whose id
+   * appears here, the product gallery switches to that image set. Options
+   * without an entry fall back to `images`. Only add an entry when a genuinely
+   * matching photo exists — never map an option to an unrelated photo.
+   */
+  variantImages?: Record<string, string[]>
 }
 
 export interface Category {
@@ -365,6 +373,12 @@ export const products: Product[] = [
     images: REAL_ARMY_L1_COVER,
     inStock: true,
     variants: [VARIANT_RUG_COLOR_BLACK_OLIVE, VARIANT_COVER_MULTICAM_PIXEL],
+    // The supplied photos for this product show the Pixel (MM14) cover, so the
+    // "pixel" cover option maps to them. No Multicam photo was provided, so the
+    // "multicam" option falls back to the product's default images.
+    variantImages: {
+      pixel: REAL_ARMY_L1_COVER,
+    },
   },
 
   // 5 — Gymnastic mat L0 (roll-mats)
@@ -509,7 +523,7 @@ export const products: Product[] = [
     descriptionUa:
       "Виріб призначений для професіоналів, відповідає високим стандартам якості та забезпечує широкий функціонал використання. Сидіння складається з двох секцій, які при розгортанні утворюють зручний невеликий килимок прямокутної форми, що дозволяє ізолювати значно більшу площу тіла від холоду та вологи. Кріплення здійснюється за допомогою строп і кнопок на тактичний пояс або будь-який ремінь з системою MOLLE; фастекси дозволяють швидко пристібати та знімати сидіння, висота кріплення регулюється. У комплекті є універсальний ремінь з двома стрічками-петельками для швидкої фіксації на будь-якій стороні. Чохол виготовлений з міцної тканини, стійкої до зносу. Кожна секція має товщину 12 мм, тому при з'єднанні двох секцій загальна товщина становить 24 мм. Наповнювач має підвищені характеристики щільності та теплоізоляції, а також повністю не вбирає вологу.",
     descriptionRu:
-      "Изделие предназначено для профессионалов, соответствует высоким стандартам качества и обеспечивает широкий функционал использования. Сиденье состоит из двух секций, которые при разворачивании образуют удобный небольшой коврик прямоугольной формы, что позволяет изолировать значительно большую площадь тела от холода и влаги. Крепление осуществляется с помощью строп и кнопок на т��ктический пояс или любой ремень с системой MOLLE; фастексы позволяют быстро пристёгивать и снимать сиденье, высота крепления регулируется. В комплекте имеется универсальный ремень с двумя петельками для быстрой фиксации на любой стороне. Чехол изго��овлен из прочной ткани, устойчивой к износу. Каждая секция имеет толщину 12 мм, поэтому при соединении двух секций общая толщина составляет 24 мм. Наполнитель обладает повышенными характеристиками плотности и теплоизоляции, а также полностью не впитывает влагу.",
+      "Изделие предназначено для профессионалов, соответствует высоким стандартам качества и обеспечивает широкий функционал использования. Сиденье состоит из двух секций, которые при разворачивании образуют удобный небольшой коврик прямоугольной формы, что позволяет изолировать значительно большую площадь тела от холода и влаги. Крепление осуществляется с помощью строп и кнопок на т��ктический пояс или любой ремень с системой MOLLE; фастексы позволяют быстро пристёгивать и снимать сиденье, высота креп��ения регулируется. В комплекте имеется универсальный ремень с двумя петельками для быстрой фиксации на любой стороне. Чехол изго��овлен из прочной ткани, устойчивой к износу. Каждая секция имеет толщину 12 мм, поэтому при соединении двух секций общая толщина составляет 24 мм. Наполнитель обладает повышенными характеристиками плотности и теплоизоляции, а также полностью не впитывает влагу.",
     specifications: {
       "Size": "300×400×12 mm x2 (total 24 mm)",
       "Cover material": "100% Polyester",
@@ -964,4 +978,26 @@ export function variantSummary(variants: SelectedVariant[] | undefined, language
   return variants
     .map((v) => `${variantGroupLabel(v, language)}: ${variantOptionLabel(v, language)}`)
     .join(", ")
+}
+
+/**
+ * Resolves which image set to show for the currently selected options.
+ *
+ * Looks up `product.variantImages` by each chosen option id and returns the
+ * first matching, non-empty set. Falls back to the product's default `images`
+ * when no selected option has a dedicated photo set. Always returns a non-empty
+ * array as long as the product has at least one base image.
+ */
+export function resolveVariantImages(
+  product: Product,
+  selectedOptionIds: string[],
+): string[] {
+  const map = product.variantImages
+  if (map) {
+    for (const optionId of selectedOptionIds) {
+      const set = map[optionId]
+      if (set && set.length > 0) return set
+    }
+  }
+  return product.images
 }
