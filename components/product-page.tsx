@@ -9,6 +9,7 @@ import {
   categoryName,
   formatPrice,
   makeSelectedVariant,
+  resolveVariantImages,
   type SelectedVariant,
 } from "@/lib/catalog"
 import Link from "next/link"
@@ -90,6 +91,12 @@ export function ProductPage({ product }: ProductPageProps) {
   const variantGroups = product.variants ?? []
   const allVariantsChosen = variantGroups.every((g) => selectedOptions[g.id])
 
+  // Gallery reflects the chosen options: if a selected option has its own photo
+  // set (product.variantImages), show it; otherwise fall back to product.images.
+  const galleryImages = resolveVariantImages(product, Object.values(selectedOptions))
+  // Keep the selected thumbnail in range when the image set changes.
+  const safeSelectedImage = Math.min(selectedImage, galleryImages.length - 1)
+
   const groupLabel = (g: (typeof variantGroups)[number]) =>
     language === "ru" ? g.labelRu : language === "en" ? g.labelEn : g.labelUa
   const optionLabel = (o: { labelUa: string; labelRu: string; labelEn: string }) =>
@@ -101,7 +108,15 @@ export function ProductPage({ product }: ProductPageProps) {
       .filter((v): v is SelectedVariant => v !== null)
 
   const selectOption = (groupId: string, optionId: string) => {
-    setSelectedOptions((prev) => ({ ...prev, [groupId]: optionId }))
+    setSelectedOptions((prev) => {
+      const next = { ...prev, [groupId]: optionId }
+      // If the new selection changes the image set, reset to the first image
+      // so the customer always sees the relevant variant photo.
+      const before = resolveVariantImages(product, Object.values(prev))
+      const after = resolveVariantImages(product, Object.values(next))
+      if (before !== after) setSelectedImage(0)
+      return next
+    })
     setVariantError(false)
   }
 
@@ -199,13 +214,13 @@ export function ProductPage({ product }: ProductPageProps) {
           <div className="space-y-4">
             {/* Main Image */}
             <motion.div
-              key={selectedImage}
+              key={`${galleryImages.length}-${safeSelectedImage}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="relative aspect-square bg-muted overflow-hidden"
             >
               <img
-                src={product.images[selectedImage]}
+                src={galleryImages[safeSelectedImage] || "/placeholder.svg"}
                 alt={getName()}
                 loading="eager"
                 decoding="async"
@@ -222,12 +237,12 @@ export function ProductPage({ product }: ProductPageProps) {
 
             {/* Thumbnails */}
             <div className="grid grid-cols-4 gap-2 sm:gap-3">
-              {product.images.map((image, index) => (
+              {galleryImages.map((image, index) => (
                 <button
-                  key={index}
+                  key={`${image}-${index}`}
                   onClick={() => setSelectedImage(index)}
                   className={`relative aspect-square overflow-hidden transition-all ${
-                    selectedImage === index
+                    safeSelectedImage === index
                       ? "ring-2 ring-primary"
                       : "ring-1 ring-border hover:ring-primary/50"
                   }`}

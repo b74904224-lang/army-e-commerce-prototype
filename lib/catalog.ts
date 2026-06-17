@@ -68,6 +68,14 @@ export interface Product {
   inStock: boolean
   /** Optional selectable variants (color, thickness, ...). */
   variants?: ProductVariantGroup[]
+  /**
+   * Optional per-variant image sets, keyed by a variant OPTION id
+   * (e.g. "pixel", "olive-green"). When the customer selects an option whose id
+   * appears here, the product gallery switches to that image set. Options
+   * without an entry fall back to `images`. Only add an entry when a genuinely
+   * matching photo exists — never map an option to an unrelated photo.
+   */
+  variantImages?: Record<string, string[]>
 }
 
 export interface Category {
@@ -94,15 +102,36 @@ const CATEGORY_SEATS = {
   categoryRu: "Сиденья полевые Army",
 }
 
-const ROLL_IMAGES_L1 = ["/images/products/army-l1-roll.webp", "/images/products/army-l1-stand.webp"]
-const ROLL_IMAGES_L0 = [
-  "/images/products/army-l0-roll.webp",
-  "/images/products/army-l0-stand.webp",
-  "/images/products/army-l0-detail.jpg",
-  "/images/products/army-l0-outdoor.jpg",
-]
-const FOLDING_IMAGES = ["/images/categories/karematy-rozkladni.jpg", "/images/products/army-l0-outdoor.jpg"]
+// Fallback images (used only for products that don't yet have real photos uploaded).
 const SEAT_IMAGES = ["/images/categories/sidinnia-polovi.jpg", "/images/products/army-l0-outdoor.jpg"]
+
+/* ----------------------------- Real product photos ----------------------------- */
+// Real photos live under public/images/products-real/<folder>/ as main.webp +
+// gallery-N.webp. Each folder maps to a specific product model. `main.webp` is the
+// primary preview; gallery images follow.
+const REAL = (folder: string, galleryCount: number): string[] => {
+  const base = `/images/products-real/${folder}`
+  const imgs = [`${base}/main.webp`]
+  for (let i = 1; i <= galleryCount; i++) imgs.push(`${base}/gallery-${i}.webp`)
+  return imgs
+}
+
+// Optimized preview/main image that takes priority as the first (preview) image.
+// The original main.webp + gallery follow it, so galleries stay intact.
+const REAL_WITH_PREVIEW = (folder: string, previewFile: string, galleryCount: number): string[] => [
+  `/images/products-real/${folder}/${previewFile}`,
+  ...REAL(folder, galleryCount),
+]
+
+const REAL_ARMY_L0_TOURIST = REAL_WITH_PREVIEW("army-l0-tourist", "preview-00131.webp", 4)
+const REAL_ARMY_L1_STANDARD = REAL_WITH_PREVIEW("army-l1-standard", "preview-00114.webp", 4)
+const REAL_ARMY_L1_TACTICAL = REAL_WITH_PREVIEW("army-l1-tactical", "preview-00042.webp", 4)
+const REAL_ARMY_L1_COVER = REAL_WITH_PREVIEW("army-l1-cover", "preview-00084.webp", 4)
+const REAL_GYM_MAT_L0 = REAL("gym-mat-l0", 4)
+const REAL_FOLDING_MAT_COVER = REAL("folding-mat-cover", 3)
+const REAL_FIELD_FOLDING_MATTRESS = REAL("field-folding-mattress", 4)
+const REAL_FIELD_SEAT_2X = REAL("field-seat-2x-folding", 4)
+const REAL_FIELD_SEAT_MOLLE = REAL("field-seat-molle", 2)
 
 /* --------------------------- Variant definitions --------------------------- */
 // Reusable variant groups shared by several products. Option ids are stable and
@@ -151,6 +180,19 @@ const VARIANT_COVER_MULTICAM_PIXEL: ProductVariantGroup = {
   options: [
     { id: "multicam", labelUa: "Мультикам", labelRu: "Мультикам", labelEn: "Multicam" },
     { id: "pixel", labelUa: "Піксель", labelRu: "Пиксель", labelEn: "Pixel" },
+  ],
+}
+
+// Cover (chohol) choice for field seats. Option order follows the seat product
+// names ("Піксель, Мультикам"), so Pixel is listed first here.
+const VARIANT_COVER_PIXEL_MULTICAM: ProductVariantGroup = {
+  id: "cover",
+  labelUa: "Чохол",
+  labelRu: "Чехол",
+  labelEn: "Cover",
+  options: [
+    { id: "pixel", labelUa: "Піксель", labelRu: "Пиксель", labelEn: "Pixel" },
+    { id: "multicam", labelUa: "Мультикам", labelRu: "Мультикам", labelEn: "Multicam" },
   ],
 }
 
@@ -206,9 +248,11 @@ export const products: Product[] = [
       "Крепление": "Система MOLLE",
       "Материал чехла": "Прочная водонепроницаемая ткань",
     },
-    images: FOLDING_IMAGES,
+    images: REAL_FOLDING_MAT_COVER,
     isNew: true,
     inStock: true,
+    // Name lists two thickness options: "12 мм (15 мм)" → selectable thickness.
+    variants: [VARIANT_THICKNESS_12_15],
   },
 
   // 2 — Army L1 sleeping mat, standard attachment (roll-mats)
@@ -218,14 +262,14 @@ export const products: Product[] = [
     ...CATEGORY_ROLL,
     name: "Field Insulated Sleeping Mat Army L1, Standard Attachment (1900×600×12/15 mm, Black / Olive Green)",
     nameUa: "Килим спальний польовий ізоляційний Army L1 з стандартним кріпленням (1900×600×12/15 мм, Чорний / Olive Green)",
-    nameRu: "Спальный коврик полевой изоляционный Army L1 со стандартным креплением (1900×600×12/15 мм, Чёрный / Olive Green)",
+    nameRu: "Спальный коврик полевой изоляционный Army L1 со стандартным кре��лением (1900×600×12/15 мм, Чёрный / Olive Green)",
     price: 0,
     description:
       "The product range of Army L1 field insulated sleeping mats offers a wide variety in color, thickness, and attachment type. All products in this line feature a protective laminated surface, which significantly improves their performance characteristics.\n\nThe mats are available in two colors: Black and Olive Green. The increased thickness can be 12 mm or 15 mm. The attachment system is also available in two variants: standard military attachment (two strong polypropylene straps with quick tightening) and improved attachment with an additional handle for convenient carrying or attachment to a backpack.\n\nAlthough these mats have larger dimensions and weight compared to compact models, they significantly increase comfort during long stays in field conditions.",
     descriptionUa:
       "Товарний асортимент спальних польових ізоляційних килимів Army L1 має широку варіацію за кольором, товщиною та видом кріплення. Усі вироби цього асортименту мають захисну ламіновану поверхню, що значно підвищує їх експлуатаційні властивості.\n\nВироби представлені у двох кольорах: чорному та Olive Green. Збільшена товщина килимів може бути 12 або 15 мм. Кріплення також доступне у двох варіантах: стандартне армійське кріплення (дві міцні поліпропіленові стрічки з швидким затягуванням) та покращене кріплення з додатковою ручкою для зручного перенесення або кріплення до рюкзака.\n\nНезважаючи на більші габарити та вагу порівняно з компактними моделями, ці килими значно підвищують комфорт при тривалому перебуванні людини в польових умовах.",
     descriptionRu:
-      "Товарный ассортимент спальных полевых изоляционных ковриков Army L1 отличается широким выбором по цвету, толщине и типу крепления. Все изделия данной линейки имеют защитную ламинированную поверхность, что существенно повышает их эксплуатационные свойства.\n\nИзделия представлены в двух цветах: чёрном и Olive Green. Увеличенная толщина ковриков может быть 12 или 15 мм. Крепление также доступно в двух вариантах: стандартное армейское (две прочные полипропиленовые ленты с быстрым затягиванием) и улучшенное крепление с дополнительной ручкой для удобного переноса или крепления к рюкзаку.\n\nНесмотря на большие габариты и вес по сравнению с компактными моделями, эти коврики значительно повышают комфорт при длительном пребывании человека в полевых условиях.",
+      "Товарный ассортимент спальных полевых изоляционных к��вриков Army L1 отличается широким выбором по цвету, толщине и типу крепления. Все изделия данной линейки имеют защитную ламинированную поверхность, что существенно повышает их эксплуатационные свойства.\n\nИзделия представлены в двух цветах: чёрном и Olive Green. Увеличенная толщина ковриков может быть 12 или 15 мм. Крепление также доступно в двух вариантах: стандартное армейское (две прочные полипропиленовые ленты с быстрым затягиванием) и улучшенное крепление с дополнительной ручкой для удобного переноса или крепления к рюкзаку.\n\nНесмотря на большие габариты и вес по сравнению с компактными моделями, эти коврики значительно повышают комфорт при длительном пребывании человека в полевых условиях.",
     specifications: {
       "Size": "1900×600×12/15 mm",
       "Color": "Black / Olive Green",
@@ -247,10 +291,17 @@ export const products: Product[] = [
       "Лента": "Полипропиленовая, тёмно-зелёная, 25 мм, толщина 2,5 мм, плотность 13,2 г/м.п.",
       "Пряжка": "3-х щелевая, полипропилен/полиамид, 25 мм",
     },
-    images: ROLL_IMAGES_L1,
+    images: REAL_ARMY_L1_STANDARD,
     isNew: true,
     inStock: true,
     variants: [VARIANT_COLOR_BLACK_OLIVE, VARIANT_THICKNESS_12_15],
+    // The standard-attachment photos show the black foam; the tactical-attachment
+    // folder shows the same model in olive green. Both are the genuine colorways
+    // of this mat, so the color option switches the gallery between them.
+    variantImages: {
+      black: REAL_ARMY_L1_STANDARD,
+      "olive-green": REAL_ARMY_L1_TACTICAL,
+    },
   },
 
   // 3 — Army L1 sleeping mat, tactical attachment (roll-mats)
@@ -267,7 +318,7 @@ export const products: Product[] = [
     descriptionUa:
       "Товарний асортимент спальних польових ізоляційних килимів Army L1 має широку варіацію за кольором, товщиною та видом кріплення. Усі вироби цього асортименту мають захисну ламіновану поверхню, що суттєво підвищує їх експлуатаційні властивості.\n\nВироби представлені у двох кольорах: Чорному та Olive Green. Збільшена товщина килимів може бути 12 або 15 мм. Кріплення також доступне у двох варіантах: стандартне армійське та покращене тактичне кріплення з додатковою ручкою для зручного перенесення або кріплення до рюкзака чи тулуба.\n\nНезважаючи на більші габарити та вагу, ці килими значно покращують комфорт при тривалому перебуванні людини в польових умовах.",
     descriptionRu:
-      "Товарный ассортимент спальных полевых изоляционных ковриков Army L1 отличается широким выбором по цвету, толщине и типу крепления. Все изделия данной линейки имеют защитную ламинированную поверхность, что существенно повышает их эксплуатационные свойства.\n\nИзделия представлены в двух цветах: чёрном и Olive Green. Увеличенная толщина ковриков может быть 12 или 15 мм. Крепление также доступно в двух вариантах: стандартное армейское и улучшенное тактическое крепление с дополнительной ручкой для удобного переноса или крепления к рюкзаку или телу.\n\nНесмотря на большие габариты и вес, эти коврики значительно повышают комфорт при длительном пребывании человека в полевых условиях.",
+      "Товарный ассортимент спальных полевых изоляционных ко��риков Army L1 отличается широким выбором по цвету, толщине и типу крепления. Все изделия данной линейки имеют защитную ламинированную поверхность, что существенно повышает их эксплуатационные свойства.\n\nИзделия представлены в двух цветах: чёрном и Olive Green. Увеличенная толщина ковриков может быть 12 или 15 мм. Крепление также доступно в двух вариантах: стандартное армейское и улучшенное тактическое крепление с дополнительной ручкой для удобного переноса или крепления к рюкзаку или телу.\n\nНесмотря на большие габариты и вес, эти коврики значительно повышают комфорт при д��ительном пребывании человека в полевых условиях.",
     specifications: {
       "Size": "1900×600×12/15 mm",
       "Color": "Black / Olive Green",
@@ -292,9 +343,16 @@ export const products: Product[] = [
       "Фастекс": "20 мм, тёмно-зелёный",
       "Пряжки": "3-х и 2-х щелевые, тёмно-зелёные",
     },
-    images: ROLL_IMAGES_L1,
+    images: REAL_ARMY_L1_TACTICAL,
     inStock: true,
     variants: [VARIANT_COLOR_BLACK_OLIVE, VARIANT_THICKNESS_12_15],
+    // The tactical-attachment photos show the olive-green foam; the standard
+    // folder shows the same model in black. Both are genuine colorways of this
+    // mat, so the color option switches the gallery between them.
+    variantImages: {
+      black: REAL_ARMY_L1_STANDARD,
+      "olive-green": REAL_ARMY_L1_TACTICAL,
+    },
   },
 
   // 4 — Army L1 sleeping mat in Multicam / Pixel baul cover (roll-mats)
@@ -348,10 +406,15 @@ export const products: Product[] = [
       "Пряжки": "3-х и 2-х щелевые",
       "Молния": "Влагостойкая, тип T7",
     },
-    images: ROLL_IMAGES_L1,
-    isNew: true,
+    images: REAL_ARMY_L1_COVER,
     inStock: true,
     variants: [VARIANT_RUG_COLOR_BLACK_OLIVE, VARIANT_COVER_MULTICAM_PIXEL],
+    // The supplied photos for this product show the Pixel (MM14) cover, so the
+    // "pixel" cover option maps to them. No Multicam photo was provided, so the
+    // "multicam" option falls back to the product's default images.
+    variantImages: {
+      pixel: REAL_ARMY_L1_COVER,
+    },
   },
 
   // 5 — Gymnastic mat L0 (roll-mats)
@@ -368,7 +431,7 @@ export const products: Product[] = [
     descriptionUa:
       "Виріб призначений для використання на спортивних тренуваннях вдома або при виконанні фітнес-вправ у спортивних залах. Килимок складається з двох різнокольорових шарів спіненого поліетилену підвищеної щільності. У комплекті є дві фіксуючі гумки барвистого кольору, які зручно фіксують виріб у згорнутому стані.\n\nСпортивний килимок ArmY стане у нагоді як дітям, так і дорослим під час аматорських тренувань або активного відпочинку.",
     descriptionRu:
-      "Изделие предназначено для использования на спортивных тренировках дома или при выполнении фитнес-упражнений в спортивных залах. Коврик состоит из двух разноцветных слоёв вспененного полиэтилена повышенной плотности. В комплекте имеются две цветные фиксирующие резинки, которые удобно фиксируют изделие в свернутом состоянии.\n\nСпортивный коврик ArmY станет отличным помощником как для детей, так и для взрослых при любительских тренировках или активном отдыхе.",
+      "Изделие предназначено для использования на спортивных тренировках дома или при выполнении фитнес-упражнений в спортивных залах. Коврик состоит из двух разноцветных слоёв вспененного полиэтилена повышенной плотности. В комплекте имеются две цветные фиксирующие резинки, которые удобно фиксируют издели�� в свернутом состоянии.\n\nСпортивный коврик ArmY станет отличным помощником как для детей, так и для взрослых при любительских тренировках или активном отдыхе.",
     specifications: {
       "Size": "1800×550×12 mm",
       "Color": "Yellow / Red (two-color)",
@@ -390,7 +453,7 @@ export const products: Product[] = [
       "Лента": "Эластичная полиэфирная, 30 мм, толщина 1,2 мм, плотность 25 г/м.п.",
       "Пружинность": "22 параллельные силиконовые резинки",
     },
-    images: ROLL_IMAGES_L0,
+    images: REAL_GYM_MAT_L0,
     inStock: true,
     variants: [VARIANT_GYM_COLOR],
   },
@@ -434,7 +497,7 @@ export const products: Product[] = [
       "Лента": "Эластичная полиэфирная, чёрная, 25 мм, толщина 1,8–2 мм, плотность 22 г/м.п.",
       "Пружинность": "25 параллельных силиконовых резинок",
     },
-    images: ROLL_IMAGES_L0,
+    images: REAL_ARMY_L0_TOURIST,
     inStock: true,
   },
 
@@ -450,7 +513,7 @@ export const products: Product[] = [
     description:
       "The field folding mattress is designed for stationary long-term use in field conditions — for sleeping in tents, on camping beds, or directly on the ground; it can also be used during field shooting or even as a floating device. Thanks to its waterproof properties it can be placed on any wet surface while keeping the body dry, and it dries quickly since moisture does not penetrate inside. The mattress has three main sections, one with two additional sections for forming a pillow; all sections have waterproof zippers so the filling can be replaced or the cover washed. It is equipped with carrying handles and a fixation system for quick rolling. The Monoisol HD filling gives it high density, thermal insulation and elasticity, allowing it to be used as flooring in sleeping tents.",
     descriptionUa:
-      "Матрац польовий розкладний призначений для стаціонарного тривалого перебування в польових умовах — для відпочинку в наметах, на похідних ліжках або просто на землі; також може застосовуватися під час польових стрільб або навіть як плавучий засіб. Завдяки водонепроникним властивостям матрац можна класти на будь-яку вологу поверхню, при цьому тіло залишається на сухій поверхні, а виріб швидко висихає, оскільки волога не проникає всередину. Матрац складається з трьох основних секцій, одна з яких має дві додаткові секції для формування подушки; усі секції оснащені водозахисними блискавками, що дозволяє замінити наповнювач або випрати чохол. Обладнаний переносними ручками та системою кріплень для швидкого фіксування. Наповнювач Monoisol HD надає підвищену щільність, теплоізоляцію та пружність, зав��яки чому матрац можна використовувати для облаштування підлоги в спальних наметах.",
+      "Матрац польовий розкладний призначений для стаціонарного тривалого перебування в польових умовах — для відпочинку в наметах, на похідних ліжках або просто на землі; також може застосовуватися під час польових стрільб або навіть як плавучий засіб. З��вдяки водонепроникним властивостям матрац можна класти на будь-яку вологу поверхню, при цьому тіло залишається на сухій поверхні, а виріб швидко висихає, оскільки волога не проникає всередину. Матрац складається з трьох основних секцій, одна з яких має дві додаткові секції для формування подушки; усі секції оснащені водозахисними блискавками, що дозволяє замінити наповнювач або випрати чохол. Обладнаний переносними ручками та системою кріплень для швидкого фіксування. Наповнювач Monoisol HD надає підвищену щільність, теплоізоляцію та пружність, зав��яки чому матрац можна використовувати для облаштування підлоги в спальних наметах.",
     descriptionRu:
       "Полевой раскладной матрас предназначен для стационарного длительного пребывания в полевых условиях — для отдыха в палатках, на походных кроватях или прямо на земле; также может применяться во время полевых стрельб или даже в качестве плавсредства. Благодаря водонепроницаемым свойствам матрас можно класть на любую влажную поверхность, при этом тело остаётся на сухой поверхности, а изделие быстро сохнет, так как влага не проникает внутрь. Матрас состоит из трёх основных секций, одна из которых имеет две дополнительные секции для формирования подушки; все секции оснащены влагозащитными молниями, что позволяет заменить наполнитель или постирать чехол. Оборудован переносными ручками и системой креплений для быстрой фиксации. Наполнитель Monoisol HD придаёт повышенную плотность, теплоизоляцию и упругость, благодаря чему матрас можно использовать для обустройства пола в спальных палатках.",
     specifications: {
@@ -477,7 +540,7 @@ export const products: Product[] = [
       "Молнии": "Влагозащитные",
       "Водонепроницаемость": "Да",
     },
-    images: ["/images/categories/karematy-rozkladni.jpg", "/images/hero-outdoor.jpg"],
+    images: REAL_FIELD_FOLDING_MATTRESS,
     isNew: true,
     inStock: true,
   },
@@ -494,9 +557,9 @@ export const products: Product[] = [
     description:
       "Designed for professionals, this seat meets high quality standards and offers wide functionality. It consists of two sections which, when unfolded, form a comfortable small rectangular mat, isolating a much larger body area from cold and moisture. It is attached using straps and buttons to a tactical belt or any MOLLE-compatible belt; fastex buckles allow quick attachment and removal, and the height is adjustable. The set includes a universal strap with two loop tapes for quick fixation on any side. The cover is made of durable, wear-resistant fabric. Each section is 12 mm thick, so joined together the total thickness is 24 mm. The filling has enhanced density and thermal insulation and is completely non-absorbent.",
     descriptionUa:
-      "Виріб призначений для професіоналів, відповідає високим стандартам якості та забезпечує широкий функціонал використання. Сидіння складається з двох секцій, які при розгортанні утворюють зручний невеликий килимок прямокутної форми, що дозволяє ізолювати значно більшу площу тіла від холоду та вологи. Кріплення здійснюється за допомогою строп і кнопок на тактичний пояс або будь-який ремінь з системою MOLLE; фастекси дозволяють швидко пристібати та знімати сидіння, висота кріплення регулюється. У комплекті є універсальний ремінь з двома стрічками-петельками для швидкої фіксації на будь-якій стороні. Чохол виготовлений з міцної тканини, стійкої до зносу. Кожна секція має товщину 12 мм, тому при з'єднанні двох секцій загальна товщина становить 24 мм. Наповнювач має підвищені характеристики щільності та теплоізоляції, а також повністю не вбирає вологу.",
+      "Виріб призначений для професіоналів, відповідає високим стандартам якості та забезпечує широкий функціонал використання. Сидіння складається з двох секцій, які при розгортанні утворюють зручний невеликий килимок прямокутної форми, що дозволяє ізолювати значно більшу площу тіла від холоду та вологи. Кріплення здій��нюється за допомогою строп і кнопок на тактичний пояс або будь-який ремінь з системою MOLLE; фастекси дозволяють швидко пристібати та знімати сидіння, висота кріплення регулюється. У комплекті є універсальний ремінь з двома стрічками-петельками для швидкої фіксації на будь-якій стороні. Чохол виготовлений з міцної тканини, стійкої до зносу. Кожна секція має товщину 12 мм, тому при з'єднан��і двох секцій загальна товщина становить 24 мм. Наповнювач має підвищені характеристики щільності та теплоізоляції, а також повністю не вбирає вологу.",
     descriptionRu:
-      "Изделие предназначено для профессионалов, соответствует высоким стандартам качества и обеспечивает широкий функционал использования. Сиденье состоит из двух секций, которые при разворачивании образуют удобный небольшой коврик прямоугольной формы, что позволяет изолировать значительно большую площадь тела от холода и влаги. Крепление осуществляется с помощью строп и кнопок на т��ктический пояс или любой ремень с системой MOLLE; фастексы позволяют быстро пристёгивать и снимать сиденье, высота крепления регулируется. В комплекте имеется универсальный ремень с двумя петельками для быстрой фиксации на любой стороне. Чехол изготовлен из прочной ткани, устойчивой к износу. Каждая секция имеет толщину 12 мм, поэтому при соединении двух секций общая толщина составляет 24 мм. Наполнитель обладает повышенными характеристиками плотности и теплоизоляции, а также полностью не впитывает влагу.",
+      "Изделие предназначено для профессионалов, соответствует высоким стандартам качества и обеспечивает широкий функционал использования. Сиденье состоит из двух секций, которые при разворачивании образуют удобный небольшой коврик прямоугольной формы, что позволяет изолировать значительно большую площадь тела от холода и влаги. Крепление осуществляется с помощью строп и кнопок на т��ктический пояс или любой ремень с системой MOLLE; фастексы позволяют быстро пристёгивать и снимать сиденье, высота креп��ения регулируется. В комплекте имеется универсальный ремень с двумя петельками для быстрой фиксации на любой стороне. Чехол изго��овлен из прочной ткани, устойчивой к износу. Каждая секция имеет толщину 12 мм, поэтому при соединении двух секций общая толщина составляет 24 мм. Наполнитель обладает повышенными характеристиками плотности и теплоизоляции, а также полностью не впитывает влагу.",
     specifications: {
       "Size": "300×400×12 mm x2 (total 24 mm)",
       "Cover material": "100% Polyester",
@@ -524,9 +587,11 @@ export const products: Product[] = [
       "Рамка": "Полипропилен/полиамид, 25 мм",
       "Крепление": "Система MOLLE",
     },
-    images: SEAT_IMAGES,
+    images: REAL_FIELD_SEAT_2X,
     isNew: true,
     inStock: true,
+    // Name lists cover options "Піксель, Мультикам" → selectable cover.
+    variants: [VARIANT_COVER_PIXEL_MULTICAM],
   },
 
   // 9 — Field seat MOLLE attachment (field-seats)
@@ -556,7 +621,7 @@ export const products: Product[] = [
     specificationsUa: {
       "Розмір": "300×400×20 мм",
       "Наповнювач": "Monoisol HD",
-      "Матеріал чохла": "100% поліестер",
+      "Матер��ал чохла": "100% поліестер",
       "Колір": "Мультикам, Піксель",
       "Стрічка": "Поліпропіленова, 25 мм",
       "Фастекс": "30 мм, темно-зелений",
@@ -571,8 +636,10 @@ export const products: Product[] = [
       "Фастекс": "30 мм, тёмно-зелёный",
       "Крепление": "Система MOLLE",
     },
-    images: SEAT_IMAGES,
+    images: REAL_FIELD_SEAT_MOLLE,
     inStock: true,
+    // Name lists cover options "Піксель, Мультикам" → selectable cover.
+    variants: [VARIANT_COVER_PIXEL_MULTICAM],
   },
 
   // 10 — Field seat standard (field-seats)
@@ -603,7 +670,7 @@ export const products: Product[] = [
       "Матеріал чохла": "100% поліестер",
       "Колір": "Мультикам, Піксель, темно-зелений",
       "Стрічка": "Еластична поліамідна, темно-зелена, 25 мм",
-      "Фастекс": "30 мм, темно-зелений",
+      "Фастекс": "30 мм, темно-з��лений",
       "Липка стрічка": "25 мм, чорна",
     },
     specificationsRu: {
@@ -616,6 +683,8 @@ export const products: Product[] = [
     },
     images: SEAT_IMAGES,
     inStock: true,
+    // Name lists cover options "Піксель, Мультикам" → selectable cover.
+    variants: [VARIANT_COVER_PIXEL_MULTICAM],
   },
 
   // 11 — Field seat standard+ (field-seats)
@@ -662,6 +731,8 @@ export const products: Product[] = [
     },
     images: SEAT_IMAGES,
     inStock: true,
+    // Name lists cover options "Піксель, Мультикам" → selectable cover.
+    variants: [VARIANT_COVER_PIXEL_MULTICAM],
   },
 
   // 12 — Insulated field seat (field-seats)
@@ -676,7 +747,7 @@ export const products: Product[] = [
     description:
       "This product is an improved version of the standard field seat due to increased thickness, larger coverage area, higher density and a reinforced attachment system. The seat has protective lamination layers on both sides, which significantly enhances its performance. It is a great helper during long stays in field conditions on hiking trips or when performing professional tasks in the open air.",
     descriptionUa:
-      "Даний виріб є покращеною моделлю стандартного польового сидіння завдяки збільшеній товщині, більшій площі покриття, вищій щільності та посиленій системі кріплення. Сидіння має захисні шари ламінації з двох сторін, що значно підвищує його експлуатаційні властивості. Такий виріб стане у пригоді при тривалому перебуванні в польових умовах туристичного походу або при виконанні професійних завдань просто неба.",
+      "Даний виріб є покращеною моделлю стандартного польового сидіння завдяки збільшеній товщині, більшій площі покриття, вищій щільності та посиленій системі кріплення. Сидіння має захисні шари ламінації з двох сторін, що значно підвищує його експлуатаційні властивості. Такий виріб стане у пригоді при тривалому перебуванні в польових умовах туристичного походу або при виконанні професійних з��вдань просто неба.",
     descriptionRu:
       "Данное изделие является улучшенной моделью стандартного полевого сиденья за счёт увеличенной толщины, большей площади покрытия, повышенной плотности и усиленной системы крепления. Сиденье имеет защитные слои ламинации с двух сторон, что значительно повышает его эксплуатационные свойства. Такое изделие станет отличным помощником при длительном пребывании в полевых условиях туристического похода или при выполнении профессиональных задач под открытым небом.",
     specifications: {
@@ -699,7 +770,7 @@ export const products: Product[] = [
       "Размер": "300×400×12 мм",
       "Цвет": "Olive Green",
       "Поверхность": "Ламинированная с двух сторон",
-      "Лента": "Эластичная полиамидная, тёмно-зелёная, 25 мм, толщина 1,8–2 мм, плотность 22 г/м.п.",
+      "Лента": "Эластична�� полиамидная, тёмно-зелёная, 25 мм, толщина 1,8–2 мм, плотность 22 г/м.п.",
       "Пружинность": "25 параллельных силиконовых резинок",
       "Фастекс": "20–30 мм, тёмно-зелёный",
     },
@@ -784,7 +855,7 @@ export const products: Product[] = [
     specificationsRu: {
       "Размер": "260×340×20 мм (до 25 мм)",
       "Цвет": "Olive Green",
-      "Поверхность": "Увеличенная ламинация с двух сторон",
+      "Поверхность": "Увеличенная ламинация с двух стор��н",
       "Лента": "Эластичная полиамидная, тёмно-зелёная, 30 мм, толщина 1,9 мм, плотность 38 г/м.п.",
       "Пружинность": "24 параллельные силиконовые резинки",
       "Фастекс": "30 мм, тёмно-зелёный",
@@ -951,4 +1022,26 @@ export function variantSummary(variants: SelectedVariant[] | undefined, language
   return variants
     .map((v) => `${variantGroupLabel(v, language)}: ${variantOptionLabel(v, language)}`)
     .join(", ")
+}
+
+/**
+ * Resolves which image set to show for the currently selected options.
+ *
+ * Looks up `product.variantImages` by each chosen option id and returns the
+ * first matching, non-empty set. Falls back to the product's default `images`
+ * when no selected option has a dedicated photo set. Always returns a non-empty
+ * array as long as the product has at least one base image.
+ */
+export function resolveVariantImages(
+  product: Product,
+  selectedOptionIds: string[],
+): string[] {
+  const map = product.variantImages
+  if (map) {
+    for (const optionId of selectedOptionIds) {
+      const set = map[optionId]
+      if (set && set.length > 0) return set
+    }
+  }
+  return product.images
 }
