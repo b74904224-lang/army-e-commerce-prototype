@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion"
 import { useStore } from "@/lib/store-context"
+import { formatPrice } from "@/lib/catalog"
 import { routes } from "@/lib/site-routes"
 import { useRouter } from "next/navigation"
 import { X, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react"
@@ -134,7 +135,7 @@ export function CartDrawer() {
                           {getProductName(item)}
                         </h3>
                         <p className="text-sm text-muted-foreground">
-                          {item.product.price} грн
+                          {formatPrice(item.product.price, language)}
                         </p>
                         <div className="flex items-center gap-2 mt-2">
                           <button
@@ -174,7 +175,7 @@ export function CartDrawer() {
               <div className="p-4 sm:p-6 border-t border-border space-y-4">
                 <div className="flex items-center justify-between text-lg font-semibold">
                   <span>{t.total}</span>
-                  <span>{cartTotal} грн</span>
+                  <span>{formatPrice(cartTotal, language)}</span>
                 </div>
                 <button
                   onClick={handleCheckout}

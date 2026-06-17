@@ -3,6 +3,7 @@
 import { motion } from "framer-motion"
 import { useStore, categories, type Product } from "@/lib/store-context"
 import { useProducts } from "@/lib/use-products"
+import { formatPrice } from "@/lib/catalog"
 import { routes } from "@/lib/site-routes"
 import Link from "next/link"
 import { Heart, ShoppingBag } from "lucide-react"
@@ -170,10 +171,10 @@ export function CategoryView({ categoryId = null }: CategoryViewProps) {
                       {getProductName(product)}
                     </h3>
                     <div className="mt-2 flex items-baseline gap-2">
-                      <span className="font-bold text-foreground">{product.price} грн</span>
+                      <span className="font-bold text-foreground">{formatPrice(product.price, language)}</span>
                       {product.originalPrice && (
                         <span className="text-sm text-muted-foreground line-through">
-                          {product.originalPrice} грн
+                          {formatPrice(product.originalPrice, language)}
                         </span>
                       )}
                     </div>

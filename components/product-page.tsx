@@ -4,7 +4,7 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useStore, Product } from "@/lib/store-context"
 import { routes } from "@/lib/site-routes"
-import { getCategoryById, categoryName } from "@/lib/catalog"
+import { getCategoryById, categoryName, formatPrice } from "@/lib/catalog"
 import Link from "next/link"
 import { Heart, ShoppingBag, Zap, ChevronRight, Minus, Plus } from "lucide-react"
 
@@ -216,11 +216,11 @@ export function ProductPage({ product }: ProductPageProps) {
               </h1>
               <div className="mt-4 flex items-baseline gap-3">
                 <span className="text-2xl sm:text-3xl font-bold text-foreground">
-                  {product.price} грн
+                  {formatPrice(product.price, language)}
                 </span>
                 {product.originalPrice && (
                   <span className="text-lg text-muted-foreground line-through">
-                    {product.originalPrice} грн
+                    {formatPrice(product.originalPrice, language)}
                   </span>
                 )}
               </div>
@@ -331,7 +331,7 @@ export function ProductPage({ product }: ProductPageProps) {
                   className="pt-4"
                 >
                   {activeTab === "description" ? (
-                    <p className="text-muted-foreground leading-relaxed">
+                    <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
                       {getDescription()}
                     </p>
                   ) : (

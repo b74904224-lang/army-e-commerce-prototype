@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useStore } from "@/lib/store-context"
+import { formatPrice } from "@/lib/catalog"
 import { isApiConfigured } from "@/lib/api-client"
 import { createOrder, type OrderPayload } from "@/lib/api"
 import { X, Zap, CheckCircle } from "lucide-react"
@@ -211,7 +212,7 @@ export function BuyNowModal() {
                       />
                       <div>
                         <p className="font-medium text-foreground">{getProductName()}</p>
-                        <p className="text-lg font-bold text-primary">{selectedProduct.price} грн</p>
+                        <p className="text-lg font-bold text-primary">{formatPrice(selectedProduct.price, language)}</p>
                       </div>
                     </div>
                   )}
