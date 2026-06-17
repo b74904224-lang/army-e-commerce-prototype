@@ -9,6 +9,21 @@
 // NOTE: prices are intentionally 0 ("price on request") until the official
 // price list is provided.
 
+export interface ProductVariantOption {
+  id: string
+  labelUa: string
+  labelRu: string
+  labelEn: string
+}
+
+export interface ProductVariantGroup {
+  id: string
+  labelUa: string
+  labelRu: string
+  labelEn: string
+  options: ProductVariantOption[]
+}
+
 export interface Product {
   id: string
   /** URL slug used by /product/[slug]. Must match lib/catalog.ts. */
@@ -30,6 +45,76 @@ export interface Product {
   images: string[]
   isNew?: boolean
   inStock: boolean
+  /** Optional selectable variants (color, thickness, cover, ...). Mirror of lib/catalog.ts. */
+  variants?: ProductVariantGroup[]
+}
+
+/* ----------------------- Variant definitions (mirror lib/catalog.ts) ----------------------- */
+const VARIANT_COLOR_BLACK_OLIVE: ProductVariantGroup = {
+  id: "color",
+  labelUa: "Колір",
+  labelRu: "Цвет",
+  labelEn: "Color",
+  options: [
+    { id: "black", labelUa: "Чорний", labelRu: "Чёрный", labelEn: "Black" },
+    { id: "olive-green", labelUa: "Olive Green", labelRu: "Olive Green", labelEn: "Olive Green" },
+  ],
+}
+
+const VARIANT_THICKNESS_12_15: ProductVariantGroup = {
+  id: "thickness",
+  labelUa: "Товщина",
+  labelRu: "Толщина",
+  labelEn: "Thickness",
+  options: [
+    { id: "12mm", labelUa: "12 мм", labelRu: "12 мм", labelEn: "12 mm" },
+    { id: "15mm", labelUa: "15 мм", labelRu: "15 мм", labelEn: "15 mm" },
+  ],
+}
+
+const VARIANT_RUG_COLOR_BLACK_OLIVE: ProductVariantGroup = {
+  id: "rug-color",
+  labelUa: "Колір килима",
+  labelRu: "Цвет коврика",
+  labelEn: "Mat color",
+  options: [
+    { id: "black", labelUa: "Чорний", labelRu: "Чёрный", labelEn: "Black" },
+    { id: "olive-green", labelUa: "Olive Green", labelRu: "Olive Green", labelEn: "Olive Green" },
+  ],
+}
+
+const VARIANT_COVER_MULTICAM_PIXEL: ProductVariantGroup = {
+  id: "cover",
+  labelUa: "Чохол",
+  labelRu: "Чехол",
+  labelEn: "Cover",
+  options: [
+    { id: "multicam", labelUa: "Мультикам", labelRu: "Мультикам", labelEn: "Multicam" },
+    { id: "pixel", labelUa: "Піксель", labelRu: "Пиксель", labelEn: "Pixel" },
+  ],
+}
+
+const VARIANT_COVER_PIXEL_MULTICAM: ProductVariantGroup = {
+  id: "cover",
+  labelUa: "Чохол",
+  labelRu: "Чехол",
+  labelEn: "Cover",
+  options: [
+    { id: "pixel", labelUa: "Піксель", labelRu: "Пиксель", labelEn: "Pixel" },
+    { id: "multicam", labelUa: "Мультикам", labelRu: "Мультикам", labelEn: "Multicam" },
+  ],
+}
+
+const VARIANT_GYM_COLOR: ProductVariantGroup = {
+  id: "color",
+  labelUa: "Колір",
+  labelRu: "Цвет",
+  labelEn: "Color",
+  options: [
+    { id: "yellow-blue", labelUa: "Жовто-синій", labelRu: "Жёлто-синий", labelEn: "Yellow-Blue" },
+    { id: "yellow-red", labelUa: "Жовто-червоний", labelRu: "Жёлто-красный", labelEn: "Yellow-Red" },
+    { id: "red-green", labelUa: "Червоно-зелений", labelRu: "Красно-зелёный", labelEn: "Red-Green" },
+  ],
 }
 
 const CATEGORY_ROLL = {
@@ -101,6 +186,7 @@ export const products: Product[] = [
     images: FOLDING_IMAGES,
     isNew: true,
     inStock: true,
+    variants: [VARIANT_THICKNESS_12_15],
   },
 
   // 2 — Army L1 sleeping mat, standard attachment (roll-mats)
@@ -142,6 +228,7 @@ export const products: Product[] = [
     images: ROLL_IMAGES_L1,
     isNew: true,
     inStock: true,
+    variants: [VARIANT_COLOR_BLACK_OLIVE, VARIANT_THICKNESS_12_15],
   },
 
   // 3 — Army L1 sleeping mat, tactical attachment (roll-mats)
@@ -185,6 +272,7 @@ export const products: Product[] = [
     },
     images: ROLL_IMAGES_L1,
     inStock: true,
+    variants: [VARIANT_COLOR_BLACK_OLIVE, VARIANT_THICKNESS_12_15],
   },
 
   // 4 — Army L1 sleeping mat in Multicam / Pixel baul cover (roll-mats)
@@ -241,6 +329,7 @@ export const products: Product[] = [
     images: ROLL_IMAGES_L1,
     isNew: true,
     inStock: true,
+    variants: [VARIANT_RUG_COLOR_BLACK_OLIVE, VARIANT_COVER_MULTICAM_PIXEL],
   },
 
   // 5 — Gymnastic mat L0 (roll-mats)
@@ -281,6 +370,7 @@ export const products: Product[] = [
     },
     images: ROLL_IMAGES_L0,
     inStock: true,
+    variants: [VARIANT_GYM_COLOR],
   },
 
   // 6 — Tourist mat Army L0 (roll-mats)
@@ -297,7 +387,7 @@ export const products: Product[] = [
     descriptionUa:
       "Килимок туристичний виготовлений зі спіненого поліетилену, завдяки чому має високий рівень теплоізоляційних властивостей та повністю не поглинає вологу. Збільшена щільність основного матеріалу перешкоджає усадці при довготривалому навантаженні. Додаткові гумові кріплення дозволяють швидко та зручно фіксувати виріб у згорнутому вигляді. Килимок призначений для використання в будь-яких польових умовах: відпочинок, рибальство, тренування тощо.",
     descriptionRu:
-      "Туристический коврик изготовлен из вспененного полиэтилена, благодаря чему обладает высоким уровнем теплоизоляционных свойств и полностью не впитывает влагу. Повышенная плотность основного материала предотвращает усадку при длительной нагрузке. Дополнительные резиновые крепления позволяют быстро и удобно фиксировать изделие в свёрнутом виде. Коврик предназначен для использования в любых полевых условиях: отдых, рыбалка, тренировки и т.д.",
+      "Туристический коврик изготовлен из вспененного полиэтилена, благодаря чему обладает высоким уровнем теплоизоляционных свойств и полностью не впитывает влагу. Повышенная плотность основного материала предотвращает усадку при длительной нагрузке. Дополнительны�� резиновые крепления позволяют быстро и удобно фиксировать изделие в свёрнутом виде. Коврик предназначен для использования в любых полевых условиях: отдых, рыбалка, тренировки и т.д.",
     specifications: {
       "Size": "1800×550×10 mm",
       "Color": "Black",
@@ -415,6 +505,7 @@ export const products: Product[] = [
     images: SEAT_IMAGES,
     isNew: true,
     inStock: true,
+    variants: [VARIANT_COVER_PIXEL_MULTICAM],
   },
 
   // 9 — Field seat MOLLE attachment (field-seats)
@@ -431,7 +522,7 @@ export const products: Product[] = [
     descriptionUa:
       "Виріб призначений для професіоналів, відповідає високим стандартам якості та забезпечує широкий функціонал. Таку модель сидіння активно використовують спецпідрозділи поліції та військові. Сидіння має збільшену товщину та складається з однієї секції прямокутної форми, кріпиться за допомогою регулюючих петельок та міцних застібок системи фастекс для швидкого пристібання та знімання, висота кріплення легко регулюється. Чохол виготовлений з міцної тканини, стійкої до зносу, та обладнаний зручним клапаном для заміни наповнювача або прання. Наповнювач Monoisol HD має підвищені характеристики щільності, теплоізоляції та повністю не вбирає вологу.",
     descriptionRu:
-      "Изделие предназначено для профессионалов, соответствует высоким стандартам качества и обеспечивает широкий функционал. Такую модель сиденья используют спецподразделения полиции и военные. Сиденье имеет увеличенную толщину и состоит из одной прямоугольной секции, крепится с помощью регулируемых петель и прочных застёжек системы фастекс для быстрого пристёгивания и снятия, высота крепления легко регулируется. Чехол изготовлен из прочной ткани, устойчивой к износу, и оснащён удобным клапаном для замены наполнителя или стирки. Наполнитель Monoisol HD обладает повышенными характеристиками плотности и теплоизоляции и полностью не впитывает влагу.",
+      "Изделие предназначено для профессионалов, соответствует высоким стандартам качества и обеспечивает широкий функционал. Такую модель сиденья используют спецподраздел��ния полиции и военные. Сиденье имеет увеличенную толщину и состоит из одной прямоугольной секции, крепится с помощью регулируемых петель и прочных застёжек системы фастекс для быстрого пристёгивания и снятия, высота крепления легко регулируется. Чехол изготовлен из прочной ткани, устойчивой к износу, и оснащён удобным клапаном для замены наполнителя или стирки. Наполнитель Monoisol HD обладает повышенными характеристиками плотности и теплоизоляции и полностью не впитывает влагу.",
     specifications: {
       "Size": "300×400×20 mm",
       "Filling": "Monoisol HD",
@@ -461,6 +552,7 @@ export const products: Product[] = [
     },
     images: SEAT_IMAGES,
     inStock: true,
+    variants: [VARIANT_COVER_PIXEL_MULTICAM],
   },
 
   // 10 — Field seat standard (field-seats)
@@ -504,6 +596,7 @@ export const products: Product[] = [
     },
     images: SEAT_IMAGES,
     inStock: true,
+    variants: [VARIANT_COVER_PIXEL_MULTICAM],
   },
 
   // 11 — Field seat standard+ (field-seats)
@@ -550,6 +643,7 @@ export const products: Product[] = [
     },
     images: SEAT_IMAGES,
     inStock: true,
+    variants: [VARIANT_COVER_PIXEL_MULTICAM],
   },
 
   // 12 — Insulated field seat (field-seats)
@@ -607,9 +701,9 @@ export const products: Product[] = [
     description:
       "The seat is made of foam polyethylene, additionally laminated with a protective layer on the outer side. The material has a high level of thermal insulation and is completely waterproof, providing reliable protection from contact with cold or wet surfaces. It is equipped with a convenient fastex attachment system to the body; the elastic attachment straps allow secure fixation on people of different builds. Thanks to its very low weight, it can be carried over long distances. The seat is designed for use on short hiking trips, outdoor recreation, etc.",
     descriptionUa:
-      "Сидіння виготовлено зі спіненого поліетилену та додатково ламіноване захисним шаром з зовнішньої сторони. Матеріал сидіння має високий рівень теплоізоляційних властивостей та є повністю вологонепроникним, завдяки чому створюється надійний захист від контакту з холодною або вологою поверхнею. Виріб оснащений зручною системою кріплення фастекс до тулуба людини; стрічки кріплення виготовлені з еластичного матеріалу, що дозволяє міцно фіксувати сидіння на людях різної статури. Завдяки дуже малій вазі сидіння зручно носити з собою на великі відстані. Сидіння призначене для використання в нетривалих туристичних походах, відпочинку на природі тощо.",
+      "Сидіння виготовлено зі спіненого поліетилену та додатково ламіноване захисним шаром з зовнішньої сторони. Матеріал сидіння має високий рівень теплоізоляційних властивостей та є повністю вологонепроникним, завдяки чому створюється надійний захист від контакту з холодною або вологою поверхнею. Виріб оснащений зручною системою кріплення фастек�� до тулуба людини; стрічки кріплення виготовлені з еластичного матеріалу, що дозволяє міцно фіксувати сидіння на людях різної статури. Завдяки дуже малій вазі сидіння зручно носити з собою на великі відстані. Сидіння призначене для використання в нетривалих туристичних походах, відпочинку на природі тощо.",
     descriptionRu:
-      "Сиденье изготовлено из вспененного полиэтилена и дополнительно ламинировано защитным слоем с внешней стороны. Материал сиденья обладает высоким уровнем теплоизоляционных свойств и полностью влагонепроницаем, благодаря чему создаётся надёжная защита от контакта с холодной или влажной поверхностью. Изделие оснащено удобной системой крепления фастекс к телу человека; крепёжные ленты изготовлены из эластичного материала, что позволяет надёжно фиксировать сиденье на людях разной комплекции. Благодаря очень малому весу сиденье удобно носить с собой на большие расстояния. Сиденье предназначено для использования в непродолжительных туристических походах, отдыхе на природе и т.д.",
+      "Сиденье изготовлено из вспененного полиэтилена и дополнительно ламинировано защитным слоем с внешней стороны. Материал сиденья обладает высоким уровнем теплоизоляционных свойств и полностью влагонепроницаем, благодаря чему создаётся надёжная защита от контакта с холодной или влажной поверхностью. Изделие оснащено удобной системой крепления фастекс к телу человека; крепёжные ленты изготовлены из эластичного материала, что позволяет надёжно фиксировать сиденье на людях разной комплекции. Благодаря очень малому весу сиденье удобно носить с собой на большие расстояния. Сиденье предназначено для использования в непродолжительных туристических походах, отдыхе на природе �� т.д.",
     specifications: {
       "Size": "350×270×10 mm",
       "Color": "Black",

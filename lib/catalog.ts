@@ -176,6 +176,19 @@ const VARIANT_COVER_MULTICAM_PIXEL: ProductVariantGroup = {
   ],
 }
 
+// Cover (chohol) choice for field seats. Option order follows the seat product
+// names ("Піксель, Мультикам"), so Pixel is listed first here.
+const VARIANT_COVER_PIXEL_MULTICAM: ProductVariantGroup = {
+  id: "cover",
+  labelUa: "Чохол",
+  labelRu: "Чехол",
+  labelEn: "Cover",
+  options: [
+    { id: "pixel", labelUa: "Піксель", labelRu: "Пиксель", labelEn: "Pixel" },
+    { id: "multicam", labelUa: "Мультикам", labelRu: "Мультикам", labelEn: "Multicam" },
+  ],
+}
+
 const VARIANT_GYM_COLOR: ProductVariantGroup = {
   id: "color",
   labelUa: "Колір",
@@ -231,6 +244,8 @@ export const products: Product[] = [
     images: REAL_FOLDING_MAT_COVER,
     isNew: true,
     inStock: true,
+    // Name lists two thickness options: "12 мм (15 мм)" → selectable thickness.
+    variants: [VARIANT_THICKNESS_12_15],
   },
 
   // 2 — Army L1 sleeping mat, standard attachment (roll-mats)
@@ -535,7 +550,7 @@ export const products: Product[] = [
     description:
       "Designed for professionals, this seat meets high quality standards and offers wide functionality. It consists of two sections which, when unfolded, form a comfortable small rectangular mat, isolating a much larger body area from cold and moisture. It is attached using straps and buttons to a tactical belt or any MOLLE-compatible belt; fastex buckles allow quick attachment and removal, and the height is adjustable. The set includes a universal strap with two loop tapes for quick fixation on any side. The cover is made of durable, wear-resistant fabric. Each section is 12 mm thick, so joined together the total thickness is 24 mm. The filling has enhanced density and thermal insulation and is completely non-absorbent.",
     descriptionUa:
-      "Виріб призначений для професіоналів, відповідає високим стандартам якості та забезпечує широкий функціонал використання. Сидіння складається з двох секцій, які при розгортанні утворюють зручний невеликий килимок прямокутної форми, що дозволяє ізолювати значно більшу площу тіла від холоду та вологи. Кріплення здійснюється за допомогою строп і кнопок на тактичний пояс або будь-який ремінь з системою MOLLE; фастекси дозволяють швидко пристібати та знімати сидіння, висота кріплення регулюється. У комплекті є універсальний ремінь з двома стрічками-петельками для швидкої фіксації на будь-якій стороні. Чохол виготовлений з міцної тканини, стійкої до зносу. Кожна секція має товщину 12 мм, тому при з'єднан��і двох секцій загальна товщина становить 24 мм. Наповнювач має підвищені характеристики щільності та теплоізоляції, а також повністю не вбирає вологу.",
+      "Виріб призначений для професіоналів, відповідає високим стандартам якості та забезпечує широкий функціонал використання. Сидіння складається з двох секцій, які при розгортанні утворюють зручний невеликий килимок прямокутної форми, що дозволяє ізолювати значно більшу площу тіла від холоду та вологи. Кріплення здій��нюється за допомогою строп і кнопок на тактичний пояс або будь-який ремінь з системою MOLLE; фастекси дозволяють швидко пристібати та знімати сидіння, висота кріплення регулюється. У комплекті є універсальний ремінь з двома стрічками-петельками для швидкої фіксації на будь-якій стороні. Чохол виготовлений з міцної тканини, стійкої до зносу. Кожна секція має товщину 12 мм, тому при з'єднан��і двох секцій загальна товщина становить 24 мм. Наповнювач має підвищені характеристики щільності та теплоізоляції, а також повністю не вбирає вологу.",
     descriptionRu:
       "Изделие предназначено для профессионалов, соответствует высоким стандартам качества и обеспечивает широкий функционал использования. Сиденье состоит из двух секций, которые при разворачивании образуют удобный небольшой коврик прямоугольной формы, что позволяет изолировать значительно большую площадь тела от холода и влаги. Крепление осуществляется с помощью строп и кнопок на т��ктический пояс или любой ремень с системой MOLLE; фастексы позволяют быстро пристёгивать и снимать сиденье, высота креп��ения регулируется. В комплекте имеется универсальный ремень с двумя петельками для быстрой фиксации на любой стороне. Чехол изго��овлен из прочной ткани, устойчивой к износу. Каждая секция имеет толщину 12 мм, поэтому при соединении двух секций общая толщина составляет 24 мм. Наполнитель обладает повышенными характеристиками плотности и теплоизоляции, а также полностью не впитывает влагу.",
     specifications: {
@@ -568,6 +583,8 @@ export const products: Product[] = [
     images: REAL_FIELD_SEAT_2X,
     isNew: true,
     inStock: true,
+    // Name lists cover options "Піксель, Мультикам" → selectable cover.
+    variants: [VARIANT_COVER_PIXEL_MULTICAM],
   },
 
   // 9 — Field seat MOLLE attachment (field-seats)
@@ -597,7 +614,7 @@ export const products: Product[] = [
     specificationsUa: {
       "Розмір": "300×400×20 мм",
       "Наповнювач": "Monoisol HD",
-      "Матеріал чохла": "100% поліестер",
+      "Матер��ал чохла": "100% поліестер",
       "Колір": "Мультикам, Піксель",
       "Стрічка": "Поліпропіленова, 25 мм",
       "Фастекс": "30 мм, темно-зелений",
@@ -614,6 +631,8 @@ export const products: Product[] = [
     },
     images: REAL_FIELD_SEAT_MOLLE,
     inStock: true,
+    // Name lists cover options "Піксель, Мультикам" → selectable cover.
+    variants: [VARIANT_COVER_PIXEL_MULTICAM],
   },
 
   // 10 — Field seat standard (field-seats)
@@ -657,6 +676,8 @@ export const products: Product[] = [
     },
     images: SEAT_IMAGES,
     inStock: true,
+    // Name lists cover options "Піксель, Мультикам" → selectable cover.
+    variants: [VARIANT_COVER_PIXEL_MULTICAM],
   },
 
   // 11 — Field seat standard+ (field-seats)
@@ -703,6 +724,8 @@ export const products: Product[] = [
     },
     images: SEAT_IMAGES,
     inStock: true,
+    // Name lists cover options "Піксель, Мультикам" → selectable cover.
+    variants: [VARIANT_COVER_PIXEL_MULTICAM],
   },
 
   // 12 — Insulated field seat (field-seats)
