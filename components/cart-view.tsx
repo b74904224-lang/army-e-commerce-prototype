@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion"
 import { useStore } from "@/lib/store-context"
-import { formatPrice } from "@/lib/catalog"
+import { formatPrice, formatOrderTotal } from "@/lib/catalog"
 import { routes } from "@/lib/site-routes"
 import Link from "next/link"
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from "lucide-react"
@@ -176,11 +176,11 @@ export function CartView() {
               <h2 className="text-lg font-semibold text-foreground mb-4">{t.orderSummary}</h2>
               <div className="flex items-center justify-between py-3 border-b border-border">
                 <span className="text-muted-foreground">{t.subtotal}</span>
-                <span className="font-medium text-foreground tabular-nums">{formatPrice(cartTotal, language)}</span>
+                <span className="font-medium text-foreground tabular-nums">{formatOrderTotal(cartTotal, language)}</span>
               </div>
               <div className="flex items-center justify-between py-4">
                 <span className="font-semibold text-foreground">{t.total}</span>
-                <span className="text-xl font-bold text-foreground tabular-nums">{formatPrice(cartTotal, language)}</span>
+                <span className="text-xl font-bold text-foreground tabular-nums">{formatOrderTotal(cartTotal, language)}</span>
               </div>
               <Link
                 href={routes.checkout}

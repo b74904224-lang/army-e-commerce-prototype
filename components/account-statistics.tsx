@@ -56,6 +56,11 @@ const translations = {
 }
 
 function formatPrice(value: number, language: string) {
+  if (!value || value <= 0) {
+    if (language === "ru") return "уточняется менеджером"
+    if (language === "en") return "to be confirmed by manager"
+    return "уточнюється менеджером"
+  }
   return new Intl.NumberFormat(language === "en" ? "en-US" : "uk-UA").format(Math.round(value)) + " ₴"
 }
 
