@@ -331,7 +331,7 @@ export function ProductPage({ product }: ProductPageProps) {
                   className="pt-4"
                 >
                   {activeTab === "description" ? (
-                    <p className="text-muted-foreground leading-relaxed">
+                    <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
                       {getDescription()}
                     </p>
                   ) : (
