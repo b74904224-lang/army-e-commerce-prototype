@@ -133,6 +133,35 @@ const REAL_FIELD_FOLDING_MATTRESS = REAL("field-folding-mattress", 4)
 const REAL_FIELD_SEAT_2X = REAL("field-seat-2x-folding", 4)
 const REAL_FIELD_SEAT_MOLLE = REAL("field-seat-molle", 2)
 
+/* ------------------------ Per-variant photo galleries ------------------------ */
+// Dedicated, color/cover-specific photo sets for the "Каремати рулонні Army"
+// roll mats. These are real studio/field photos sorted by the actual colorway
+// (Black / Olive Green) or cover (Multicam / Pixel) shown in each shot, so the
+// product gallery shows ONLY the photos that match the selected variant.
+const VG = (folder: string, group: string, files: string[]): string[] =>
+  files.map((f) => `/images/products-real/${folder}/variant-galleries/${group}/${f}`)
+
+// Army L1, standard attachment — Black vs Olive Green
+const VG_L1_STD_BLACK = VG("army-l1-standard", "black", ["photo-00019.jpg", "photo-00102.jpg"])
+const VG_L1_STD_OLIVE = VG("army-l1-standard", "olive-green", ["photo-00108.jpg", "photo-00109.jpg"])
+// Army L1, tactical attachment — Black vs Olive Green
+const VG_L1_TAC_BLACK = VG("army-l1-tactical", "black", ["photo-00118.jpg"])
+const VG_L1_TAC_OLIVE = VG("army-l1-tactical", "olive-green", [
+  "photo-00035.jpg",
+  "photo-00121.jpg",
+  "photo-00122.jpg",
+])
+// Army L1 in baul cover — Multicam vs Pixel
+const VG_L1_COVER_MULTICAM = VG("army-l1-cover", "multicam", ["photo-00081.jpg", "photo-00082.jpg"])
+const VG_L1_COVER_PIXEL = VG("army-l1-cover", "pixel", ["photo-00148.jpg", "photo-00150.jpg"])
+// Tourist Army L0 — single Black colorway gallery (appended after preview/main).
+const VG_L0_TOURIST_BLACK = VG("army-l0-tourist", "black", [
+  "photo-00045.jpg",
+  "photo-00128.jpg",
+  "photo-00130.jpg",
+  "photo-00133.jpg",
+])
+
 /* --------------------------- Variant definitions --------------------------- */
 // Reusable variant groups shared by several products. Option ids are stable and
 // language-independent so they can be safely persisted in cart/orders.
@@ -221,7 +250,7 @@ export const products: Product[] = [
     description:
       "The product is designed to improve comfort during long stays in field conditions. Thanks to its characteristics, it creates reliable thermal and moisture insulation, as well as additional cushioning protection from hard and uneven ground surfaces.\n\nThe mat consists of 10 sections, allowing adjustment of insulation thickness by changing its length. For example, you can create a comfortable headrest by shortening the overall length.\n\nThe mat features a convenient quick-roll and fixation system. It can also be attached to a backpack using the MOLLE system. The fixing straps also serve as comfortable carrying handles.\n\nThe outer cover is made of durable waterproof fabric, so even on wet ground a person feels only dryness and warmth. The MONOISOL filling is completely waterproof and has excellent cushioning properties, allowing the product to maintain its thickness for a long time.\n\nThe product is available in two thickness options: 12 mm and 15 mm. Each has its own advantages. The 15 mm version provides a softer surface and better thermal insulation. The 12 mm version is lighter and more compact, which is especially important for long hikes over rough terrain.",
     descriptionUa:
-      "Виріб призначений для підвищення комфорту при тривалому перебуванні в польових умовах. Завдяки своїм характеристикам він створює надійний теплоізоляційний та вологозахисний бар'єр, а також додатковий амортизаційний захист від твердої та нерівної поверхні землі.\n\nКилим складається з 10 секцій, що дозволяє регулювати товщину ізоляції шляхом зміни довжини. Наприклад, можна зробити зручну підкладку під голову, зменшивши загальну довжину.\n\nКилим оснащений зручною системою шв��дкого згортання та фіксації. Також є можливість кріплення до рюкзака за допомогою системи MOLLE. Лямки-фіксатори одночасно служать зручними ручками для перенесення.\n\nЗовнішній чохол виготовлений з міцної водонепроникної тканини, завдяки чому навіть на вологій землі людина відчуває сухість і тепло. Наповнювач MONOISOL повністю водонепроникний і має високі амортизаційні властивості, тому виріб довго зберігає свою товщину.\n\nАсортимент представлений у двох варіантах товщини: 12 мм та 15 мм. Кожен має свої переваги. Модель 15 мм забезпечує м'якішу поверхню та кращу теплоізоляцію, а 12 мм — меншу вагу та компактність, що важливо при тривалих переходах.",
+      "Виріб призначений для підвищення комфорту при тривалому перебуванні в польових умовах. Завдяки своїм характеристикам він створює надійний теплоізоляційний та вологозахисний бар'єр, а також додатковий амортиз��ційний захист від твердої та нерівної поверхні землі.\n\nКилим складається з 10 секцій, що дозволяє регулювати товщину ізоляції шляхом зміни довжини. Наприклад, можна зробити зручну підкладку під голову, зменшивши загальну довжину.\n\nКилим оснащений зручною системою шв��дкого згортання та фіксації. Також є можливість кріплення до рюкзака за допомогою системи MOLLE. Лямки-фіксатори одночасно служать зручними ручками для перенесення.\n\nЗовнішній чохол виготовлений з міцної водонепроникної тканини, завдяки чому навіть на вологій землі людина відчуває сухість і тепло. Наповнювач MONOISOL повністю водонепроникний і має високі амортизаційні властивості, тому виріб довго зберігає свою товщину.\n\nАсортимент представлений у двох варіантах товщини: 12 мм та 15 мм. Кожен має свої переваги. Модель 15 мм забезпечує м'якішу поверхню та кращу теплоізоляцію, а 12 мм — меншу вагу та компактність, що важливо при тривалих переходах.",
     descriptionRu:
       "Изделие предназначено для повышения комфорта при длительном пребывании в полевых условиях. Благодаря своим характеристикам оно создаёт надёжную тепло- и влагоизоляцию, а также дополнительную амортизационную защиту от твёрдой и неровной поверхности земли.\n\nКоврик состоит из 10 секций, что позволяет регулировать толщину изоляции за счёт изменения длины. Например, можно сделать удобную подушку под голову, уменьшив общую длину изделия.\n\nКоврик оснащён удобной системой быстрого сворачивания и фиксации. Также предусмотрена возможность крепления к рюкзаку с помощью системы MOLLE. Лямки-фиксаторы одновременно выполняют функцию удобных ручек для переноски.\n\nВнешний чехол изготовлен из прочной водонепроницаемой ткани, благодаря чему даже на влажной земле человек ощущает сухость и тепло. Наполнитель MONOISOL полностью водонепроницаем и обладает хорошими амортизирующими свойствами, поэтому изделие долго сохраняет свою толщину.\n\nАссортимент представлен в двух вариантах толщины: 12 мм и 15 мм. Каждый вариант имеет свои преимущества. Модель 15 мм обеспечивает более мягкую поверхность и лучшую теплоизоляцию. Версия 12 мм легче и компактнее, что особенно важно при длительных переходах по пересечённой местности.",
     specifications: {
@@ -262,7 +291,7 @@ export const products: Product[] = [
     ...CATEGORY_ROLL,
     name: "Field Insulated Sleeping Mat Army L1, Standard Attachment (1900×600×12/15 mm, Black / Olive Green)",
     nameUa: "Килим спальний польовий ізоляційний Army L1 з стандартним кріпленням (1900×600×12/15 мм, Чорний / Olive Green)",
-    nameRu: "Спальный коврик полевой изоляционный Army L1 со стандартным кре��лением (1900×600×12/15 мм, Чёрный / Olive Green)",
+    nameRu: "Спальный коврик полевой изоляционный Army L1 со стандартным ��ре��лением (1900×600×12/15 мм, Чёрный / Olive Green)",
     price: 0,
     description:
       "The product range of Army L1 field insulated sleeping mats offers a wide variety in color, thickness, and attachment type. All products in this line feature a protective laminated surface, which significantly improves their performance characteristics.\n\nThe mats are available in two colors: Black and Olive Green. The increased thickness can be 12 mm or 15 mm. The attachment system is also available in two variants: standard military attachment (two strong polypropylene straps with quick tightening) and improved attachment with an additional handle for convenient carrying or attachment to a backpack.\n\nAlthough these mats have larger dimensions and weight compared to compact models, they significantly increase comfort during long stays in field conditions.",
@@ -295,12 +324,12 @@ export const products: Product[] = [
     isNew: true,
     inStock: true,
     variants: [VARIANT_COLOR_BLACK_OLIVE, VARIANT_THICKNESS_12_15],
-    // The standard-attachment photos show the black foam; the tactical-attachment
-    // folder shows the same model in olive green. Both are the genuine colorways
-    // of this mat, so the color option switches the gallery between them.
+    // Dedicated colorway galleries: selecting "Чорний" shows only the black
+    // photos, "Olive Green" shows only the olive-green photos. The main image
+    // and thumbnails switch (and reset to the first photo) on variant change.
     variantImages: {
-      black: REAL_ARMY_L1_STANDARD,
-      "olive-green": REAL_ARMY_L1_TACTICAL,
+      black: VG_L1_STD_BLACK,
+      "olive-green": VG_L1_STD_OLIVE,
     },
   },
 
@@ -346,12 +375,12 @@ export const products: Product[] = [
     images: REAL_ARMY_L1_TACTICAL,
     inStock: true,
     variants: [VARIANT_COLOR_BLACK_OLIVE, VARIANT_THICKNESS_12_15],
-    // The tactical-attachment photos show the olive-green foam; the standard
-    // folder shows the same model in black. Both are genuine colorways of this
-    // mat, so the color option switches the gallery between them.
+    // Dedicated colorway galleries: selecting "Чорний" shows only the black
+    // photos, "Olive Green" shows only the olive-green photos. The main image
+    // and thumbnails switch (and reset to the first photo) on variant change.
     variantImages: {
-      black: REAL_ARMY_L1_STANDARD,
-      "olive-green": REAL_ARMY_L1_TACTICAL,
+      black: VG_L1_TAC_BLACK,
+      "olive-green": VG_L1_TAC_OLIVE,
     },
   },
 
@@ -385,7 +414,7 @@ export const products: Product[] = [
     specificationsUa: {
       "Розмір килима": "1900×600×15 мм",
       "Колір": "Чорний / Olive Green",
-      "Поверхня": "Ламінована з однієї сторони",
+      "Поверхня": "Ламінована з одні��ї сторони",
       "Матеріал чохла": "100% поліестер",
       "Макс. об'єм чохла": "35 л",
       "Кольори чохла": "Піксель, Мультикам, темно-зелений",
@@ -409,11 +438,13 @@ export const products: Product[] = [
     images: REAL_ARMY_L1_COVER,
     inStock: true,
     variants: [VARIANT_RUG_COLOR_BLACK_OLIVE, VARIANT_COVER_MULTICAM_PIXEL],
-    // The supplied photos for this product show the Pixel (MM14) cover, so the
-    // "pixel" cover option maps to them. No Multicam photo was provided, so the
-    // "multicam" option falls back to the product's default images.
+    // Gallery switches by the chosen cover: "Мультикам" shows only the multicam
+    // photos, "Піксель" shows only the pixel photos — never both at once. The
+    // rug-color option has no dedicated photos, so it leaves the cover gallery
+    // (or the default images) in place.
     variantImages: {
-      pixel: REAL_ARMY_L1_COVER,
+      multicam: VG_L1_COVER_MULTICAM,
+      pixel: VG_L1_COVER_PIXEL,
     },
   },
 
@@ -472,7 +503,7 @@ export const products: Product[] = [
     descriptionUa:
       "Килимок туристичний виготовлений зі спіненого поліетилену, завдяки чому має високий рівень теплоізоляційних властивостей та повністю не поглинає вологу. Збільшена щільність основного матеріалу перешкоджає усадці при довготривалому навантаженні. Додаткові гумові кріплення дозволяють швидко та зручно фіксувати виріб у згорнутому вигляді. Килимок призначений для використання в будь-яких польових умовах: відпочинок, рибальство, тренування тощо.",
     descriptionRu:
-      "Туристический коврик изготовлен из вспененного полиэтилена, благодаря чему обладает высоким уровнем теплоизоляционных свойств и полностью не впитывает влагу. Повышенная плотность основного материала предотвращает усадку при длительной нагрузке. Дополнительные резиновые крепления позволяют быстро и удобно фиксировать изделие в свёрнутом виде. Коврик предназначен для использования в любых полевых условиях: отдых, рыбалка, тренировки и т.д.",
+      "Туристический коврик изготовлен из вспененного полиэтилена, благодаря чему обладает высоким уровнем теплоизоляционных свойств и полностью не впитывает влагу. Повышенная плотность основного материала предотвращает усадку при длительной нагрузке. Дополнительные резиновые крепления позволяют быстро и удобно фиксировать изделие в свёрнутом вид��. Коврик предназначен для использования в любых полевых условиях: отдых, рыбалка, тренировки и т.д.",
     specifications: {
       "Size": "1800×550×10 mm",
       "Color": "Black",
@@ -497,7 +528,10 @@ export const products: Product[] = [
       "Лента": "Эластичная полиэфирная, чёрная, 25 мм, толщина 1,8–2 мм, плотность 22 г/м.п.",
       "Пружинность": "25 параллельных силиконовых резинок",
     },
-    images: REAL_ARMY_L0_TOURIST,
+    // Default preview/main (preview-00131 + main + gallery) stays first and
+    // unchanged; the dedicated Black colorway photos are appended as extra
+    // gallery thumbnails. Single color, so no variant switching is needed.
+    images: [...REAL_ARMY_L0_TOURIST, ...VG_L0_TOURIST_BLACK],
     inStock: true,
   },
 
@@ -726,7 +760,7 @@ export const products: Product[] = [
       "Цвет": "Мультикам, Пиксель, тёмно-зелёный",
       "Лента": "Эластичная, тёмно-зелёная, 25 мм",
       "Фастекс": "30 мм, тёмно-зелёный",
-      "Рамка": "Полипропилен/полиамид, 25 мм, тёмно-зелёная",
+      "Рамка": "Полипропилен/полиамид, 25 ��м, тёмно-зелёная",
       "Точки крепления": "2 дополнительные",
     },
     images: SEAT_IMAGES,
@@ -848,14 +882,14 @@ export const products: Product[] = [
       "Розмір": "260×340×20 мм (до 25 мм)",
       "Колір": "Olive Green",
       "Поверхня": "Збільшена ламінація з двох сторін",
-      "Стрічка": "Еластична поліамідна, темно-зелена, 30 мм, товщина 1,9 мм, щільність 38 г/м.п.",
+      "Стрічка": "Ел��стична поліамідна, темно-зелена, 30 мм, товщина 1,9 мм, щільність 38 г/м.п.",
       "Пружність": "24 паралельні силіконові гумки",
       "Фастекс": "30 мм, темно-зелений",
     },
     specificationsRu: {
       "Размер": "260×340×20 мм (до 25 мм)",
       "Цвет": "Olive Green",
-      "Поверхность": "Увеличенная ламинация с двух стор��н",
+      "Поверхность": "Увеличенная ламинация с двух с��ор��н",
       "Лента": "Эластичная полиамидная, тёмно-зелёная, 30 мм, толщина 1,9 мм, плотность 38 г/м.п.",
       "Пружинность": "24 параллельные силиконовые резинки",
       "Фастекс": "30 мм, тёмно-зелёный",
