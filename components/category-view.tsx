@@ -6,25 +6,28 @@ import { useProducts } from "@/lib/use-products"
 import { formatPrice } from "@/lib/catalog"
 import { routes } from "@/lib/site-routes"
 import Link from "next/link"
-import { Heart, ShoppingBag } from "lucide-react"
+import { Heart, ShoppingBag, SlidersHorizontal } from "lucide-react"
 
 const translations = {
   ua: {
     allProducts: "Всі товари",
     new: "Новинка",
     addToCart: "В кошик",
+    chooseOptions: "Обрати параметри",
     noProducts: "Товари не знайдено"
   },
   ru: {
     allProducts: "Все товары",
     new: "Новинка",
     addToCart: "В корзину",
+    chooseOptions: "Выбрать параметры",
     noProducts: "Товары не найдены"
   },
   en: {
     allProducts: "All Products",
     new: "New",
     addToCart: "Add to Cart",
+    chooseOptions: "Choose options",
     noProducts: "No products found"
   }
 }
