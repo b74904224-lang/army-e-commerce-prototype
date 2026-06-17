@@ -302,7 +302,7 @@ export const products: Product[] = [
     nameRu: "Туристический коврик Army L0 с комплектом фиксирующих резинок (чёрный 1800×550×10 мм)",
     price: 0,
     description:
-      "The tourist mat is made of foam polyethylene, which provides a high level of thermal insulation and does not absorb moisture at all. The increased density of the material prevents compression under prolonged load. Additional elastic bands allow quick and convenient fixation of the mat in the rolled state. The mat is designed for use in any field conditions: recreation, fishing, training, etc.",
+      "The tourist mat is made of foam polyethylene, which provides a high level of thermal insulation properties and does not absorb moisture at all. The increased density of the main material prevents shrinkage under prolonged load. Additional rubber fasteners allow quick and convenient fixation of the product in the rolled state. The mat is designed for use in any field conditions: recreation, fishing, training, etc.",
     descriptionUa:
       "Килимок туристичний виготовлений зі спіненого поліетилену, завдяки чому має високий рівень теплоізоляційних властивостей та повністю не поглинає вологу. Збільшена щільність основного матеріалу перешкоджає усадці при довготривалому навантаженні. Додаткові гумові кріплення дозволяють швидко та зручно фіксувати виріб у згорнутому вигляді. Килимок призначений для використання в будь-яких польових умовах: відпочинок, рибальство, тренування тощо.",
     descriptionRu:
@@ -527,7 +527,7 @@ export const products: Product[] = [
     description:
       "Unlike the standard covered field seat, this model has improved features that increase comfort during use. The seat has two additional attachment points to the belt, and the fixing straps have a special shape that allows more comfortable wrapping around the body. The cover fabric is available in three colors: Multicam, Pixel or dark green, and is equipped with a flap for replacing the filling or washing the cover.",
     descriptionUa:
-      "Виріб, на відміну від стандартного сидіння по��ьового в чохлі, має покращені властивості, які збільшують зручність при використанні. Сидіння має дві додаткові точки кріплення до ременя, а фіксуючі стрічки мають особливу форму, яка дозволяє більш зручно обгортати тулуб людини. Тканина чохла може бути у трьох кольорах: Мультикам, Піксель або темно-зелений, та обладнана клапаном для заміни наповнювача або прання чохла.",
+      "Виріб, на відміну від стандартного сидіння польового в чохлі, має покращені властивості, які збільшують зручність при використанні. Сидіння має дві додаткові точки кріплення до ременя, а фіксуючі стрічки мають особливу форму, яка дозволяє більш зручно обгортати тулуб людини. Тканина чохла може бути у трьох кольорах: Мультикам, Піксель або темно-зелений, та обладнана клапаном для заміни наповнювача або прання чохла.",
     descriptionRu:
       "Изделие, в отличие от стандартного полевого сиденья в чехле, имеет улучшенные свойства, которые повышают удобство использования. Сиденье имеет две дополнительные точки крепления к ремню, а фиксирующие ленты обладают особой формой, позволяющей более удобно обхватывать тело человека. Ткань чехла может быть трёх цветов: Мультикам, Пиксель или тёмно-зелёный, и оснащена клапаном для замены наполнителя или стирки чехла.",
     specifications: {
