@@ -116,10 +116,17 @@ const REAL = (folder: string, galleryCount: number): string[] => {
   return imgs
 }
 
-const REAL_ARMY_L0_TOURIST = REAL("army-l0-tourist", 4)
-const REAL_ARMY_L1_STANDARD = REAL("army-l1-standard", 4)
-const REAL_ARMY_L1_TACTICAL = REAL("army-l1-tactical", 4)
-const REAL_ARMY_L1_COVER = REAL("army-l1-cover", 4)
+// Optimized preview/main image that takes priority as the first (preview) image.
+// The original main.webp + gallery follow it, so galleries stay intact.
+const REAL_WITH_PREVIEW = (folder: string, previewFile: string, galleryCount: number): string[] => [
+  `/images/products-real/${folder}/${previewFile}`,
+  ...REAL(folder, galleryCount),
+]
+
+const REAL_ARMY_L0_TOURIST = REAL_WITH_PREVIEW("army-l0-tourist", "preview-00131.webp", 4)
+const REAL_ARMY_L1_STANDARD = REAL_WITH_PREVIEW("army-l1-standard", "preview-00114.webp", 4)
+const REAL_ARMY_L1_TACTICAL = REAL_WITH_PREVIEW("army-l1-tactical", "preview-00042.webp", 4)
+const REAL_ARMY_L1_COVER = REAL_WITH_PREVIEW("army-l1-cover", "preview-00084.webp", 4)
 const REAL_GYM_MAT_L0 = REAL("gym-mat-l0", 4)
 const REAL_FOLDING_MAT_COVER = REAL("folding-mat-cover", 3)
 const REAL_FIELD_FOLDING_MATTRESS = REAL("field-folding-mattress", 4)
@@ -255,7 +262,7 @@ export const products: Product[] = [
     ...CATEGORY_ROLL,
     name: "Field Insulated Sleeping Mat Army L1, Standard Attachment (1900×600×12/15 mm, Black / Olive Green)",
     nameUa: "Килим спальний польовий ізоляційний Army L1 з стандартним кріпленням (1900×600×12/15 мм, Чорний / Olive Green)",
-    nameRu: "Спальный коврик полевой изоляционный Army L1 со стандартным креплением (1900×600×12/15 мм, Чёрный / Olive Green)",
+    nameRu: "Спальный коврик полевой изоляционный Army L1 со стандартным кре��лением (1900×600×12/15 мм, Чёрный / Olive Green)",
     price: 0,
     description:
       "The product range of Army L1 field insulated sleeping mats offers a wide variety in color, thickness, and attachment type. All products in this line feature a protective laminated surface, which significantly improves their performance characteristics.\n\nThe mats are available in two colors: Black and Olive Green. The increased thickness can be 12 mm or 15 mm. The attachment system is also available in two variants: standard military attachment (two strong polypropylene straps with quick tightening) and improved attachment with an additional handle for convenient carrying or attachment to a backpack.\n\nAlthough these mats have larger dimensions and weight compared to compact models, they significantly increase comfort during long stays in field conditions.",
@@ -311,7 +318,7 @@ export const products: Product[] = [
     descriptionUa:
       "Товарний асортимент спальних польових ізоляційних килимів Army L1 має широку варіацію за кольором, товщиною та видом кріплення. Усі вироби цього асортименту мають захисну ламіновану поверхню, що суттєво підвищує їх експлуатаційні властивості.\n\nВироби представлені у двох кольорах: Чорному та Olive Green. Збільшена товщина килимів може бути 12 або 15 мм. Кріплення також доступне у двох варіантах: стандартне армійське та покращене тактичне кріплення з додатковою ручкою для зручного перенесення або кріплення до рюкзака чи тулуба.\n\nНезважаючи на більші габарити та вагу, ці килими значно покращують комфорт при тривалому перебуванні людини в польових умовах.",
     descriptionRu:
-      "Товарный ассортимент спальных полевых изоляционных ковриков Army L1 отличается широким выбором по цвету, толщине и типу крепления. Все изделия данной линейки имеют защитную ламинированную поверхность, что существенно повышает их эксплуатационные свойства.\n\nИзделия представлены в двух цветах: чёрном и Olive Green. Увеличенная толщина ковриков может быть 12 или 15 мм. Крепление также доступно в двух вариантах: стандартное армейское и улучшенное тактическое крепление с дополнительной ручкой для удобного переноса или крепления к рюкзаку или телу.\n\nНесмотря на большие габариты и вес, эти коврики значительно повышают комфорт при д��ительном пребывании человека в полевых условиях.",
+      "Товарный ассортимент спальных полевых изоляционных ко��риков Army L1 отличается широким выбором по цвету, толщине и типу крепления. Все изделия данной линейки имеют защитную ламинированную поверхность, что существенно повышает их эксплуатационные свойства.\n\nИзделия представлены в двух цветах: чёрном и Olive Green. Увеличенная толщина ковриков может быть 12 или 15 мм. Крепление также доступно в двух вариантах: стандартное армейское и улучшенное тактическое крепление с дополнительной ручкой для удобного переноса или крепления к рюкзаку или телу.\n\nНесмотря на большие габариты и вес, эти коврики значительно повышают комфорт при д��ительном пребывании человека в полевых условиях.",
     specifications: {
       "Size": "1900×600×12/15 mm",
       "Color": "Black / Olive Green",
@@ -663,7 +670,7 @@ export const products: Product[] = [
       "Матеріал чохла": "100% поліестер",
       "Колір": "Мультикам, Піксель, темно-зелений",
       "Стрічка": "Еластична поліамідна, темно-зелена, 25 мм",
-      "Фастекс": "30 мм, темно-зелений",
+      "Фастекс": "30 мм, темно-з��лений",
       "Липка стрічка": "25 мм, чорна",
     },
     specificationsRu: {
@@ -848,7 +855,7 @@ export const products: Product[] = [
     specificationsRu: {
       "Размер": "260×340×20 мм (до 25 мм)",
       "Цвет": "Olive Green",
-      "Поверхность": "Увеличенная ламинация с двух сторон",
+      "Поверхность": "Увеличенная ламинация с двух стор��н",
       "Лента": "Эластичная полиамидная, тёмно-зелёная, 30 мм, толщина 1,9 мм, плотность 38 г/м.п.",
       "Пружинность": "24 параллельные силиконовые резинки",
       "Фастекс": "30 мм, тёмно-зелёный",
