@@ -56,7 +56,10 @@ function renderOrderText(order: StoredOrder): string {
         : "Не потребується (швидке замовлення)"
 
   const itemLines = items
-    .map((i) => `  • ${i.name} ×${i.quantity} — ${itemPrice(i.price)}`)
+    .map((i) => {
+      const variant = i.variant ? ` (${i.variant})` : ""
+      return `  • ${i.name}${variant} ×${i.quantity} — ${itemPrice(i.price)}`
+    })
     .join("\n")
 
   return [

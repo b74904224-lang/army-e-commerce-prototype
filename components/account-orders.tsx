@@ -196,10 +196,13 @@ export function AccountOrders() {
                   >
                     <div className="p-4 sm:p-5 space-y-3">
                       <ul className="divide-y divide-border">
-                        {order.items.map((item) => (
-                          <li key={item.productId} className="flex items-center justify-between py-2 text-sm">
+                        {order.items.map((item, index) => (
+                          <li key={`${item.productId}-${index}`} className="flex items-center justify-between py-2 text-sm">
                             <span className="text-foreground">
                               {item.name} <span className="text-muted-foreground">× {item.quantity}</span>
+                              {item.variant && (
+                                <span className="block text-xs text-muted-foreground">{item.variant}</span>
+                              )}
                             </span>
                             <span className="text-foreground font-medium">
                               {formatPrice(item.lineTotal, language)}

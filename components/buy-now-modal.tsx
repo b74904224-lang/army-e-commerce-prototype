@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useStore } from "@/lib/store-context"
-import { formatPrice } from "@/lib/catalog"
+import { formatPrice, variantSummary } from "@/lib/catalog"
 import { isApiConfigured } from "@/lib/api-client"
 import { createOrder, type OrderPayload } from "@/lib/api"
 import { X, Zap, CheckCircle } from "lucide-react"
@@ -53,7 +53,7 @@ const translations = {
 }
 
 export function BuyNowModal() {
-  const { language, isBuyNowOpen, setIsBuyNowOpen, buyNowProduct: selectedProduct } = useStore()
+  const { language, isBuyNowOpen, setIsBuyNowOpen, buyNowProduct: selectedProduct, buyNowVariants } = useStore()
   const t = translations[language]
   const [submitted, setSubmitted] = useState(false)
   const [name, setName] = useState("")
@@ -112,6 +112,17 @@ export function BuyNowModal() {
           name: selectedProduct.name,
           price: selectedProduct.price,
           quantity: 1,
+          ...(buyNowVariants && buyNowVariants.length > 0
+            ? {
+                variant: variantSummary(buyNowVariants, language),
+                variants: buyNowVariants.map((v) => ({
+                  groupId: v.groupId,
+                  groupLabel: v.groupLabelUa,
+                  optionId: v.optionId,
+                  optionLabel: v.optionLabelUa,
+                })),
+              }
+            : {}),
         },
       ],
       totals: {
@@ -212,6 +223,11 @@ export function BuyNowModal() {
                       />
                       <div>
                         <p className="font-medium text-foreground">{getProductName()}</p>
+                        {buyNowVariants && buyNowVariants.length > 0 && (
+                          <p className="text-xs text-muted-foreground">
+                            {variantSummary(buyNowVariants, language)}
+                          </p>
+                        )}
                         <p className="text-lg font-bold text-primary">{formatPrice(selectedProduct.price, language)}</p>
                       </div>
                     </div>

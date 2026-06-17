@@ -151,13 +151,23 @@ export function CategoryView({ categoryId = null }: CategoryViewProps) {
                       </button>
                     </div>
                     <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                      <button
-                        onClick={() => addToCart(product)}
-                        className="w-full py-2.5 bg-primary text-primary-foreground font-medium text-sm flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors"
-                      >
-                        <ShoppingBag className="w-4 h-4" />
-                        {t.addToCart}
-                      </button>
+                      {product.variants && product.variants.length > 0 ? (
+                        <Link
+                          href={routes.product(product.slug)}
+                          className="w-full py-2.5 bg-primary text-primary-foreground font-medium text-sm flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors"
+                        >
+                          <SlidersHorizontal className="w-4 h-4" />
+                          {t.chooseOptions}
+                        </Link>
+                      ) : (
+                        <button
+                          onClick={() => addToCart(product)}
+                          className="w-full py-2.5 bg-primary text-primary-foreground font-medium text-sm flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors"
+                        >
+                          <ShoppingBag className="w-4 h-4" />
+                          {t.addToCart}
+                        </button>
+                      )}
                     </div>
                   </div>
                   <Link

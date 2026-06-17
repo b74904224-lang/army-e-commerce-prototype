@@ -268,8 +268,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const isFavorite = (productId: string) => favorites.includes(productId)
 
-  const openBuyNow = (product: Product) => {
+  const openBuyNow = (product: Product, variants?: SelectedVariant[]) => {
     setBuyNowProduct(product)
+    setBuyNowVariants(variants)
     setIsBuyNowOpen(true)
   }
 
@@ -298,6 +299,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         isBuyNowOpen,
         setIsBuyNowOpen,
         buyNowProduct,
+        buyNowVariants,
         openBuyNow,
         notification,
         showNotification,
