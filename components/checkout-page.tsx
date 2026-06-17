@@ -6,7 +6,7 @@ import { useStore } from "@/lib/store-context"
 import { isApiConfigured } from "@/lib/api-client"
 import { createOrder, type OrderPayload, type DeliveryService as PayloadService } from "@/lib/api"
 import { routes } from "@/lib/site-routes"
-import { formatPrice, formatOrderTotal } from "@/lib/catalog"
+import { formatPrice, formatOrderTotal, variantSummary } from "@/lib/catalog"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import {
@@ -271,6 +271,17 @@ export function CheckoutPage() {
       name: item.product.name,
       price: item.product.price,
       quantity: item.quantity,
+      ...(item.variants && item.variants.length > 0
+        ? {
+            variant: variantSummary(item.variants, language),
+            variants: item.variants.map((v) => ({
+              groupId: v.groupId,
+              groupLabel: v.groupLabelUa,
+              optionId: v.optionId,
+              optionLabel: v.optionLabelUa,
+            })),
+          }
+        : {}),
     })),
     totals: {
       subtotal: cartTotal,
@@ -648,7 +659,7 @@ export function CheckoutPage() {
 
                 <div className="space-y-4 max-h-64 overflow-y-auto mb-4">
                   {cart.map((item) => (
-                    <div key={item.product.id} className="flex gap-3">
+                    <div key={item.key} className="flex gap-3">
                       <img
                         src={item.product.images[0] || "/placeholder.svg"}
                         alt={getProductName(item)}
@@ -658,6 +669,11 @@ export function CheckoutPage() {
                         <p className="text-sm font-medium text-foreground line-clamp-2 leading-snug">
                           {getProductName(item)}
                         </p>
+                        {item.variants && item.variants.length > 0 && (
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            {variantSummary(item.variants, language)}
+                          </p>
+                        )}
                         <p className="text-xs text-muted-foreground mt-1">
                           {t.qty}: {item.quantity} × {formatPrice(item.product.price, language)}
                         </p>

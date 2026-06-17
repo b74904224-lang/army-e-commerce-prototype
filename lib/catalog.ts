@@ -10,6 +10,41 @@
 
 export type Language = "ua" | "ru" | "en"
 
+/** A single selectable value inside a variant group (e.g. "15 mm" or "Olive Green"). */
+export interface ProductVariantOption {
+  /** Stable id used in cart keys and order payloads. Never localized. */
+  id: string
+  labelUa: string
+  labelRu: string
+  labelEn: string
+}
+
+/** A group of mutually-exclusive options the customer must choose from. */
+export interface ProductVariantGroup {
+  /** Stable id, e.g. "color" or "thickness". Never localized. */
+  id: string
+  labelUa: string
+  labelRu: string
+  labelEn: string
+  options: ProductVariantOption[]
+}
+
+/**
+ * A customer's chosen value for one variant group. Labels are embedded so the
+ * cart, checkout, email and order backup can render the selection without
+ * re-reading the catalog (robust against future catalog edits).
+ */
+export interface SelectedVariant {
+  groupId: string
+  groupLabelUa: string
+  groupLabelRu: string
+  groupLabelEn: string
+  optionId: string
+  optionLabelUa: string
+  optionLabelRu: string
+  optionLabelEn: string
+}
+
 export interface Product {
   id: string
   /** URL slug used by /product/[slug]. Stable, human-readable product code. */
@@ -31,6 +66,8 @@ export interface Product {
   images: string[]
   isNew?: boolean
   inStock: boolean
+  /** Optional selectable variants (color, thickness, ...). */
+  variants?: ProductVariantGroup[]
 }
 
 export interface Category {
@@ -67,6 +104,68 @@ const ROLL_IMAGES_L0 = [
 const FOLDING_IMAGES = ["/images/categories/karematy-rozkladni.jpg", "/images/products/army-l0-outdoor.jpg"]
 const SEAT_IMAGES = ["/images/categories/sidinnia-polovi.jpg", "/images/products/army-l0-outdoor.jpg"]
 
+/* --------------------------- Variant definitions --------------------------- */
+// Reusable variant groups shared by several products. Option ids are stable and
+// language-independent so they can be safely persisted in cart/orders.
+
+const VARIANT_COLOR_BLACK_OLIVE: ProductVariantGroup = {
+  id: "color",
+  labelUa: "Колір",
+  labelRu: "Цвет",
+  labelEn: "Color",
+  options: [
+    { id: "black", labelUa: "Чорний", labelRu: "Чёрный", labelEn: "Black" },
+    { id: "olive-green", labelUa: "Olive Green", labelRu: "Olive Green", labelEn: "Olive Green" },
+  ],
+}
+
+const VARIANT_THICKNESS_12_15: ProductVariantGroup = {
+  id: "thickness",
+  labelUa: "Товщина",
+  labelRu: "Толщина",
+  labelEn: "Thickness",
+  options: [
+    { id: "12mm", labelUa: "12 мм", labelRu: "12 мм", labelEn: "12 mm" },
+    { id: "15mm", labelUa: "15 мм", labelRu: "15 мм", labelEn: "15 mm" },
+  ],
+}
+
+// Rug color choice specific to the baul-cover product (thickness is fixed at 15 mm there).
+const VARIANT_RUG_COLOR_BLACK_OLIVE: ProductVariantGroup = {
+  id: "rug-color",
+  labelUa: "Колір килима",
+  labelRu: "Цвет коврика",
+  labelEn: "Mat color",
+  options: [
+    { id: "black", labelUa: "Чорний", labelRu: "Чёрный", labelEn: "Black" },
+    { id: "olive-green", labelUa: "Olive Green", labelRu: "Olive Green", labelEn: "Olive Green" },
+  ],
+}
+
+// Cover (chohol) choice for the baul-cover product.
+const VARIANT_COVER_MULTICAM_PIXEL: ProductVariantGroup = {
+  id: "cover",
+  labelUa: "Чохол",
+  labelRu: "Чехол",
+  labelEn: "Cover",
+  options: [
+    { id: "multicam", labelUa: "Мультикам", labelRu: "Мультикам", labelEn: "Multicam" },
+    { id: "pixel", labelUa: "Піксель", labelRu: "Пиксель", labelEn: "Pixel" },
+  ],
+}
+
+const VARIANT_GYM_COLOR: ProductVariantGroup = {
+  id: "color",
+  labelUa: "Колір",
+  labelRu: "Цвет",
+  labelEn: "Color",
+  options: [
+    { id: "yellow-blue", labelUa: "Жовто-синій", labelRu: "Жёлто-синий", labelEn: "Yellow-Blue" },
+    { id: "yellow-red", labelUa: "Жовто-червоний", labelRu: "Жёлто-красный", labelEn: "Yellow-Red" },
+    { id: "red-green", labelUa: "Червоно-зелений", labelRu: "Красно-зелёный", labelEn: "Red-Green" },
+  ],
+}
+
 export const products: Product[] = [
   // 1 — Folding mat in cover (folding-mats)
   {
@@ -80,7 +179,7 @@ export const products: Product[] = [
     description:
       "The product is designed to improve comfort during long stays in field conditions. Thanks to its characteristics, it creates reliable thermal and moisture insulation, as well as additional cushioning protection from hard and uneven ground surfaces.\n\nThe mat consists of 10 sections, allowing adjustment of insulation thickness by changing its length. For example, you can create a comfortable headrest by shortening the overall length.\n\nThe mat features a convenient quick-roll and fixation system. It can also be attached to a backpack using the MOLLE system. The fixing straps also serve as comfortable carrying handles.\n\nThe outer cover is made of durable waterproof fabric, so even on wet ground a person feels only dryness and warmth. The MONOISOL filling is completely waterproof and has excellent cushioning properties, allowing the product to maintain its thickness for a long time.\n\nThe product is available in two thickness options: 12 mm and 15 mm. Each has its own advantages. The 15 mm version provides a softer surface and better thermal insulation. The 12 mm version is lighter and more compact, which is especially important for long hikes over rough terrain.",
     descriptionUa:
-      "Виріб призначений для підвищення комфорту при тривалому перебуванні в польових умовах. Завдяки своїм характеристикам він створює надійний теплоізоляційний та вологозахисний бар'єр, а також додатковий амортизаційний захист від твердої та нерівної поверхні землі.\n\nКилим складається з 10 секцій, що дозволяє регулювати товщину ізоляції шляхом зміни довжини. Наприклад, можна зробити зручну підкладку під голову, зменшивши загальну довжину.\n\nКилим оснащений зручною системою швидкого згортання та фіксації. Також є можливість кріплення до рюкзака за допомогою системи MOLLE. Лямки-фіксатори одночасно служать зручними ручками для перенесення.\n\nЗовнішній чохол виготовлений з міцної водонепроникної тканини, завдяки чому навіть на вологій землі людина відчуває сухість і тепло. Наповнювач MONOISOL повністю водонепроникний і має високі амортизаційні властивості, тому виріб довго зберігає свою товщину.\n\nАсортимент представлений у двох варіантах товщини: 12 мм та 15 мм. Кожен має свої переваги. Модель 15 мм забезпечує м'якішу поверхню та кращу теплоізоляцію, а 12 мм — меншу вагу та компактність, що важливо при тривалих переходах.",
+      "Виріб призначений для підвищення комфорту при тривалому перебуванні в польових умовах. Завдяки своїм характеристикам він створює надійний теплоізоляційний та вологозахисний бар'єр, а також додатковий амортизаційний захист від твердої та нерівної поверхні землі.\n\nКилим складається з 10 секцій, що дозволяє регулювати товщину ізоляції шляхом зміни довжини. Наприклад, можна зробити зручну підкладку під голову, зменшивши загальну довжину.\n\nКилим оснащений зручною системою шв��дкого згортання та фіксації. Також є можливість кріплення до рюкзака за допомогою системи MOLLE. Лямки-фіксатори одночасно служать зручними ручками для перенесення.\n\nЗовнішній чохол виготовлений з міцної водонепроникної тканини, завдяки чому навіть на вологій землі людина відчуває сухість і тепло. Наповнювач MONOISOL повністю водонепроникний і має високі амортизаційні властивості, тому виріб довго зберігає свою товщину.\n\nАсортимент представлений у двох варіантах товщини: 12 мм та 15 мм. Кожен має свої переваги. Модель 15 мм забезпечує м'якішу поверхню та кращу теплоізоляцію, а 12 мм — меншу вагу та компактність, що важливо при тривалих переходах.",
     descriptionRu:
       "Изделие предназначено для повышения комфорта при длительном пребывании в полевых условиях. Благодаря своим характеристикам оно создаёт надёжную тепло- и влагоизоляцию, а также дополнительную амортизационную защиту от твёрдой и неровной поверхности земли.\n\nКоврик состоит из 10 секций, что позволяет регулировать толщину изоляции за счёт изменения длины. Например, можно сделать удобную подушку под голову, уменьшив общую длину изделия.\n\nКоврик оснащён удобной системой быстрого сворачивания и фиксации. Также предусмотрена возможность крепления к рюкзаку с помощью системы MOLLE. Лямки-фиксаторы одновременно выполняют функцию удобных ручек для переноски.\n\nВнешний чехол изготовлен из прочной водонепроницаемой ткани, благодаря чему даже на влажной земле человек ощущает сухость и тепло. Наполнитель MONOISOL полностью водонепроницаем и обладает хорошими амортизирующими свойствами, поэтому изделие долго сохраняет свою толщину.\n\nАссортимент представлен в двух вариантах толщины: 12 мм и 15 мм. Каждый вариант имеет свои преимущества. Модель 15 мм обеспечивает более мягкую поверхность и лучшую теплоизоляцию. Версия 12 мм легче и компактнее, что особенно важно при длительных переходах по пересечённой местности.",
     specifications: {
@@ -151,6 +250,7 @@ export const products: Product[] = [
     images: ROLL_IMAGES_L1,
     isNew: true,
     inStock: true,
+    variants: [VARIANT_COLOR_BLACK_OLIVE, VARIANT_THICKNESS_12_15],
   },
 
   // 3 — Army L1 sleeping mat, tactical attachment (roll-mats)
@@ -160,7 +260,7 @@ export const products: Product[] = [
     ...CATEGORY_ROLL,
     name: "Field Insulated Sleeping Mat Army L1, Tactical Attachment (1900×600×12/15 mm, Black / Olive Green)",
     nameUa: "Килим спальний польовий ізоляційний Army L1 з тактичним кріпленням (1900×600×12/15 мм, Чорний / Olive Green)",
-    nameRu: "Спальный коврик полевой изоляционный Army L1 с тактическим креплением (1900×600×12/15 мм, Чёрный / Olive Green)",
+    nameRu: "Спальный коврик полевой изоляционный Army L1 с тактическим крепление�� (1900×600×12/15 мм, Чёрный / Olive Green)",
     price: 0,
     description:
       "The product range of Army L1 field insulated sleeping mats offers a wide variety in color, thickness, and attachment type. All products in this line feature a protective laminated surface, which significantly improves their performance.\n\nThe mats are available in two colors: Black and Olive Green. The increased thickness can be 12 mm or 15 mm. The attachment system is also available in two variants: standard military attachment and improved tactical attachment with an additional handle for convenient carrying or attachment to a backpack or body.\n\nDespite their larger dimensions and weight, these mats significantly increase comfort during long stays in field conditions.",
@@ -194,6 +294,7 @@ export const products: Product[] = [
     },
     images: ROLL_IMAGES_L1,
     inStock: true,
+    variants: [VARIANT_COLOR_BLACK_OLIVE, VARIANT_THICKNESS_12_15],
   },
 
   // 4 — Army L1 sleeping mat in Multicam / Pixel baul cover (roll-mats)
@@ -210,7 +311,7 @@ export const products: Product[] = [
     descriptionUa:
       "Чохлами-баулами комплектуються лише килими товщиною 15 мм, ламіновані з однієї сторони, у кольорах Чорний або Olive Green. Замість традиційного кріплення використовується багатофункціональний чохол-баул.\n\nТакий чохол можна використовувати не тільки для транспортування килима, але й як зручну та надійну туристичну сумку. Він має циліндричну форму, систему MOLLE, декілька зручних транспортувальних ручок. Зверху застібається водостійкою блискавкою, а верх утворює додатковий захисний клапан, який фіксується на трищілинну пряжку. Чохол виготовлений з міцної тканини з підвищеною зносостійкістю. Доступні кольори: камуфляж Піксель, камуфляж Мультикам або однотонний темно-зелений.",
     descriptionRu:
-      "Чехлами-баулами комплектуются только коврики толщиной 15 мм, ламинированные с одной стороны, в цветах Чёрный или Olive Green. Вместо традиционного крепления используется многофункциональный чехол-баул.\n\nТакой чехол можно использовать не только для транспортировки коврика, но и как удобную и надёжную туристическую сумку. Он имеет цилиндрическую форму, систему MOLLE и несколько удобных транспортных ручек. Сверху закрывается влагостойкой молнией, а верхняя часть образует дополнительный защитный клапан, который фиксируется на трёхщелевую пряжку. Чехол выполнен из прочной ткани с повышенной износостойкостью. Доступные цвета: камуфляж Пиксель, камуфляж Мультикам или однотонный тёмно-зелёный.",
+      "Чехлами-баулами комплектуются только коврики толщиной 15 мм, ламинированные с одн��й стороны, в цветах Чёрный или Olive Green. Вместо традиционного крепления используется многофункциональный чехол-баул.\n\nТакой чехол можно использовать не только для транспортировки коврика, но и как удобную и надёжную туристическую сумку. Он имеет цилиндрическую форму, систему MOLLE и несколько удобных транспортных ручек. Сверху закрывается влагостойкой молнией, а верхняя часть образует дополнительный защитный клапан, который фиксируется на трёхщелевую пряжку. Чехол выполнен из прочной ткани с повышенной износостойкостью. Доступные цвета: камуфляж Пиксель, камуфляж Мультикам или однотонный тёмно-зелёный.",
     specifications: {
       "Mat size": "1900×600×15 mm",
       "Color": "Black / Olive Green",
@@ -250,6 +351,7 @@ export const products: Product[] = [
     images: ROLL_IMAGES_L1,
     isNew: true,
     inStock: true,
+    variants: [VARIANT_RUG_COLOR_BLACK_OLIVE, VARIANT_COVER_MULTICAM_PIXEL],
   },
 
   // 5 — Gymnastic mat L0 (roll-mats)
@@ -290,6 +392,7 @@ export const products: Product[] = [
     },
     images: ROLL_IMAGES_L0,
     inStock: true,
+    variants: [VARIANT_GYM_COLOR],
   },
 
   // 6 — Tourist mat Army L0 (roll-mats)
@@ -347,7 +450,7 @@ export const products: Product[] = [
     description:
       "The field folding mattress is designed for stationary long-term use in field conditions — for sleeping in tents, on camping beds, or directly on the ground; it can also be used during field shooting or even as a floating device. Thanks to its waterproof properties it can be placed on any wet surface while keeping the body dry, and it dries quickly since moisture does not penetrate inside. The mattress has three main sections, one with two additional sections for forming a pillow; all sections have waterproof zippers so the filling can be replaced or the cover washed. It is equipped with carrying handles and a fixation system for quick rolling. The Monoisol HD filling gives it high density, thermal insulation and elasticity, allowing it to be used as flooring in sleeping tents.",
     descriptionUa:
-      "Матрац польовий розкладний призначений для стаціонарного тривалого перебування в польових умовах — для відпочинку в наметах, на похідних ліжках або просто на землі; також може застосовуватися під час польових стрільб або навіть як плавучий засіб. Завдяки водонепроникним властивостям матрац можна класти на будь-яку вологу поверхню, при цьому тіло залишається на сухій поверхні, а виріб швидко висихає, оскільки волога не проникає всередину. Матрац складається з трьох основних секцій, одна з яких має дві додаткові секції для формування подушки; усі секції оснащені водозахисними блискавками, що дозволяє замінити наповнювач або випрати чохол. Обладнаний переносними ручками та системою кріплень для швидкого фіксування. Наповнювач Monoisol HD надає підвищену щільність, теплоізоляцію та пружність, завдяки чому матрац можна використовувати для облаштування підлоги в спальних наметах.",
+      "Матрац польовий розкладний призначений для стаціонарного тривалого перебування в польових умовах — для відпочинку в наметах, на похідних ліжках або просто на землі; також може застосовуватися під час польових стрільб або навіть як плавучий засіб. Завдяки водонепроникним властивостям матрац можна класти на будь-яку вологу поверхню, при цьому тіло залишається на сухій поверхні, а виріб швидко висихає, оскільки волога не проникає всередину. Матрац складається з трьох основних секцій, одна з яких має дві додаткові секції для формування подушки; усі секції оснащені водозахисними блискавками, що дозволяє замінити наповнювач або випрати чохол. Обладнаний переносними ручками та системою кріплень для швидкого фіксування. Наповнювач Monoisol HD надає підвищену щільність, теплоізоляцію та пружність, зав��яки чому матрац можна використовувати для облаштування підлоги в спальних наметах.",
     descriptionRu:
       "Полевой раскладной матрас предназначен для стационарного длительного пребывания в полевых условиях — для отдыха в палатках, на походных кроватях или прямо на земле; также может применяться во время полевых стрельб или даже в качестве плавсредства. Благодаря водонепроницаемым свойствам матрас можно класть на любую влажную поверхность, при этом тело остаётся на сухой поверхности, а изделие быстро сохнет, так как влага не проникает внутрь. Матрас состоит из трёх основных секций, одна из которых имеет две дополнительные секции для формирования подушки; все секции оснащены влагозащитными молниями, что позволяет заменить наполнитель или постирать чехол. Оборудован переносными ручками и системой креплений для быстрой фиксации. Наполнитель Monoisol HD придаёт повышенную плотность, теплоизоляцию и упругость, благодаря чему матрас можно использовать для обустройства пола в спальных палатках.",
     specifications: {
@@ -393,7 +496,7 @@ export const products: Product[] = [
     descriptionUa:
       "Виріб призначений для професіоналів, відповідає високим стандартам якості та забезпечує широкий функціонал використання. Сидіння складається з двох секцій, які при розгортанні утворюють зручний невеликий килимок прямокутної форми, що дозволяє ізолювати значно більшу площу тіла від холоду та вологи. Кріплення здійснюється за допомогою строп і кнопок на тактичний пояс або будь-який ремінь з системою MOLLE; фастекси дозволяють швидко пристібати та знімати сидіння, висота кріплення регулюється. У комплекті є універсальний ремінь з двома стрічками-петельками для швидкої фіксації на будь-якій стороні. Чохол виготовлений з міцної тканини, стійкої до зносу. Кожна секція має товщину 12 мм, тому при з'єднанні двох секцій загальна товщина становить 24 мм. Наповнювач має підвищені характеристики щільності та теплоізоляції, а також повністю не вбирає вологу.",
     descriptionRu:
-      "Изделие предназначено для профессионалов, соответствует высоким стандартам качества и обеспечивает широкий функционал использования. Сиденье состоит из двух секций, которые при разворачивании образуют удобный небольшой коврик прямоугольной формы, что позволяет изолировать значительно большую площадь тела от холода и влаги. Крепление осуществляется с помощью строп и кнопок на тактический пояс или любой ремень с системой MOLLE; фастексы позволяют быстро пристёгивать и снимать сиденье, высота крепления регулируется. В комплекте имеется универсальный ремень с двумя петельками для быстрой фиксации на любой стороне. Чехол изготовлен из прочной ткани, устойчивой к износу. Каждая секция имеет толщину 12 мм, поэтому при соединении двух секций общая толщина составляет 24 мм. Наполнитель обладает повышенными характеристиками плотности и теплоизоляции, а также полностью не впитывает влагу.",
+      "Изделие предназначено для профессионалов, соответствует высоким стандартам качества и обеспечивает широкий функционал использования. Сиденье состоит из двух секций, которые при разворачивании образуют удобный небольшой коврик прямоугольной формы, что позволяет изолировать значительно большую площадь тела от холода и влаги. Крепление осуществляется с помощью строп и кнопок на т��ктический пояс или любой ремень с системой MOLLE; фастексы позволяют быстро пристёгивать и снимать сиденье, высота крепления регулируется. В комплекте имеется универсальный ремень с двумя петельками для быстрой фиксации на любой стороне. Чехол изготовлен из прочной ткани, устойчивой к износу. Каждая секция имеет толщину 12 мм, поэтому при соединении двух секций общая толщина составляет 24 мм. Наполнитель обладает повышенными характеристиками плотности и теплоизоляции, а также полностью не впитывает влагу.",
     specifications: {
       "Size": "300×400×12 mm x2 (total 24 mm)",
       "Cover material": "100% Polyester",
@@ -406,7 +509,7 @@ export const products: Product[] = [
     specificationsUa: {
       "Розмір": "300×400×12 мм х2 (загалом 24 мм)",
       "Матеріал чохла": "100% поліестер",
-      "Колір": "Мультикам, Піксель",
+      "Колір": "��ультикам, Піксель",
       "Стрічка": "Поліпропіленова, 25 мм",
       "Фастекс": "30 мм",
       "Рамка": "Поліпропілен/поліамід, 25 мм",
@@ -438,9 +541,9 @@ export const products: Product[] = [
     description:
       "Designed for professionals, this seat meets high quality standards and is actively used by police special units and military personnel. It has increased thickness and consists of one rectangular section, attached using adjustable loops and strong fastex buckles for quick attachment and removal, with easily adjustable height. The cover is made of durable, wear-resistant fabric and has a convenient flap for replacing the filling or washing. The Monoisol HD filling provides enhanced density and thermal insulation and is completely non-absorbent.",
     descriptionUa:
-      "Виріб призначений для професіоналів, відповідає високим стандартам якості та забезпечує широкий функціонал. Таку модель сидіння активно використовують спецпідрозділи поліції та військові. Сидіння має збільшену товщину та складається з однієї секції прямокутної форми, кріпиться за допомогою регулюючих петельок та міцних застібок системи фастекс для швидкого пристібання та знімання, висота кріплення легко регулюється. Чохол виготовлений з міцної тканини, стійкої до зносу, ��а обладнаний зручним клапаном для заміни наповнювача або прання. Наповнювач Monoisol HD має підвищені характеристики щільності, теплоізоляції та повністю не вбирає вологу.",
+      "Виріб призначений для професіоналів, відповідає високим стандартам якості та забезпечує широкий функціонал. Таку модель сидіння активно використовують спецпідрозділи поліції та військові. Сидіння має збільшену товщину та складається з однієї секції прямокутної форми, кріпиться за допомогою регулюючих петельок та міцних застібок системи фастекс для швидкого пристібання та знімання, висота кріплення легко регулюється. Чохол виготовлений з міцної тканини, стійкої до зн��су, ��а обладнаний зручним клапаном для заміни наповнювача або прання. Наповнювач Monoisol HD має підвищені характеристики щільності, теплоізоляції та повністю не вбирає вологу.",
     descriptionRu:
-      "Изделие предназначено для профессионалов, соответствует высоким стандартам каче��тва и обеспечивает широкий функционал. Такую модель сиденья используют спецподразделения полиции и военные. Сиденье имеет увеличенную толщину и состоит из одной прямоугольной секции, крепится с помощью регулируемых петель и прочных застёжек системы фастекс для быстрого пристёгивания и снятия, высота крепления легко регулируется. Чехол изготовлен из прочной ткани, устойчивой к износу, и оснащён удобным клапаном для замены наполнителя или стирки. Наполнитель Monoisol HD обладает повышенными характеристиками плотности и теплоизоляции и полностью не впитывает влагу.",
+      "Изделие предназначено для профессионалов, соответствует высоким стандартам ка��е��тва и обеспечивает широкий функционал. Такую модель сиденья используют спецподразделения полиции и военные. Сиденье имеет увеличенную толщину и состоит из одной прямоугольной секции, крепится с помощью регулируемых петель и прочных застёжек системы фастекс для быстрого пристёгивания и снятия, высота крепления легко регулируется. Чехол изготовлен из прочной ткани, устойчивой к износу, и оснащён удобным клапаном для замены наполнителя или стирки. Наполнитель Monoisol HD обладает повышенными характеристиками плотности и теплоизоляции и полностью не впитывает влагу.",
     specifications: {
       "Size": "300×400×20 mm",
       "Filling": "Monoisol HD",
@@ -486,7 +589,7 @@ export const products: Product[] = [
     descriptionUa:
       "Сидіння польове в чохлі стандартне має високі теплоізоляційні показники, а завдяки міцному чохлу прослужить вам не один рік. Тканина чохла може бути у трьох кольорах: Мультикам, Піксель або темно-зелений, та обладнана клапаном, що дозволяє замінити наповнювач або випрати чохол. Додатково виріб оснащений більш міцними еластичними стрічками-фіксато��ами та надійною застібкою фастекс. У разі зносу наповнювача можна замовити новий або вирізати самостійно зі спіненого поліетилену товщиною 12 мм.",
     descriptionRu:
-      "Полевое сиденье в чехле стандартное обладает высокими теплоизоляционными показателями, а благодаря прочному чехлу прослужит вам не один год. Ткань чехла может быть трёх цветов: Мультикам, Пиксель или тёмно-зелёный, и оснащена клапаном, позволяющим заменить наполнитель или постирать чехол. Дополнительно изделие оснащено более прочными эластичными лентами-фиксаторами и надёжной застёжкой фастекс. В случае износа наполнителя можно заказать новый или вырезать самостоятельно из вспененного полиэтилена толщиной 12 мм.",
+      "Полевое сиденье в чехле стандартное обладает высокими теплоизоляционными показателями, а благодаря прочному чехлу прослужит вам не один год. Ткань чехла может быть трёх цветов: Мультикам, Пиксель или тёмно-зелён��й, и оснащена клапаном, позволяющим заменить наполнитель или постирать чехол. Дополнительно изделие оснащено более прочными эластичными лентами-фиксаторами и надёжной застёжкой фастекс. В случае износа наполнителя можно заказать новый или вырезать самостоятельно из вспененного полиэтилена толщиной 12 мм.",
     specifications: {
       "Size": "300×400×12 mm",
       "Cover material": "100% Polyester",
@@ -618,7 +721,7 @@ export const products: Product[] = [
     descriptionUa:
       "Сидіння виготовлено зі спіненого поліетилену та додатково ламіноване захисним шаром з зовнішньої сторони. Матеріал сидіння має високий рівень теплоізоляційних властивостей та є повністю вологонепроникним, завдяки чому створюється надійний захист від контак��у з холодною або вологою поверхнею. Виріб оснащений зручною системою кріплення фастекс до тулуба людини; стрічки кріплення виготовлені з еластичного матеріалу, що дозволяє міцно фіксувати сидіння на людях різної статури. Завдяки дуже малій вазі сидіння зручно носити з собою на великі відстані. Сидіння призначене для використання в нетривалих туристичних походах, відпочинку на природі тощо.",
     descriptionRu:
-      "Сиденье изготовлено из вспененного полиэтилена и дополнительно ламинировано защитным слоем с внешней стороны. Материал сиденья обладает высоким уровнем теплоизоляционных свойств и полностью влагонепроницаем, благодаря чему создаётся надёжная защита от контакта с холодной или влажной поверхностью. Изделие оснащено удобной системой крепления фастекс к телу человека; крепёжные ленты изготовлены из эластичного материала, что позволяет надёжно фиксировать сиденье на людях разной комплекции. Благодаря очень малому весу сиденье удобно носить с собой на большие расстояния. Сиденье предназначено для использования в непродолжительных туристических походах, отдыхе на природе и т.д.",
+      "Сиденье изготовлено из вспененного полиэтилена и дополнительно ламинировано защитным слоем с внешней стороны. Материал сиденья обладает высоким уровнем теплоизоляционных свойств и полностью влагонепроницаем, благодаря чему создаётся надёжная защита от контакта с холодной или влажной поверхностью. Изделие оснащено удобной системой крепления фастекс к телу человека; крепёжные ленты изготовлены из эластичного материала, что позволяет надёжно фиксировать сиденье на людях разной комплекции. Благодаря очень малому весу сиденье удобно носить с собой на большие расстояния. Сиденье предна��начено для использования в непродолжительных туристических походах, отдыхе на природе и т.д.",
     specifications: {
       "Size": "350×270×10 mm",
       "Color": "Black",
@@ -792,4 +895,60 @@ export function formatOrderTotal(value: number, language: Language): string {
     return "to be confirmed by manager"
   }
   return `${value} грн`
+}
+
+/* ------------------------------- Variants -------------------------------- */
+
+/** Localized group label, e.g. "Колір" / "Цвет" / "Color". */
+export function variantGroupLabel(v: SelectedVariant, language: Language): string {
+  if (language === "ru") return v.groupLabelRu
+  if (language === "en") return v.groupLabelEn
+  return v.groupLabelUa
+}
+
+/** Localized option label, e.g. "Olive Green" / "15 мм". */
+export function variantOptionLabel(v: SelectedVariant, language: Language): string {
+  if (language === "ru") return v.optionLabelRu
+  if (language === "en") return v.optionLabelEn
+  return v.optionLabelUa
+}
+
+/**
+ * Stable cart-line key: product id plus the chosen option ids. Two cart lines
+ * with different variants must NOT merge, while identical selections do.
+ */
+export function cartItemKey(productId: string, variants?: SelectedVariant[]): string {
+  if (!variants || variants.length === 0) return productId
+  const suffix = variants
+    .map((v) => `${v.groupId}:${v.optionId}`)
+    .sort()
+    .join("|")
+  return `${productId}__${suffix}`
+}
+
+/** Builds a SelectedVariant from a catalog group + the chosen option id. */
+export function makeSelectedVariant(
+  group: ProductVariantGroup,
+  optionId: string,
+): SelectedVariant | null {
+  const option = group.options.find((o) => o.id === optionId)
+  if (!option) return null
+  return {
+    groupId: group.id,
+    groupLabelUa: group.labelUa,
+    groupLabelRu: group.labelRu,
+    groupLabelEn: group.labelEn,
+    optionId: option.id,
+    optionLabelUa: option.labelUa,
+    optionLabelRu: option.labelRu,
+    optionLabelEn: option.labelEn,
+  }
+}
+
+/** Compact, language-independent variant summary for order payloads/email. */
+export function variantSummary(variants: SelectedVariant[] | undefined, language: Language): string {
+  if (!variants || variants.length === 0) return ""
+  return variants
+    .map((v) => `${variantGroupLabel(v, language)}: ${variantOptionLabel(v, language)}`)
+    .join(", ")
 }

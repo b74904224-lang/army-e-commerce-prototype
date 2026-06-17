@@ -18,6 +18,13 @@ export class PricingError extends Error {
   }
 }
 
+export interface PricedItemVariant {
+  groupId: string
+  groupLabel: string
+  optionId: string
+  optionLabel: string
+}
+
 export interface PricedItem {
   productId: string
   name: string
@@ -25,6 +32,10 @@ export interface PricedItem {
   price: number
   quantity: number
   lineTotal: number
+  /** Human-readable variant summary (server-validated), e.g. "Колір: Olive Green". */
+  variant?: string
+  /** Server-validated variant selections (labels re-read from catalog). */
+  variants?: PricedItemVariant[]
 }
 
 export interface PricedOrder {
@@ -50,12 +61,27 @@ export function priceOrder(order: OrderInput): PricedOrder {
     }
     const quantity = Math.max(1, Math.floor(requested.quantity))
     const lineTotal = product.price * quantity
+    // Variants don't affect price (price is authoritative from the catalog), but
+    // we preserve the customer's validated selection so the manager sees it.
+    const variants = requested.variants?.map((v) => ({
+      groupId: v.groupId,
+      groupLabel: v.groupLabel,
+      optionId: v.optionId,
+      optionLabel: v.optionLabel,
+    }))
+    const variant =
+      requested.variant ||
+      (variants && variants.length > 0
+        ? variants.map((v) => `${v.groupLabel}: ${v.optionLabel}`).join(", ")
+        : undefined)
     items.push({
       productId: product.id,
       name: product.name,
       price: product.price,
       quantity,
       lineTotal,
+      ...(variant ? { variant } : {}),
+      ...(variants && variants.length > 0 ? { variants } : {}),
     })
   }
 

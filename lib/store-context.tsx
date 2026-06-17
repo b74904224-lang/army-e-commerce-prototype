@@ -7,15 +7,17 @@ import { ApiError, getToken } from "./api-client"
 import {
   products,
   categories,
+  cartItemKey,
   type Product,
   type Category,
   type Language,
+  type SelectedVariant,
 } from "./catalog"
 
 // Re-export catalog types/data so existing imports from "@/lib/store-context"
 // keep working after the data was extracted to a server-safe module.
 export { products, categories }
-export type { Product, Category, Language }
+export type { Product, Category, Language, SelectedVariant }
 
 export interface AuthUser {
   name: string
@@ -24,17 +26,21 @@ export interface AuthUser {
 }
 
 export interface CartItem {
+  /** Stable line key: product id + chosen variant option ids. */
+  key: string
   product: Product
   quantity: number
+  /** Chosen variant selections (color/thickness). Absent for simple products. */
+  variants?: SelectedVariant[]
 }
 
 interface StoreState {
   language: Language
   setLanguage: (lang: Language) => void
   cart: CartItem[]
-  addToCart: (product: Product, quantity?: number) => void
-  removeFromCart: (productId: string) => void
-  updateQuantity: (productId: string, quantity: number) => void
+  addToCart: (product: Product, quantity?: number, variants?: SelectedVariant[]) => void
+  removeFromCart: (key: string) => void
+  updateQuantity: (key: string, quantity: number) => void
   clearCart: () => void
   favorites: string[]
   toggleFavorite: (productId: string) => void
@@ -49,7 +55,9 @@ interface StoreState {
   setIsBuyNowOpen: (open: boolean) => void
   /** Product shown inside the "buy in 1 click" modal. */
   buyNowProduct: Product | null
-  openBuyNow: (product: Product) => void
+  /** Variants pre-selected on the product page when opening the buy-now modal. */
+  buyNowVariants: SelectedVariant[] | undefined
+  openBuyNow: (product: Product, variants?: SelectedVariant[]) => void
   notification: string | null
   showNotification: (message: string) => void
   currentUser: AuthUser | null
@@ -70,6 +78,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isBuyNowOpen, setIsBuyNowOpen] = useState(false)
   const [buyNowProduct, setBuyNowProduct] = useState<Product | null>(null)
+  const [buyNowVariants, setBuyNowVariants] = useState<SelectedVariant[] | undefined>(undefined)
   const [notification, setNotification] = useState<string | null>(null)
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null)
   const [authReady, setAuthReady] = useState(false)
@@ -82,7 +91,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       const storedCart = localStorage.getItem("army_cart")
       if (storedCart) {
         const parsed = JSON.parse(storedCart)
-        if (Array.isArray(parsed)) setCart(parsed)
+        if (Array.isArray(parsed)) {
+          // Backfill a stable key for carts saved before variants existed.
+          const normalized = parsed
+            .filter((item) => item && item.product && item.product.id)
+            .map((item) => ({
+              ...item,
+              key: item.key || cartItemKey(item.product.id, item.variants),
+            }))
+          setCart(normalized)
+        }
       }
     } catch {
       // ignore corrupted cart storage
@@ -214,29 +232,30 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     )
   }
 
-  const addToCart = (product: Product, quantity = 1) => {
+  const addToCart = (product: Product, quantity = 1, variants?: SelectedVariant[]) => {
+    const key = cartItemKey(product.id, variants)
     setCart((prev) => {
-      const existing = prev.find((item) => item.product.id === product.id)
+      const existing = prev.find((item) => item.key === key)
       if (existing) {
         return prev.map((item) =>
-          item.product.id === product.id ? { ...item, quantity: item.quantity + quantity } : item,
+          item.key === key ? { ...item, quantity: item.quantity + quantity } : item,
         )
       }
-      return [...prev, { product, quantity }]
+      return [...prev, { key, product, quantity, variants }]
     })
     showNotification(language === "ua" ? "Додано до кошика!" : language === "ru" ? "Добавлено в корзину!" : "Added to cart!")
   }
 
-  const removeFromCart = (productId: string) => {
-    setCart((prev) => prev.filter((item) => item.product.id !== productId))
+  const removeFromCart = (key: string) => {
+    setCart((prev) => prev.filter((item) => item.key !== key))
   }
 
-  const updateQuantity = (productId: string, quantity: number) => {
+  const updateQuantity = (key: string, quantity: number) => {
     if (quantity < 1) {
-      removeFromCart(productId)
+      removeFromCart(key)
       return
     }
-    setCart((prev) => prev.map((item) => (item.product.id === productId ? { ...item, quantity } : item)))
+    setCart((prev) => prev.map((item) => (item.key === key ? { ...item, quantity } : item)))
   }
 
   const clearCart = () => setCart([])
@@ -249,8 +268,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const isFavorite = (productId: string) => favorites.includes(productId)
 
-  const openBuyNow = (product: Product) => {
+  const openBuyNow = (product: Product, variants?: SelectedVariant[]) => {
     setBuyNowProduct(product)
+    setBuyNowVariants(variants)
     setIsBuyNowOpen(true)
   }
 
@@ -279,6 +299,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         isBuyNowOpen,
         setIsBuyNowOpen,
         buyNowProduct,
+        buyNowVariants,
         openBuyNow,
         notification,
         showNotification,

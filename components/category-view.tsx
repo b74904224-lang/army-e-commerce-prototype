@@ -6,25 +6,28 @@ import { useProducts } from "@/lib/use-products"
 import { formatPrice } from "@/lib/catalog"
 import { routes } from "@/lib/site-routes"
 import Link from "next/link"
-import { Heart, ShoppingBag } from "lucide-react"
+import { Heart, ShoppingBag, SlidersHorizontal } from "lucide-react"
 
 const translations = {
   ua: {
     allProducts: "Всі товари",
     new: "Новинка",
     addToCart: "В кошик",
+    chooseOptions: "Обрати параметри",
     noProducts: "Товари не знайдено"
   },
   ru: {
     allProducts: "Все товары",
     new: "Новинка",
     addToCart: "В корзину",
+    chooseOptions: "Выбрать параметры",
     noProducts: "Товары не найдены"
   },
   en: {
     allProducts: "All Products",
     new: "New",
     addToCart: "Add to Cart",
+    chooseOptions: "Choose options",
     noProducts: "No products found"
   }
 }
@@ -151,13 +154,23 @@ export function CategoryView({ categoryId = null }: CategoryViewProps) {
                       </button>
                     </div>
                     <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                      <button
-                        onClick={() => addToCart(product)}
-                        className="w-full py-2.5 bg-primary text-primary-foreground font-medium text-sm flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors"
-                      >
-                        <ShoppingBag className="w-4 h-4" />
-                        {t.addToCart}
-                      </button>
+                      {product.variants && product.variants.length > 0 ? (
+                        <Link
+                          href={routes.product(product.slug)}
+                          className="w-full py-2.5 bg-primary text-primary-foreground font-medium text-sm flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors"
+                        >
+                          <SlidersHorizontal className="w-4 h-4" />
+                          {t.chooseOptions}
+                        </Link>
+                      ) : (
+                        <button
+                          onClick={() => addToCart(product)}
+                          className="w-full py-2.5 bg-primary text-primary-foreground font-medium text-sm flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors"
+                        >
+                          <ShoppingBag className="w-4 h-4" />
+                          {t.addToCart}
+                        </button>
+                      )}
                     </div>
                   </div>
                   <Link

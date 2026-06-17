@@ -6,25 +6,28 @@ import { useProducts } from "@/lib/use-products"
 import { formatPrice } from "@/lib/catalog"
 import { routes } from "@/lib/site-routes"
 import Link from "next/link"
-import { ShoppingBag } from "lucide-react"
+import { ShoppingBag, SlidersHorizontal } from "lucide-react"
 
 const translations = {
   ua: {
     newArrivals: "Новинки",
     popularProducts: "Популярні товари",
     addToCart: "В кошик",
+    chooseOptions: "Обрати параметри",
     new: "Новинка"
   },
   ru: {
     newArrivals: "Новинки",
     popularProducts: "Популярные товары",
     addToCart: "В корзину",
+    chooseOptions: "Выбрать параметры",
     new: "Новинка"
   },
   en: {
     newArrivals: "New Arrivals",
     popularProducts: "Popular Products",
     addToCart: "Add to Cart",
+    chooseOptions: "Choose options",
     new: "New"
   }
 }
@@ -108,13 +111,23 @@ export function ProductsGrid({ type }: ProductsGridProps) {
                       <span className="text-sm text-muted-foreground line-through">{formatPrice(product.originalPrice, language)}</span>
                     )}
                   </div>
-                  <button
-                    onClick={() => addToCart(product)}
-                    className="p-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-                    aria-label={t.addToCart}
-                  >
-                    <ShoppingBag className="w-4 h-4" />
-                  </button>
+                  {product.variants && product.variants.length > 0 ? (
+                    <Link
+                      href={routes.product(product.slug)}
+                      className="p-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                      aria-label={t.chooseOptions}
+                    >
+                      <SlidersHorizontal className="w-4 h-4" />
+                    </Link>
+                  ) : (
+                    <button
+                      onClick={() => addToCart(product)}
+                      className="p-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                      aria-label={t.addToCart}
+                    >
+                      <ShoppingBag className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
               </div>
             </motion.div>

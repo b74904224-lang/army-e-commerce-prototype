@@ -4,7 +4,13 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useStore, Product } from "@/lib/store-context"
 import { routes } from "@/lib/site-routes"
-import { getCategoryById, categoryName, formatPrice } from "@/lib/catalog"
+import {
+  getCategoryById,
+  categoryName,
+  formatPrice,
+  makeSelectedVariant,
+  type SelectedVariant,
+} from "@/lib/catalog"
 import Link from "next/link"
 import { Heart, ShoppingBag, Zap, ChevronRight, Minus, Plus } from "lucide-react"
 
@@ -22,7 +28,8 @@ const translations = {
     new: "Новинка",
     quantity: "Кількість:",
     home: "Головна",
-    catalog: "Каталог"
+    catalog: "Каталог",
+    chooseVariant: "Будь ласка, оберіть усі параметри товару"
   },
   ru: {
     addToCart: "Добавить в корзину",
@@ -37,7 +44,8 @@ const translations = {
     new: "Новинка",
     quantity: "Количество:",
     home: "Главная",
-    catalog: "Каталог"
+    catalog: "Каталог",
+    chooseVariant: "Пожалуйста, выберите все параметры товара"
   },
   en: {
     addToCart: "Add to Cart",
@@ -52,7 +60,8 @@ const translations = {
     new: "New",
     quantity: "Quantity:",
     home: "Home",
-    catalog: "Catalog"
+    catalog: "Catalog",
+    chooseVariant: "Please select all product options"
   }
 }
 
@@ -72,8 +81,29 @@ export function ProductPage({ product }: ProductPageProps) {
   const [selectedImage, setSelectedImage] = useState(0)
   const [activeTab, setActiveTab] = useState<"description" | "specifications">("description")
   const [quantity, setQuantity] = useState(1)
+  // Map of variant groupId -> chosen optionId
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({})
+  const [variantError, setVariantError] = useState(false)
   const favorite = isFavorite(product.id)
   const category = getCategoryById(product.category)
+
+  const variantGroups = product.variants ?? []
+  const allVariantsChosen = variantGroups.every((g) => selectedOptions[g.id])
+
+  const groupLabel = (g: (typeof variantGroups)[number]) =>
+    language === "ru" ? g.labelRu : language === "en" ? g.labelEn : g.labelUa
+  const optionLabel = (o: { labelUa: string; labelRu: string; labelEn: string }) =>
+    language === "ru" ? o.labelRu : language === "en" ? o.labelEn : o.labelUa
+
+  const buildSelectedVariants = (): SelectedVariant[] =>
+    variantGroups
+      .map((g) => makeSelectedVariant(g, selectedOptions[g.id]))
+      .filter((v): v is SelectedVariant => v !== null)
+
+  const selectOption = (groupId: string, optionId: string) => {
+    setSelectedOptions((prev) => ({ ...prev, [groupId]: optionId }))
+    setVariantError(false)
+  }
 
   const getName = () => {
     switch (language) {
@@ -100,13 +130,21 @@ export function ProductPage({ product }: ProductPageProps) {
   }
 
   const handleAddToCart = () => {
-    for (let i = 0; i < quantity; i++) {
-      addToCart(product)
+    if (!allVariantsChosen) {
+      setVariantError(true)
+      return
     }
+    const variants = buildSelectedVariants()
+    addToCart(product, quantity, variants.length ? variants : undefined)
   }
 
   const handleBuyNow = () => {
-    openBuyNow(product)
+    if (!allVariantsChosen) {
+      setVariantError(true)
+      return
+    }
+    const variants = buildSelectedVariants()
+    openBuyNow(product, variants.length ? variants : undefined)
   }
 
   const specs = getSpecifications()
@@ -228,6 +266,55 @@ export function ProductPage({ product }: ProductPageProps) {
                 {product.inStock ? t.inStock : t.outOfStock}
               </p>
             </div>
+
+            {/* Variant Selectors */}
+            {variantGroups.length > 0 && (
+              <div className="space-y-5">
+                {variantGroups.map((group) => {
+                  const chosen = selectedOptions[group.id]
+                  const showError = variantError && !chosen
+                  return (
+                    <div key={group.id}>
+                      <div className="flex items-baseline gap-2 mb-2">
+                        <span className="text-sm font-medium text-foreground">{groupLabel(group)}:</span>
+                        {chosen && (
+                          <span className="text-sm text-muted-foreground">
+                            {optionLabel(group.options.find((o) => o.id === chosen)!)}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {group.options.map((option) => {
+                          const active = chosen === option.id
+                          return (
+                            <button
+                              key={option.id}
+                              type="button"
+                              onClick={() => selectOption(group.id, option.id)}
+                              aria-pressed={active}
+                              className={`px-4 py-2 text-sm font-medium border transition-colors ${
+                                active
+                                  ? "border-primary bg-primary text-primary-foreground"
+                                  : showError
+                                    ? "border-destructive text-foreground hover:border-primary"
+                                    : "border-border text-foreground hover:border-primary"
+                              }`}
+                            >
+                              {optionLabel(option)}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )
+                })}
+                {variantError && (
+                  <p className="text-sm font-medium text-destructive" role="alert">
+                    {t.chooseVariant}
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Quantity Selector */}
             <div className="flex items-center gap-4">

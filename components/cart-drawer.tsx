@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion"
 import { useStore } from "@/lib/store-context"
-import { formatPrice, formatOrderTotal } from "@/lib/catalog"
+import { formatPrice, formatOrderTotal, variantSummary } from "@/lib/catalog"
 import { routes } from "@/lib/site-routes"
 import { useRouter } from "next/navigation"
 import { X, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react"
@@ -118,7 +118,7 @@ export function CartDrawer() {
                 <div className="space-y-4">
                   {cart.map(item => (
                     <motion.div
-                      key={item.product.id}
+                      key={item.key}
                       layout
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -134,12 +134,17 @@ export function CartDrawer() {
                         <h3 className="font-medium text-foreground truncate">
                           {getProductName(item)}
                         </h3>
+                        {item.variants && item.variants.length > 0 && (
+                          <p className="text-xs text-muted-foreground truncate">
+                            {variantSummary(item.variants, language)}
+                          </p>
+                        )}
                         <p className="text-sm text-muted-foreground">
                           {formatPrice(item.product.price, language)}
                         </p>
                         <div className="flex items-center gap-2 mt-2">
                           <button
-                            onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                            onClick={() => updateQuantity(item.key, item.quantity - 1)}
                             className="p-1 hover:bg-muted rounded transition-colors"
                             aria-label="Decrease quantity"
                           >
@@ -149,14 +154,14 @@ export function CartDrawer() {
                             {item.quantity}
                           </span>
                           <button
-                            onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                            onClick={() => updateQuantity(item.key, item.quantity + 1)}
                             className="p-1 hover:bg-muted rounded transition-colors"
                             aria-label="Increase quantity"
                           >
                             <Plus className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => removeFromCart(item.product.id)}
+                            onClick={() => removeFromCart(item.key)}
                             className="ml-auto p-1 text-muted-foreground hover:text-destructive transition-colors"
                             aria-label={t.remove}
                           >

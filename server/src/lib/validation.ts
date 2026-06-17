@@ -33,11 +33,20 @@ export const updateProfileSchema = z
 
 /* ----------------------------- Orders ---------------------------- */
 
+const orderItemVariantSchema = z.object({
+  groupId: z.string().min(1).max(60),
+  groupLabel: z.string().min(1).max(120),
+  optionId: z.string().min(1).max(60),
+  optionLabel: z.string().min(1).max(120),
+})
+
 const orderItemSchema = z.object({
   productId: z.string().min(1),
   name: z.string().min(1).max(300),
   price: z.number().nonnegative(),
   quantity: z.number().int().positive().max(999),
+  variant: z.string().trim().max(300).optional(),
+  variants: z.array(orderItemVariantSchema).max(10).optional(),
 })
 
 const deliverySchema = z.object({

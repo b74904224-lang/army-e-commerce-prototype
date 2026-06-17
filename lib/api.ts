@@ -83,11 +83,22 @@ export type DeliveryType = "branch" | "home" | "not_required_for_quick_order"
 /** Safe payment methods only — no card data is ever collected on the frontend. */
 export type PaymentMethod = "cod" | "bank_transfer" | "manager_confirmation"
 
+export interface OrderItemVariantPayload {
+  groupId: string
+  groupLabel: string
+  optionId: string
+  optionLabel: string
+}
+
 export interface OrderItemPayload {
   productId: string
   name: string
   price: number
   quantity: number
+  /** Human-readable variant summary, e.g. "Колір: Olive Green, Товщина: 15 мм". */
+  variant?: string
+  /** Structured chosen variants (stable ids + labels). */
+  variants?: OrderItemVariantPayload[]
 }
 
 export interface OrderPayload {
@@ -147,6 +158,8 @@ export interface AccountOrderItem {
   price: number
   quantity: number
   lineTotal: number
+  variant?: string
+  variants?: OrderItemVariantPayload[]
 }
 
 export interface AccountOrder {
