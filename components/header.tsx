@@ -4,6 +4,7 @@ import { Search, User, Heart, ShoppingBag, Menu, X, LogOut, LayoutDashboard } fr
 import { useStore } from "@/lib/store-context"
 import { routes } from "@/lib/site-routes"
 import Link from "next/link"
+import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { useState } from "react"
@@ -54,9 +55,17 @@ export function Header() {
           {/* Logo */}
           <Link
             href={routes.home}
-            className="text-2xl lg:text-3xl font-bold tracking-tight text-foreground hover:text-primary transition-colors"
+            className="flex items-center shrink-0 transition-opacity hover:opacity-80"
+            aria-label="ARMY — Made in UA"
           >
-            ARMY
+            <Image
+              src="/images/logo-army.png"
+              alt="ARMY"
+              width={500}
+              height={184}
+              priority
+              className="h-9 w-auto lg:h-11"
+            />
           </Link>
 
           {/* Desktop Navigation */}
