@@ -224,10 +224,14 @@ const FS_INSULATED_IMAGES = [
 
 // Field seat insulated Army L1 — single colorway (Black), no cover choice.
 const FS_INSULATED_L1_IMAGES = [
+  // Client-requested primary: gallery-00065.webp (black L1 seat on white bg,
+  // front side with strap + fastex buckle centered) — the former last
+  // thumbnail is now the catalog card, product-page default, and first image.
+  // The remaining photos follow it, keeping the gallery intact. Reorder only.
+  "gallery-00065.webp",
   "preview-00001122.webp",
   "gallery-00141.webp",
   "gallery-00066.webp",
-  "gallery-00065.webp",
 ].map((f) => FS("field-seat-insulated-l1", f))
 
 /* --------------------------- Variant definitions --------------------------- */

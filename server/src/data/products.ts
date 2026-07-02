@@ -173,10 +173,12 @@ const SEAT_INSULATED_IMAGES = FS_SEAT("field-seat-insulated", [
   "gallery-00257.webp",
 ])
 const SEAT_INSULATED_L1_IMAGES = FS_SEAT("field-seat-insulated-l1", [
+  // Client-requested primary: gallery-00065.webp (black L1 seat, white bg,
+  // front + fastex centered). Remaining photos follow it. Reorder only.
+  "gallery-00065.webp",
   "preview-00001122.webp",
   "gallery-00141.webp",
   "gallery-00066.webp",
-  "gallery-00065.webp",
 ])
 
 export const products: Product[] = [
