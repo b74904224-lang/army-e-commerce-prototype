@@ -127,11 +127,34 @@ const REAL_ARMY_L0_TOURIST = REAL_WITH_PREVIEW("army-l0-tourist", "preview-00131
 const REAL_ARMY_L1_STANDARD = REAL_WITH_PREVIEW("army-l1-standard", "preview-00114.webp", 4)
 const REAL_ARMY_L1_TACTICAL = REAL_WITH_PREVIEW("army-l1-tactical", "preview-00042.webp", 4)
 const REAL_ARMY_L1_COVER = REAL_WITH_PREVIEW("army-l1-cover", "preview-00084.webp", 4)
-const REAL_GYM_MAT_L0 = REAL("gym-mat-l0", 4)
+// Gymnastic mat L0 — main.webp = "гимнастичекский3333" (primary/preview/first).
+// Gallery keeps both the new archive photos (gallery-1..3) and the restored
+// original photos (gallery-4..8), so old and new photos are all shown.
+const REAL_GYM_MAT_L0 = REAL("gym-mat-l0", 8)
 const REAL_FOLDING_MAT_COVER = REAL("folding-mat-cover", 3)
 const REAL_FIELD_FOLDING_MATTRESS = REAL("field-folding-mattress", 4)
-const REAL_FIELD_SEAT_2X = REAL("field-seat-2x-folding", 4)
-const REAL_FIELD_SEAT_MOLLE = REAL("field-seat-molle", 2)
+// 2x folding seat: gallery-2.webp (the vertical Multicam shot with the straps /
+// fastex clearly visible) is promoted to the primary/preview image, so it is the
+// catalog card image, the product-page default, and the first thumbnail. The
+// original main.webp + remaining gallery images follow it, keeping the gallery
+// intact. Reorder only — no files renamed and no quality change.
+const REAL_FIELD_SEAT_2X = [
+  "/images/products-real/field-seat-2x-folding/gallery-2.webp",
+  "/images/products-real/field-seat-2x-folding/main.webp",
+  "/images/products-real/field-seat-2x-folding/gallery-1.webp",
+  "/images/products-real/field-seat-2x-folding/gallery-3.webp",
+  "/images/products-real/field-seat-2x-folding/gallery-4.webp",
+]
+// MOLLE seat: gallery-2.webp (the Multicam shot on white background with the
+// top straps/fastex clearly visible) is promoted to the primary/preview image,
+// so it is the catalog card image, the product-page default, and the first
+// thumbnail. The remaining photos follow it, keeping the gallery intact.
+// Reorder only — no files renamed and no quality change.
+const REAL_FIELD_SEAT_MOLLE = [
+  "/images/products-real/field-seat-molle/gallery-2.webp",
+  "/images/products-real/field-seat-molle/gallery-1.webp",
+  "/images/products-real/field-seat-molle/main.webp",
+]
 
 /* ------------------------ Per-variant photo galleries ------------------------ */
 // Dedicated, color/cover-specific photo sets for the "Каремати рулонні Army"
@@ -159,6 +182,70 @@ const VG_L0_TOURIST_BLACK = VG("army-l0-tourist", "black", [
   "photo-00130.jpg",
   "photo-00133.jpg",
 ])
+
+/* --------------------------- Field seat real photos --------------------------- */
+// Real studio photos for the four "Сидіння польові Army" field-seat products.
+// Files live flat under public/images/products-real/<folder>/ as preview-*.webp
+// (main/preview image) + gallery-*.webp. The `preview-*` file is always first so
+// it stays the card/cart/checkout image.
+const FS = (folder: string, file: string): string => `/images/products-real/${folder}/${file}`
+
+// Field seat standard+ — cover options Піксель / Мультикам.
+// preview-00057 shows both covers together (used as the default/card image).
+// Single-cover shots: 00051/00052 = Pixel, 00053/00055 = Multicam.
+const FS_STD_PLUS_DIR = "field-seat-standard-plus"
+const FS_STD_PLUS_PIXEL = ["gallery-00052.webp", "gallery-00051.webp"].map((f) => FS(FS_STD_PLUS_DIR, f))
+const FS_STD_PLUS_MULTICAM = ["gallery-00053.webp", "gallery-00055.webp"].map((f) => FS(FS_STD_PLUS_DIR, f))
+const FS_STD_PLUS_IMAGES = [
+  FS(FS_STD_PLUS_DIR, "preview-00057.webp"),
+  ...FS_STD_PLUS_PIXEL,
+  ...FS_STD_PLUS_MULTICAM,
+]
+
+// Field seat standard — cover options Піксель / Мультикам.
+// preview-00062 and gallery-00058 show both covers together (default/card image).
+// Single-cover shots: 00059/00060 = Pixel, 00061 = Multicam.
+const FS_STD_DIR = "field-seat-standard"
+const FS_STD_PIXEL = ["gallery-00059.webp", "gallery-00060.webp"].map((f) => FS(FS_STD_DIR, f))
+const FS_STD_MULTICAM = ["gallery-00061.webp"].map((f) => FS(FS_STD_DIR, f))
+const FS_STD_IMAGES = [
+  FS(FS_STD_DIR, "preview-00062.webp"),
+  FS(FS_STD_DIR, "gallery-00058.webp"),
+  ...FS_STD_PIXEL,
+  ...FS_STD_MULTICAM,
+]
+
+// Field seat insulated Army — single colorway (Olive Green), no cover choice.
+const FS_INSULATED_IMAGES = [
+  // Exact client-specified gallery for the insulated Olive Green seat: exactly
+  // two photos, preview-00256 as the primary/preview/default and gallery-00257
+  // second. gallery-00140 (bright green grass) and the white/studio shots
+  // (gallery-00064 / 00063) are intentionally not referenced by this product.
+  "preview-00256.webp",
+  "gallery-00257.webp",
+].map((f) => FS("field-seat-insulated", f))
+
+// Field seat insulated Army L1 — single colorway (Black), no cover choice.
+const FS_INSULATED_L1_IMAGES = [
+  // Original L1 studio photos. gallery-00065.webp (black L1 seat, white bg,
+  // front + fastex centered) is the primary/preview/first image; the rest follow.
+  "gallery-00065.webp",
+  "preview-00001122.webp",
+  "gallery-00141.webp",
+  "gallery-00066.webp",
+].map((f) => FS("field-seat-insulated-l1", f))
+
+// Field seat insulated Army L2 — client-supplied archive photos (army l1.zip).
+// 00566 — background removed to a clean white — is the primary/preview/first
+// image (catalog card, cart/checkout and product-page default). The remaining
+// archive shots follow it as gallery images.
+const FS_INSULATED_L2_IMAGES = [
+  "main-00566.webp",
+  "gallery-01.webp",
+  "gallery-02.webp",
+  "gallery-03.webp",
+  "gallery-04.webp",
+].map((f) => FS("field-seat-insulated-l2", f))
 
 /* --------------------------- Variant definitions --------------------------- */
 // Reusable variant groups shared by several products. Option ids are stable and
@@ -248,7 +335,7 @@ export const products: Product[] = [
     description:
       "The product is designed to improve comfort during long stays in field conditions. Thanks to its characteristics, it creates reliable thermal and moisture insulation, as well as additional cushioning protection from hard and uneven ground surfaces.\n\nThe mat consists of 10 sections, allowing adjustment of insulation thickness by changing its length. For example, you can create a comfortable headrest by shortening the overall length.\n\nThe mat features a convenient quick-roll and fixation system. It can also be attached to a backpack using the MOLLE system. The fixing straps also serve as comfortable carrying handles.\n\nThe outer cover is made of durable waterproof fabric, so even on wet ground a person feels only dryness and warmth. The MONOISOL filling is completely waterproof and has excellent cushioning properties, allowing the product to maintain its thickness for a long time.\n\nThe product is available in two thickness options: 12 mm and 15 mm. Each has its own advantages. The 15 mm version provides a softer surface and better thermal insulation. The 12 mm version is lighter and more compact, which is especially important for long hikes over rough terrain.",
     descriptionUa:
-      "Виріб призначений для підвищення комфорту при тривалому перебуванні в польових умовах. Завдяки своїм характеристикам він створює надійний теплоізоляційний та вологозахисний бар'єр, а також додатковий амортиз��ційний захист від твердої та нерівної поверхні землі.\n\nКилим складається з 10 секцій, що дозволяє регулювати товщину ізоляції шляхом зміни довжини. Наприклад, можна зробити зручну підкладку під голову, зменшивши загальну довжину.\n\nКилим оснащений зручною системою шв��дкого згортання та фіксації. Також є можливість кріплення до рюкзака за допомогою системи MOLLE. Лямки-фіксатори одночасно служать зручними ручками для перенесення.\n\nЗовнішній чохол виготовлений з міцної водонепроникної тканини, завдяки чому навіть на вологій землі людина відчуває сухість і тепло. Наповнювач MONOISOL повністю водонепроникний і має високі амортизаційні властивості, тому виріб довго зберігає свою товщину.\n\nАсортимент представлений у двох варіантах товщини: 12 мм та 15 мм. Кожен має свої переваги. Модель 15 мм забезпечує м'якішу поверхню та кращу теплоізоляцію, а 12 мм — меншу вагу та компактність, що важливо при тривалих переходах.",
+      "Виріб призначений для підвищення комфорту при тривалому перебуванні в польових умовах. Завдяки своїм характеристикам ��ін створює надійний теплоізоляційний та вологозахисний бар'єр, а також додатковий амортиз��ційний захист від твердої та нерівн��ї поверхні землі.\n\nКилим складається з 10 секцій, що дозволяє регулювати товщину ізоляції шляхом зміни довжини. Наприклад, можна зробити зручну підкладку під голову, зменшивши загальну довжину.\n\nКилим оснащений зручною системою шв��дкого згортання та фіксації. Також є можливість кріплення до рюкзака за допомогою системи MOLLE. Лямки-фіксатори одночасно служать зручними ручками для перенесення.\n\nЗовнішній чохол виготовлений з міцної водонепроникної тканини, завдяки чому навіть на вологій землі людина відчуває сухість і тепло. Наповнювач MONOISOL повністю водонепроникний і має високі амортизаційні властивості, тому виріб довго зберігає свою товщину.\n\nАсортимент представлений у двох варіантах товщини: 12 мм та 15 мм. Кожен має свої переваги. Модель 15 мм забезпечує м'якішу поверхню та кращу теплоізоляцію, а 12 мм — меншу вагу та компактність, що важливо при тривалих переходах.",
     descriptionRu:
       "Изделие предназначено для повышения комфорта при длительном пребывании в полевых условиях. Благодаря своим характеристикам оно создаёт надёжную тепло- и влагоизоляцию, а также дополнительную амортизационную защиту от твёрдой и неровной поверхности земли.\n\nКоврик состоит из 10 секций, что позволяет регулировать толщину изоляции за счёт изменения длины. Например, можно сделать удобную подушку под голову, уменьшив общую длину изделия.\n\nКоврик оснащён удобной системой быстрого сворачивания и фиксации. Также предусмотрена возможность крепления к рюкзаку с помощью системы MOLLE. Лямки-фиксаторы одновременно выполняют функцию удобных ручек для переноски.\n\nВнешний чехол изготовлен из прочной водонепроницаемой ткани, благодаря чему даже на влажной земле человек ощущает сухость и тепло. Наполнитель MONOISOL полностью водонепроницаем и обладает хорошими амортизирующими свойствами, поэтому изделие долго сохраняет свою толщину.\n\nАссортимент представлен в двух вариантах толщины: 12 мм и 15 мм. Каждый вариант имеет свои преимущества. Модель 15 мм обеспечивает более мягкую поверхность и лучшую теплоизоляцию. Версия 12 мм легче и компактнее, что особенно важно при длительных переходах по пересечённой местности.",
     specifications: {
@@ -305,7 +392,7 @@ export const products: Product[] = [
       "Buckle": "3-slot, polypropylene/polyamide, 25 mm",
     },
     specificationsUa: {
-      "Розмір": "1900×600×12/15 мм",
+      "Розмір": "1900×600×12/15 ��м",
       "Колір": "Чорний / Olive Green",
       "Поверхня": "Ламінована",
       "Стрічка": "Поліпропіленова, темно-зелена, 25 мм, товщина 2,5 мм, щільність 13,2 г/м.п.",
@@ -355,7 +442,7 @@ export const products: Product[] = [
       "Buckle": "3-slot and 2-slot, dark green",
     },
     specificationsUa: {
-      "Розмір": "1900×600×12/15 мм",
+      "Розмір": "1900��600×12/15 мм",
       "Колір": "Чорний / Olive Green",
       "Поверхня": "Ламінована",
       "Стрічка": "Поліпропіленова, темно-зелена, 25 мм та 20 мм, товщина 2,5 мм, щільність 13,2 та 10,5 г/м.п.",
@@ -688,7 +775,7 @@ export const products: Product[] = [
     descriptionUa:
       "Сидіння польове в чохлі стандартне має високі теплоізоляційні показники, а завдяки міцному чохлу прослужить вам не один рік. Тканина чохла може бути у трьох кольорах: Мультикам, Піксель або темно-зелений, та обладнана клапаном, що дозволяє замінити наповнювач або випрати чохол. Додатково виріб оснащений більш міцними еластичними стрічками-фіксато��ами та надійною застібкою фастекс. У разі зносу наповнювача можна замовити новий або вирізати самостійно зі спіненого поліетилену товщиною 12 мм.",
     descriptionRu:
-      "Полевое сиденье в чехле стандартное обладает высокими теплоизоляционными показателями, а благодаря прочному чехлу прослужит вам не один год. Ткань чехла может быть трёх цветов: Мультикам, Пиксель или тёмно-зелён��й, и оснащена клапаном, позволяющим заменить наполнитель или постирать чехол. Дополнительно изделие оснащено более прочными эластичными лентами-фиксаторами и надёжной застёжкой фастекс. В случае износа наполнителя можно заказать новый или вырезать самостоятельно из вспененного полиэтилена толщиной 12 мм.",
+      "Полевое сиденье в чехле стандартное обладает высокими теплоизоляционными пок��зателями, а благодаря прочному чехлу прослужит вам не один год. Ткань чехла может быть трёх цветов: Мультикам, Пиксель или тёмно-зелён��й, и оснащена клапаном, позволяющим заменить наполнитель или постирать чехол. Дополнительно изделие оснащено более прочными эластичными лентами-фиксаторами и надёжной застёжкой фастекс. В случае износа наполнителя можно заказать новый или вырезать самостоятельно из вспененного полиэтилена толщиной 12 мм.",
     specifications: {
       "Size": "300×400×12 mm",
       "Cover material": "100% Polyester",
@@ -713,10 +800,17 @@ export const products: Product[] = [
       "Фастекс": "30 мм, тёмно-зелёный",
       "Липкая лента": "25 мм, чёрная",
     },
-    images: SEAT_IMAGES,
+    images: FS_STD_IMAGES,
     inStock: true,
     // Name lists cover options "Піксель, Мультикам" → selectable cover.
     variants: [VARIANT_COVER_PIXEL_MULTICAM],
+    // Cover-specific galleries: Піксель shows only pixel shots, Мультикам only
+    // multicam shots. The default images (with the "both covers" photos) stay for
+    // cards/cart. Main image + thumbnails switch (and reset) on cover change.
+    variantImages: {
+      pixel: FS_STD_PIXEL,
+      multicam: FS_STD_MULTICAM,
+    },
   },
 
   // 11 — Field seat standard+ (field-seats)
@@ -761,10 +855,17 @@ export const products: Product[] = [
       "Рамка": "Полипропилен/полиамид, 25 ��м, тёмно-зелёная",
       "Точки крепления": "2 дополнительные",
     },
-    images: SEAT_IMAGES,
+    images: FS_STD_PLUS_IMAGES,
     inStock: true,
     // Name lists cover options "Піксель, Мультикам" → selectable cover.
     variants: [VARIANT_COVER_PIXEL_MULTICAM],
+    // Cover-specific galleries: Піксель shows only pixel shots, Мультикам only
+    // multicam shots. preview-00057 (both covers) stays as the default/card image.
+    // Main image + thumbnails switch (and reset) on cover change.
+    variantImages: {
+      pixel: FS_STD_PLUS_PIXEL,
+      multicam: FS_STD_PLUS_MULTICAM,
+    },
   },
 
   // 12 — Insulated field seat (field-seats)
@@ -806,7 +907,7 @@ export const products: Product[] = [
       "Пружинность": "25 параллельных силиконовых резинок",
       "Фастекс": "20–30 мм, тёмно-зелёный",
     },
-    images: SEAT_IMAGES,
+    images: FS_INSULATED_IMAGES,
     inStock: true,
   },
 
@@ -822,9 +923,9 @@ export const products: Product[] = [
     description:
       "The seat is made of foam polyethylene, additionally laminated with a protective layer on the outer side. The material has a high level of thermal insulation and is completely waterproof, providing reliable protection from contact with cold or wet surfaces. It is equipped with a convenient fastex attachment system to the body; the elastic attachment straps allow secure fixation on people of different builds. Thanks to its very low weight, it can be carried over long distances. The seat is designed for use on short hiking trips, outdoor recreation, etc.",
     descriptionUa:
-      "Сидіння виготовлено зі спіненого поліетилену та додатково ламіноване захисним шаром з зовнішньої сторони. Матеріал сидіння має високий рівень теплоізоляційних властивостей та є повністю вологонепроникним, завдяки чому створюється надійний захист від контак��у з холодною або вологою поверхнею. Виріб оснащений зручною системою кріплення фастекс до тулуба людини; стрічки кріплення виготовлені з еластичного матеріалу, що дозволяє міцно фіксувати сидіння на людях різної статури. Завдяки дуже малій вазі сидіння зручно носити з собою на великі відстані. Сидіння призначене для використання в нетривалих туристичних походах, відпочинку на природі тощо.",
+      "Сидіння виготовлено зі спіненого поліетилену та додатково ламіноване захисним шаром з зовнішньої сторони. Матеріал сидіння має високий рівень теплоізоляційних властивостей та є повністю вологонепроникним, завдяки чому створюється надійний захист від контак��у з холодною або вологою поверхнею. Виріб оснащений зручною системою кріплення фастекс до тулуба людини; стрічки кріплення виготовлені з еластичного матеріалу, що дозволяє міцно фіксувати сидіння на людях різної статури. Завдяки дуже малій вазі сидіння зручно носити з собою на великі відстані. Сидіння призначене для використання в нет��ивалих туристичних походах, відпочинку на природі тощо.",
     descriptionRu:
-      "Сиденье изготовлено из вспененного полиэтилена и дополнительно ламинировано защитным слоем с внешней стороны. Материал сиденья обладает высоким уровнем теплоизоляционных свойств и полностью влагонепроницаем, благодаря чему создаётся надёжная защита от контакта с холодной или влажной поверхностью. Изделие оснащено удобной системой крепления фастекс к телу человека; крепёжные ленты изготовлены из эластичного материала, что позволяет надёжно фиксировать сиденье на людях разной комплекции. Благодаря очень малому весу сиденье удобно носить с собой на большие расстояния. Сиденье предна��начено для использования в непродолжительных туристических походах, отдыхе на природе и т.д.",
+      "Сиденье изготовлено из вспененного полиэтилена и дополнительно ламинировано защитным слоем с внешней стороны. Материал сиденья обладает высоким уровнем теплоизоляционных свойств и полностью ��лагонепроницаем, благодаря чему создаётся надёжная защита от контакта с холодной или влажной поверхностью. Изделие оснащено удобной системой крепления фастекс к телу человека; крепёжные ленты изготовлены из эластичного материала, что позволяет надёжно фиксировать сиденье на людях разной комплекции. Благодаря очень малому весу сиденье удобно носить с собой на большие расстояния. Сиденье предна��начено для использования в непродолжительных туристических походах, отдыхе на природе и т.д.",
     specifications: {
       "Size": "350×270×10 mm",
       "Color": "Black",
@@ -849,7 +950,7 @@ export const products: Product[] = [
       "Пружинность": "25 параллельных силиконовых резинок",
       "Фастекс": "20–30 мм, чёрный",
     },
-    images: SEAT_IMAGES,
+    images: FS_INSULATED_L1_IMAGES,
     inStock: true,
   },
 
@@ -892,7 +993,7 @@ export const products: Product[] = [
       "Пружинность": "24 параллельные силиконовые резинки",
       "Фастекс": "30 мм, тёмно-зелёный",
     },
-    images: SEAT_IMAGES,
+    images: FS_INSULATED_L2_IMAGES,
     inStock: true,
   },
 ]

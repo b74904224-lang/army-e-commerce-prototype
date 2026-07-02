@@ -147,6 +147,48 @@ const ROLL_IMAGES_L1_COVER = ["/images/products-real/army-l1-cover/preview-00084
 const ROLL_IMAGES_L0_TOURIST = ["/images/products-real/army-l0-tourist/preview-00131.webp", ...ROLL_IMAGES_L0]
 const FOLDING_IMAGES = ["/images/categories/karematy-rozkladni.jpg", "/images/products/army-l0-outdoor.jpg"]
 const SEAT_IMAGES = ["/images/categories/sidinnia-polovi.jpg", "/images/products/army-l0-outdoor.jpg"]
+// Real studio photos for the four field-seat products (mirror of lib/catalog.ts).
+// preview-* is the primary/card image; gallery-* follow. Cover-specific filtering
+// (Піксель/Мультикам) is handled on the frontend via lib/catalog.ts variantImages.
+const FS_SEAT = (folder: string, files: string[]): string[] =>
+  files.map((f) => `/images/products-real/${folder}/${f}`)
+const SEAT_STANDARD_IMAGES = FS_SEAT("field-seat-standard", [
+  "preview-00062.webp",
+  "gallery-00058.webp",
+  "gallery-00059.webp",
+  "gallery-00060.webp",
+  "gallery-00061.webp",
+])
+const SEAT_STANDARD_PLUS_IMAGES = FS_SEAT("field-seat-standard-plus", [
+  "preview-00057.webp",
+  "gallery-00052.webp",
+  "gallery-00051.webp",
+  "gallery-00053.webp",
+  "gallery-00055.webp",
+])
+const SEAT_INSULATED_IMAGES = FS_SEAT("field-seat-insulated", [
+  // Exact client-specified gallery: preview-00256 primary, gallery-00257 second.
+  // gallery-00140 and the white/studio shots (gallery-00064 / 00063) are not used.
+  "preview-00256.webp",
+  "gallery-00257.webp",
+])
+const SEAT_INSULATED_L1_IMAGES = FS_SEAT("field-seat-insulated-l1", [
+  // Client-requested primary: gallery-00065.webp (black L1 seat, white bg,
+  // front + fastex centered). Remaining photos follow it. Reorder only.
+  "gallery-00065.webp",
+  "preview-00001122.webp",
+  "gallery-00141.webp",
+  "gallery-00066.webp",
+])
+// Field seat insulated L2 — client archive photos (army l1.zip). main-00566
+// (white bg) is the primary/preview image; gallery-* follow. Mirror of lib/catalog.ts.
+const SEAT_INSULATED_L2_IMAGES = FS_SEAT("field-seat-insulated-l2", [
+  "main-00566.webp",
+  "gallery-01.webp",
+  "gallery-02.webp",
+  "gallery-03.webp",
+  "gallery-04.webp",
+])
 
 export const products: Product[] = [
   // 1 — Folding mat in cover (folding-mats)
@@ -206,7 +248,7 @@ export const products: Product[] = [
     description:
       "The product range of Army L1 field insulated sleeping mats offers a wide variety in color, thickness, and attachment type. All products in this line feature a protective laminated surface, which significantly improves their performance characteristics.\n\nThe mats are available in two colors: Black and Olive Green. The increased thickness can be 12 mm or 15 mm. The attachment system is also available in two variants: standard military attachment (two strong polypropylene straps with quick tightening) and improved attachment with an additional handle for convenient carrying or attachment to a backpack.\n\nAlthough these mats have larger dimensions and weight compared to compact models, they significantly increase comfort during long stays in field conditions.",
     descriptionUa:
-      "Товарний асортимент спальних польових ізоляційних килимів Army L1 має широку варіацію за кольором, товщиною та видом кріплення. Усі вироби цього асортименту мають захисну ламіновану поверхню, що значно підвищує їх експлуатаційні властивості.\n\nВироби представлені у двох кольорах: чорному та Olive Green. Збільшена товщина килимів може бути 12 або 15 мм. Кріплення також доступне у двох варіантах: стандартне армійське кріплення (дві міцні поліпропіленові стрічки з швидким затягуванням) та покращене кріплення з додатковою ручкою для зручного перенесення або кріплення до рюкзака.\n\nНезважаючи на більші габарити та вагу порівняно з компактними моделями, ці килими значно підвищують комфорт при тривалому перебуванні людини в польових умовах.",
+      "Товарний асортимент спальних польових ізоляційних килимів Army L1 має широку варіацію за кольором, товщиною та видом кріплення. Усі ви��оби цього асортименту мають захисну ламіновану поверхню, що значно підвищує їх експлуатаційні властивості.\n\nВироби представлені у двох кольорах: чорному та Olive Green. Збільшена товщина килимів може бути 12 або 15 мм. Кріплення також доступне у двох варіантах: стандартне армійське кріплення (дві міцні поліпропіленові стрічки з швидким затягуванням) та покращене кріплення з додатковою ручкою для зручного перенесення або кріплення до рюкзака.\n\nНезважаючи на більші габарити та вагу порівняно з компактними моделями, ці килими значно підвищують комфорт при тривалому перебуванні людини в польових умовах.",
     descriptionRu:
       "Товарный ассортимент спальных полевых изоляционных ковриков Army L1 отличается широким выбором по цвету, толщине и типу крепления. Все изделия данной линейки имеют защитную ламинированную поверхность, что существенно повышает их эксплуатационные свойства.\n\nИзделия представлены в двух цветах: чёрном и Olive Green. Увеличенная толщина ковриков может быть 12 или 15 мм. Крепление также доступно в двух вариантах: стандартное армейское (две прочные полипропиленовые ленты с быстрым затягиванием) и улучшенное крепление с дополнительной ручкой для удобного переноса или крепления к рюкзаку.\n\nНесмотря на большие габариты и вес по сравнению с компактными моделями, эти коврики значительно повышают комфорт при длительном пребывании человека в полевых условиях.",
     specifications: {
@@ -349,7 +391,7 @@ export const products: Product[] = [
     description:
       "The product is designed for sports training at home or fitness exercises in gyms. The mat consists of two layers of high-density colored foam polyethylene. The set includes two colorful fixing elastic bands that conveniently secure the mat in the rolled state.\n\nThe ArmY gymnastic mat will be an excellent helper for both children and adults during amateur workouts or active recreation.",
     descriptionUa:
-      "Виріб призначений для використання на спортивних тренуваннях вдома або при виконанні фітнес-вправ у спортивних залах. Килимок складається з двох різнокольорових шарів спіненого поліетилену підвищеної щільності. У комплекті є дві фіксуючі гумки барвистого кольору, які зручно фіксують виріб у згорнутому стані.\n\nСпортивний килимок ArmY стане у нагоді як дітям, так і дорослим під час аматорських тренувань або активного відпочинку.",
+      "Виріб призначений для використання на спортивних тренуваннях вдом�� або при виконанні фітнес-вправ у спортивних залах. Килимок складається з двох різнокольорових шарів спіненого поліетилену підвищеної щільності. У комплекті є дві фіксуючі гумки барвистого кольору, які зручно фіксують виріб у згорнутому стані.\n\nСпортивний килимок ArmY стане у нагоді як дітям, так і дорослим під час аматорських тренувань або активного відпочинку.",
     descriptionRu:
       "Изделие предназначено для использования на спортивных тренировках дома или при выполнении фитнес-упражнений в спортивных залах. Коврик состоит из двух разноцветных слоёв вспененного полиэтилена повышенной плотности. В комплекте имеются две цветные фиксирующие резинки, которые удобно фиксируют изделие в свернутом состоянии.\n\nСпортивный коврик ArmY станет отличным помощником как для детей, так и для взрослых при любительских тре��ировках или активном отдыхе.",
     specifications: {
@@ -599,7 +641,7 @@ export const products: Product[] = [
       "Фастекс": "30 мм, тёмно-зелёный",
       "Липкая лента": "25 мм, чёрная",
     },
-    images: SEAT_IMAGES,
+    images: SEAT_STANDARD_IMAGES,
     inStock: true,
     variants: [VARIANT_COVER_PIXEL_MULTICAM],
   },
@@ -642,11 +684,11 @@ export const products: Product[] = [
       "Материал чехла": "100% полиэстер",
       "Цвет": "Мультикам, Пиксель, тёмно-зелёный",
       "Лента": "Эластичная, тёмно-зелёная, 25 мм",
-      "Фастекс": "30 мм, тёмно-зелёный",
+      "Фастекс": "30 мм, ��ёмно-зелёный",
       "Рамка": "Полипропилен/полиамид, 25 мм, тёмно-зелёная",
       "Точки крепления": "2 дополнительные",
     },
-    images: SEAT_IMAGES,
+    images: SEAT_STANDARD_PLUS_IMAGES,
     inStock: true,
     variants: [VARIANT_COVER_PIXEL_MULTICAM],
   },
@@ -665,7 +707,7 @@ export const products: Product[] = [
     descriptionUa:
       "Даний виріб є покращеною моделлю стандартного польового сидіння завдяки збільшеній товщині, більшій площі покриття, вищій щільності та посиленій системі кріплення. Сидіння має захисні шари ламінації з двох сторін, що значно підвищує його експлуатаційні властивості. Такий виріб стане у пригоді при тривалому перебуванні в польових умовах туристичного походу або при виконанні професійних завдань просто неба.",
     descriptionRu:
-      "Данное изделие является улучшенной моделью стандартного полевого сиденья за счёт увеличенной толщины, большей площади покрытия, повышенной плотности и усиленной системы крепления. Сиденье имеет защитные слои ламинации с двух сторон, что значительно повышает его эксплуатационные свойства. Такое изделие станет отличным помощником при длительном пребывании в полевых условиях туристического похода или при выполнении профессиональных задач под открытым небом.",
+      "Данное изделие является улучшенной моделью стандартного полевого сиденья за счёт увеличенной толщины, большей площади покрытия, повышенной плотности и усиленной системы крепления. Сиденье имеет защитные слои ламинации с двух сторон, что значительно повышает его эксплуатационные свойства. Т��кое изделие станет отличным помощником при длительном пребывании в полевых условиях туристического похода или при выполнении профессиональных задач под открытым небом.",
     specifications: {
       "Size": "300×400×12 mm",
       "Color": "Olive Green",
@@ -690,7 +732,7 @@ export const products: Product[] = [
       "Пружинность": "25 параллельных силиконовых резинок",
       "Фастекс": "20–30 мм, тёмно-зелёный",
     },
-    images: SEAT_IMAGES,
+    images: SEAT_INSULATED_IMAGES,
     inStock: true,
   },
 
@@ -733,7 +775,7 @@ export const products: Product[] = [
       "Пружинность": "25 параллельных силиконовых резинок",
       "Фастекс": "20–30 мм, чёрный",
     },
-    images: SEAT_IMAGES,
+    images: SEAT_INSULATED_L1_IMAGES,
     inStock: true,
   },
 
@@ -776,7 +818,7 @@ export const products: Product[] = [
       "Пружинность": "24 параллельные силиконовые резинки",
       "Фастекс": "30 мм, тёмно-зелёный",
     },
-    images: SEAT_IMAGES,
+    images: SEAT_INSULATED_L2_IMAGES,
     inStock: true,
   },
 ]
