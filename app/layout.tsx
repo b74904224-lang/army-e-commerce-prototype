@@ -35,22 +35,13 @@ export const metadata: Metadata = {
       'Каремати, спальні мішки, польові сидіння та розкладні матраци армійського класу.',
   },
   icons: {
-    icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
-    ],
-    apple: '/apple-icon.png',
-  },
+  icon: [
+    { url: '/favicon.ico?v=army3' },
+    { url: '/icon.png?v=army3', type: 'image/png' },
+  ],
+  shortcut: '/favicon.ico?v=army3',
+  apple: '/apple-icon.png?v=army3',
+},
 }
 
 export default function RootLayout({
