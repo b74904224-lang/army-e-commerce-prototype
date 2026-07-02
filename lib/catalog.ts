@@ -131,7 +131,16 @@ const REAL_GYM_MAT_L0 = REAL("gym-mat-l0", 4)
 const REAL_FOLDING_MAT_COVER = REAL("folding-mat-cover", 3)
 const REAL_FIELD_FOLDING_MATTRESS = REAL("field-folding-mattress", 4)
 const REAL_FIELD_SEAT_2X = REAL("field-seat-2x-folding", 4)
-const REAL_FIELD_SEAT_MOLLE = REAL("field-seat-molle", 2)
+// MOLLE seat: gallery-1.webp (the seat on grass with the MOLLE attachment
+// straps/buckles clearly visible) is promoted to the primary/preview image, so
+// it is the catalog card image, the default image on the product page, and the
+// first thumbnail. The original main.webp and gallery-2.webp follow it, keeping
+// the gallery intact. Reorder only — no files renamed and no quality change.
+const REAL_FIELD_SEAT_MOLLE = [
+  "/images/products-real/field-seat-molle/gallery-1.webp",
+  "/images/products-real/field-seat-molle/main.webp",
+  "/images/products-real/field-seat-molle/gallery-2.webp",
+]
 
 /* ------------------------ Per-variant photo galleries ------------------------ */
 // Dedicated, color/cover-specific photo sets for the "Каремати рулонні Army"
