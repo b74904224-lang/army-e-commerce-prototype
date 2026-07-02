@@ -160,6 +160,55 @@ const VG_L0_TOURIST_BLACK = VG("army-l0-tourist", "black", [
   "photo-00133.jpg",
 ])
 
+/* --------------------------- Field seat real photos --------------------------- */
+// Real studio photos for the four "Сидіння польові Army" field-seat products.
+// Files live flat under public/images/products-real/<folder>/ as preview-*.webp
+// (main/preview image) + gallery-*.webp. The `preview-*` file is always first so
+// it stays the card/cart/checkout image.
+const FS = (folder: string, file: string): string => `/images/products-real/${folder}/${file}`
+
+// Field seat standard+ — cover options Піксель / Мультикам.
+// preview-00057 shows both covers together (used as the default/card image).
+// Single-cover shots: 00051/00052 = Pixel, 00053/00055 = Multicam.
+const FS_STD_PLUS_DIR = "field-seat-standard-plus"
+const FS_STD_PLUS_PIXEL = ["gallery-00052.webp", "gallery-00051.webp"].map((f) => FS(FS_STD_PLUS_DIR, f))
+const FS_STD_PLUS_MULTICAM = ["gallery-00053.webp", "gallery-00055.webp"].map((f) => FS(FS_STD_PLUS_DIR, f))
+const FS_STD_PLUS_IMAGES = [
+  FS(FS_STD_PLUS_DIR, "preview-00057.webp"),
+  ...FS_STD_PLUS_PIXEL,
+  ...FS_STD_PLUS_MULTICAM,
+]
+
+// Field seat standard — cover options Піксель / Мультикам.
+// preview-00062 and gallery-00058 show both covers together (default/card image).
+// Single-cover shots: 00059/00060 = Pixel, 00061 = Multicam.
+const FS_STD_DIR = "field-seat-standard"
+const FS_STD_PIXEL = ["gallery-00059.webp", "gallery-00060.webp"].map((f) => FS(FS_STD_DIR, f))
+const FS_STD_MULTICAM = ["gallery-00061.webp"].map((f) => FS(FS_STD_DIR, f))
+const FS_STD_IMAGES = [
+  FS(FS_STD_DIR, "preview-00062.webp"),
+  FS(FS_STD_DIR, "gallery-00058.webp"),
+  ...FS_STD_PIXEL,
+  ...FS_STD_MULTICAM,
+]
+
+// Field seat insulated Army — single colorway (Olive Green), no cover choice.
+const FS_INSULATED_IMAGES = [
+  "preview-00256.webp",
+  "gallery-00257.webp",
+  "gallery-00140.webp",
+  "gallery-00064.webp",
+  "gallery-00063.webp",
+].map((f) => FS("field-seat-insulated", f))
+
+// Field seat insulated Army L1 — single colorway (Black), no cover choice.
+const FS_INSULATED_L1_IMAGES = [
+  "preview-00001122.webp",
+  "gallery-00141.webp",
+  "gallery-00066.webp",
+  "gallery-00065.webp",
+].map((f) => FS("field-seat-insulated-l1", f))
+
 /* --------------------------- Variant definitions --------------------------- */
 // Reusable variant groups shared by several products. Option ids are stable and
 // language-independent so they can be safely persisted in cart/orders.
@@ -345,7 +394,7 @@ export const products: Product[] = [
     descriptionUa:
       "Товарний асортимент спальних польових ізоляційних килимів Army L1 має широку варіацію за кольором, товщиною та видом кріплення. Усі вироби цього асортименту мають захисну ламіновану поверхню, що суттєво підвищує їх експлуатаційні властивості.\n\nВироби представлені у двох кольорах: Чорному та Olive Green. Збільшена товщина килимів може бути 12 або 15 мм. Кріплення також доступне у двох варіантах: стандартне армійське та покращене тактичне кріплення з додатковою ручкою для зручного перенесення або кріплення до рюкзака чи тулуба.\n\nНезважаючи на більші габарити та вагу, ці килими значно покращують комфорт при тривалому перебуванні людини в польових умовах.",
     descriptionRu:
-      "Товарный ассортимент спальных полевых изоляционных ко��риков Army L1 отличается широким выбором по цвету, толщине и типу крепления. Все изделия данной линейки имеют защитную ламинированную поверхность, что существенно повышает их эксплуатационные свойства.\n\nИзделия представлены в двух цветах: чёрном и Olive Green. Увеличенная толщина ковриков может быть 12 или 15 мм. Крепление также доступно в двух вариантах: стандартное армейское и улучшенное тактическое крепление с дополнительной ручкой для удобного переноса или крепления к рюкзаку или телу.\n\nНесмотря на большие габариты и вес, эти коврики значительно повышают комфорт при д��ительном пребывании человека в полевых условиях.",
+      "Товарный ассортимент спальных полевых изо��яционных ко��риков Army L1 отличается широким выбором по цвету, толщине и типу крепления. Все изделия данной линейки имеют защитную ламинированную поверхность, что существенно повышает их эксплуатационные свойства.\n\nИзделия представлены в двух цветах: чёрном и Olive Green. Увеличенная толщина ковриков может быть 12 или 15 мм. Крепление также доступно в двух вариантах: стандартное армейское и улучшенное тактическое крепление с дополнительной ручкой для удобного переноса или крепления к рюкзаку или телу.\n\nНесмотря на большие габариты и вес, эти коврики значительно повышают комфорт при д��ительном пребывании человека в полевых условиях.",
     specifications: {
       "Size": "1900×600×12/15 mm",
       "Color": "Black / Olive Green",
@@ -713,10 +762,17 @@ export const products: Product[] = [
       "Фастекс": "30 мм, тёмно-зелёный",
       "Липкая лента": "25 мм, чёрная",
     },
-    images: SEAT_IMAGES,
+    images: FS_STD_IMAGES,
     inStock: true,
     // Name lists cover options "Піксель, Мультикам" → selectable cover.
     variants: [VARIANT_COVER_PIXEL_MULTICAM],
+    // Cover-specific galleries: Піксель shows only pixel shots, Мультикам only
+    // multicam shots. The default images (with the "both covers" photos) stay for
+    // cards/cart. Main image + thumbnails switch (and reset) on cover change.
+    variantImages: {
+      pixel: FS_STD_PIXEL,
+      multicam: FS_STD_MULTICAM,
+    },
   },
 
   // 11 — Field seat standard+ (field-seats)
@@ -761,10 +817,17 @@ export const products: Product[] = [
       "Рамка": "Полипропилен/полиамид, 25 ��м, тёмно-зелёная",
       "Точки крепления": "2 дополнительные",
     },
-    images: SEAT_IMAGES,
+    images: FS_STD_PLUS_IMAGES,
     inStock: true,
     // Name lists cover options "Піксель, Мультикам" → selectable cover.
     variants: [VARIANT_COVER_PIXEL_MULTICAM],
+    // Cover-specific galleries: Піксель shows only pixel shots, Мультикам only
+    // multicam shots. preview-00057 (both covers) stays as the default/card image.
+    // Main image + thumbnails switch (and reset) on cover change.
+    variantImages: {
+      pixel: FS_STD_PLUS_PIXEL,
+      multicam: FS_STD_PLUS_MULTICAM,
+    },
   },
 
   // 12 — Insulated field seat (field-seats)
@@ -793,7 +856,7 @@ export const products: Product[] = [
     specificationsUa: {
       "Розмір": "300×400×12 мм",
       "Колір": "Olive Green",
-      "Поверхня": "Ламінована з двох сторін",
+      "Поверхня": "Ламінована з двох ст��рін",
       "Стрічка": "Еластична поліамідна, темно-зелена, 25 мм, товщина 1,8–2 мм, щільність 22 г/м.п.",
       "Пружність": "25 паралельних силіконових гумок",
       "Фастекс": "20–30 мм, темно-зелений",
@@ -806,7 +869,7 @@ export const products: Product[] = [
       "Пружинность": "25 параллельных силиконовых резинок",
       "Фастекс": "20–30 мм, тёмно-зелёный",
     },
-    images: SEAT_IMAGES,
+    images: FS_INSULATED_IMAGES,
     inStock: true,
   },
 
@@ -849,7 +912,7 @@ export const products: Product[] = [
       "Пружинность": "25 параллельных силиконовых резинок",
       "Фастекс": "20–30 мм, чёрный",
     },
-    images: SEAT_IMAGES,
+    images: FS_INSULATED_L1_IMAGES,
     inStock: true,
   },
 
@@ -865,7 +928,7 @@ export const products: Product[] = [
     description:
       "This product is an improved version of the standard field seat due to increased thickness, a more ergonomic shape and a reinforced attachment system. The seat has enhanced protective lamination layers on both sides. The attachment uses a 30 mm wide polyamide elastic strap, which increases elasticity and adherence to the body. The corners are rounded to prevent snagging, and the increased thickness of 20–25 mm reliably protects the body from uneven and hard surfaces. A great helper during long stays in field conditions on hiking trips or when performing professional tasks outdoors.",
     descriptionUa:
-      "Виріб є покращеною моделлю стандартного польового сидіння завдяки збільшеній товщині, більш зручній формі та посиленій системі кріплення. Сидіння має збільшені захисні шари ламінації з двох сторін. У кріпленні використовується поліамідна еластична стрічка шириною 30 мм, завдяки чому збільшується пружність та сила прилягання виробу до тулуба людини. Кути виробу зроблені більш округлими, щоб не чіплятися за інші предмети, а збільшена товщина до 20–25 мм надійно захищає тіло від будь-якої нерівної та жорсткої поверхні. Такий виріб стане у пригоді при тривалому перебуванні в польових умовах туристичного походу або при виконанні професійних завдань просто неба.",
+      "Виріб є покращеною моделлю стандартного польового сидіння завдяки збільшеній товщині, більш зручній формі та посиленій системі кріплення. Сидіння має збільшені захисні шари ламінації з двох сторін. У кріпленні використовується поліамідна еластична стрічка шириною 30 мм, завдяки чому збільшується пружність та сила прилягання виробу до тулуба людини. Кути виробу зроблені більш округлими, щоб не чіплятися за інші предмети, а збільшена товщина до 20–25 мм надійно захищає тіло від будь-якої нерівної та жорсткої поверхні. Такий виріб стане у пригоді ��ри тривалому перебуванні в польових умовах туристичного походу або при виконанні професійних завдань просто неба.",
     descriptionRu:
       "Изделие является улучшенной моделью стандартного полевого сиденья за счёт увеличенной толщины, более удобной формы и усиленной системы крепления. Сиденье имеет увеличенные защитные слои ламинации с двух сторон. В креплении используется полиамидная эластичная лента шириной 30 мм, благодаря чему увеличивается упругость и сила прилегания изделия к телу человека. Углы изделия сделаны более округлыми, чтобы не цеплялись за другие предметы, а увеличенная толщина до 20–25 мм надёжно защищает тело от любой неровной и жёсткой поверхности. Такое изделие станет отличным помощником при длительном пребывании в полевых условиях туристического похода или при выполнении профессиональных задач под открытым небом.",
     specifications: {
