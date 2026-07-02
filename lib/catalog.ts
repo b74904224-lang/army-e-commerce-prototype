@@ -203,11 +203,11 @@ const FS_STD_IMAGES = [
 
 // Field seat insulated Army — single colorway (Olive Green), no cover choice.
 const FS_INSULATED_IMAGES = [
-  // Only the good Olive Green photos remain; the earlier primary grass shot
-  // (preview-00256) and the two white/studio shots (gallery-00064 / 00063)
-  // were removed at the client's request. gallery-00140 (strap + fastex) is
-  // now the primary; gallery-00257 (back side / strap) follows it.
-  "gallery-00140.webp",
+  // Exact client-specified gallery for the insulated Olive Green seat: exactly
+  // two photos, preview-00256 as the primary/preview/default and gallery-00257
+  // second. gallery-00140 (bright green grass) and the white/studio shots
+  // (gallery-00064 / 00063) are intentionally not referenced by this product.
+  "preview-00256.webp",
   "gallery-00257.webp",
 ].map((f) => FS("field-seat-insulated", f))
 
