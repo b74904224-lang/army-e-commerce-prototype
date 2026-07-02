@@ -167,11 +167,10 @@ const SEAT_STANDARD_PLUS_IMAGES = FS_SEAT("field-seat-standard-plus", [
   "gallery-00055.webp",
 ])
 const SEAT_INSULATED_IMAGES = FS_SEAT("field-seat-insulated", [
-  "preview-00256.webp",
+  // Only the good Olive Green photos remain; primary grass shot preview-00256
+  // and the two white/studio shots (gallery-00064 / 00063) were removed.
   "gallery-00257.webp",
   "gallery-00140.webp",
-  "gallery-00064.webp",
-  "gallery-00063.webp",
 ])
 const SEAT_INSULATED_L1_IMAGES = FS_SEAT("field-seat-insulated-l1", [
   "preview-00001122.webp",
