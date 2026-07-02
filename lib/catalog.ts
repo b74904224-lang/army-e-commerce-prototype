@@ -205,9 +205,10 @@ const FS_STD_IMAGES = [
 const FS_INSULATED_IMAGES = [
   // Only the good Olive Green photos remain; the earlier primary grass shot
   // (preview-00256) and the two white/studio shots (gallery-00064 / 00063)
-  // were removed at the client's request. gallery-00257 is now the primary.
-  "gallery-00257.webp",
+  // were removed at the client's request. gallery-00140 (strap + fastex) is
+  // now the primary; gallery-00257 (back side / strap) follows it.
   "gallery-00140.webp",
+  "gallery-00257.webp",
 ].map((f) => FS("field-seat-insulated", f))
 
 // Field seat insulated Army L1 — single colorway (Black), no cover choice.
